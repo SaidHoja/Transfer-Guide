@@ -1,6 +1,10 @@
-# Django Practice Assessment
+# Transfer Guide Team B-23
 
-__Name:__
+Names: 
+Suhayla Ahmed (sia3yd) - Scrum Master
+Emily Chang (ec5ug) - Testing
+Dagim Tekle (ddt8ee) - UI
+Saidamir Umarkhodjaev (fyg6db) - Dev Ops 
+yannie wu (ylw4sj) - Requirements
 
-__Computing ID:__
 

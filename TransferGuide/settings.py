@@ -76,11 +76,14 @@ WSGI_APPLICATION = 'TransferGuide.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'd70vntclhg0vi7',
+        'HOST': 'ec2-52-201-124-168.compute-1.amazonaws.com',
+        'PORT': 5432,
+        'USER': 'axumnhpcbjblmq',
+        'PASSWORD': 'fd81ef6d6345b04d9da5da0455027102255b641f50727687dbe6b193e5dafe67'
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -128,8 +131,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Use this code to avoid the psycopg2 / django-heroku error!
 # Do NOT import django-heroku above!
 #try:
-#    if 'HEROKU' in os.environ:
-#        import django_heroku
-#        django_heroku.settings(locals())
-#except ImportError:
-#    found = False
+try:
+    if 'HEROKU' in os.environ:
+        import django_heroku
+        django_heroku.settings(locals())
+except ImportError:
+    found = False
