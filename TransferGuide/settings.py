@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-veg1+qf#rveochi)n4)d+9qzux^1f8j@5=ohxi+)=k8!$n+-o6
 DEBUG = True
 
 ALLOWED_HOSTS = ['0.0.0.0', 'transfer-guide-b-23.herokuapp.com',
-                 'localhost', '127.0.0.1']
+                 '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
@@ -160,7 +160,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SITE_ID = 2
+SITE_ID = 0
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
