@@ -29,6 +29,7 @@ ALLOWED_HOSTS = ['0.0.0.0', 'transfer-guide-b-23.herokuapp.com',
 # Application definition
 
 INSTALLED_APPS = [
+    'TransferGuide.apps.TransferGuideConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'bootstrap5'
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,20 @@
+<h1 class = "text-center">List of course requests.</h1>
+
+<body>
+    <!-- List of course requests -->
+    {% if allCourseRequests %}
+        <ul>
+        {% for course in allCourseRequests %}
+        {{course.course_institution}}
+        <li> <b>{{course.course_name}} </b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ course.course_number}}</li>
+    	<pre>
+    		{{course.course_url}}
+    		{{course.course_description}}
+    	</pre>
+        {% endfor %} 
+        </ul>
+    {% else %}
+        <p>There are no course requests.</p>
+    {% endif %}
+
+</body>
