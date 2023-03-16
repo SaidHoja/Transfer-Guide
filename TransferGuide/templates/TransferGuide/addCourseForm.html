@@ -1,0 +1,12 @@
+{% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
+{% bootstrap_javascript %}
+
+<h1 class = "text-center">Request a course for credit.</h1>
+
+<!--Submission form-->
+<form action="" method="post" class = "form-center">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
