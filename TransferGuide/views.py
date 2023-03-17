@@ -5,7 +5,7 @@ from django.views import generic
 from django.utils import timezone
 
 from .forms import addCourseForm 
-# from .models import Course
+from .models import Course
 
 def addCourse(request):
     if request.method == 'POST':
@@ -18,8 +18,8 @@ def addCourse(request):
                 course_url = form.cleaned_data['course_url']
                 course_description = form.cleaned_data['course_description']
                 course_institution = form.cleaned_data['course_institution']
-                # c = Course(name=username,course_name=course_name, course_number=course_number, course_url=course_url, course_description=course_description, course_institution=course_institution)
-                # c.save()
+                c = Course(username=username,course_name=course_name, course_number=course_number, course_url=course_url, course_description=course_description, course_institution=course_institution)
+                c.save()
             return HttpResponseRedirect(reverse('addCourseList'))
     form = addCourseForm()
     return render(request, 'TransferGuide/addCourseForm.html', {'form': form})
