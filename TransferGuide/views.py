@@ -22,7 +22,7 @@ def addCourse(request):
                 c = Course(username=username,course_institution=course_institution,course_name=course_name,
                            course_dept_num=course_dept_num,course_grade=course_grade)
                 c.save()
-            return HttpResponseRedirect(reverse('addCourseList'))
+            return HttpResponseRedirect(reverse('tryAgain'))
     form = addCourseForm()
     return render(request, 'TransferGuide/addCourseForm.html', {'form': form})
 
@@ -30,3 +30,6 @@ def addCourse(request):
 def addCourseList(request):
     allCourseRequests = Course.objects #.order_by('-pub_date')
     return render(request, 'TransferGuide/addCourseList.html', {'allCourseRequests': allCourseRequests.all(), })
+
+def tryAgain(request):
+    return render(request, 'TransferGuide/tryAgain.html')
