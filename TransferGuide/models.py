@@ -16,4 +16,9 @@ class Course(models.Model):
         return self.course_description
         return self.course_institution
 
+class Comment(models.Model):
+    title = models.CharField(max_length=200)
+    comment_text =models.CharField(max_length=200)
+    def __str__(self):
+        return self.title + ": " + self.comment_text
 
