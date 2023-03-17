@@ -6,17 +6,12 @@ from oauth_app.models import UserType
 
 class Course(models.Model):
     username = models.CharField(max_length=100, null=True, blank=True)
-    course_name = models.CharField(max_length = 100)
-    course_number = models.CharField(max_length = 5)
-    course_url = models.CharField(max_length = 200)
-    course_description = models.CharField(max_length = 500)
-    course_institution = models.CharField(max_length = 100)
+    course_institution = models.CharField(max_length=100, null=True, blank=True)
+    course_name = models.CharField(max_length=100, null=True, blank=True)
+    course_dept_num = models.CharField(max_length=100, null=True, blank=True)
+    course_grade = models.CharField(max_length=1, null=True, blank=True)
     def __str__(self):
-        return self.course_name
-        return self.course_number
-        return self.course_url
-        return self.course_description
-        return self.course_institution
+        return str(self.username) + " " + str(self.course_name)
 
 class Comment(models.Model):
     title = models.CharField(max_length=200)
