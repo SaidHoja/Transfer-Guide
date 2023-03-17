@@ -27,5 +27,6 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('logout', LogoutView.as_view()),
     path('addCourse/', views.addCourse, name='addCourse'),
+    path('tryAgain/', views.tryAgain, name="tryAgain"),
     path('addCourse/list', views.addCourseList, name='addCourseList'),
 ]
