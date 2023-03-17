@@ -29,6 +29,7 @@ ALLOWED_HOSTS = ['0.0.0.0', 'transfer-guide-b-23.herokuapp.com',
 # Application definition
 
 INSTALLED_APPS = [
+    'TransferGuide.apps.TransferGuideConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'bootstrap5'
 ]
 
 MIDDLEWARE = [
@@ -77,7 +79,6 @@ WSGI_APPLICATION = 'TransferGuide.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -85,7 +86,10 @@ DATABASES = {
         'HOST': 'ec2-52-201-124-168.compute-1.amazonaws.com',
         'PORT': 5432,
         'USER': 'axumnhpcbjblmq',
-        'PASSWORD': 'fd81ef6d6345b04d9da5da0455027102255b641f50727687dbe6b193e5dafe67'
+        'PASSWORD': 'fd81ef6d6345b04d9da5da0455027102255b641f50727687dbe6b193e5dafe67',
+        'TEST': {
+            'NAME': 'd70vntclhg0vi7'
+        }
     }
 }
 
