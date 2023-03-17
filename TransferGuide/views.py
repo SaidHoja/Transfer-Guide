@@ -13,12 +13,14 @@ def addCourse(request):
         if form.is_valid():
             if request.user.is_authenticated:
                 username = request.user.username
-                course_name = form.cleaned_data['course_name']
-                course_number = form.cleaned_data['course_number']
-                course_url = form.cleaned_data['course_url']
-                course_description = form.cleaned_data['course_description']
                 course_institution = form.cleaned_data['course_institution']
-                c = Course(username=username,course_name=course_name, course_number=course_number, course_url=course_url, course_description=course_description, course_institution=course_institution)
+                course_name = form.cleaned_data['course_name']
+                course_dept = form.cleaned_data['course_dept']
+                course_number = form.cleaned_data['course_number']
+                course_grade = form.cleaned_data['course_grade']
+                course_dept_num = course_dept + " " + course_number
+                c = Course(username=username,course_institution=course_institution,course_name=course_name,
+                           course_dept_num=course_dept_num,course_grade=course_grade)
                 c.save()
             return HttpResponseRedirect(reverse('addCourseList'))
     form = addCourseForm()
