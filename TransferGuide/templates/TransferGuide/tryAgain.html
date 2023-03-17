@@ -6,5 +6,9 @@
         <h4>Comment submitted</h4>
         <h3>Would you like to try again?</h3>
         <button type="submit"><a href="/addCourse" style="text-decoration:none;color:black">Yes, I want to add more classes</a></button>
+        <form action="{% url 'addCourseList' %}" method="POST">
+            {% csrf_token %}
+            <button type="submit">No, I want to see my results</button>
+        </form>
     </body>
 </html>
