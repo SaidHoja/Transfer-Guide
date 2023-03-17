@@ -5,19 +5,21 @@ from django.views import generic
 from django.utils import timezone
 
 from .forms import addCourseForm 
-# from .models import Course
+from .models import Course
 
 def addCourse(request):
     if request.method == 'POST':
         form = addCourseForm(request.POST)
         if form.is_valid():
-            course_name = form.cleaned_data['course_name']
-            course_number = form.cleaned_data['course_number']
-            course_url = form.cleaned_data['course_url']
-            course_description = form.cleaned_data['course_description']
-            course_institution = form.cleaned_data['course_institution']
-            # c = Course(course_name=course_name, course_number=course_number, course_url=course_url, course_description=course_description, course_institution=course_institution)
-            # c.save()
+            if request.user.is_authenticated:
+                username = request.user.username
+                course_name = form.cleaned_data['course_name']
+                course_number = form.cleaned_data['course_number']
+                course_url = form.cleaned_data['course_url']
+                course_description = form.cleaned_data['course_description']
+                course_institution = form.cleaned_data['course_institution']
+                c = Course(name=username,course_name=course_name, course_number=course_number, course_url=course_url, course_description=course_description, course_institution=course_institution)
+                c.save()
             return HttpResponseRedirect(reverse('addCourseList'))
     form = addCourseForm()
     return render(request, 'TransferGuide/addCourseForm.html', {'form': form})

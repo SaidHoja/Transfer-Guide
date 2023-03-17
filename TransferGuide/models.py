@@ -2,14 +2,17 @@
 
 from django.contrib import admin
 from django.db import models
+from oauth_app.models import UserType
 
 class Course(models.Model):
+    name = models.CharField(max_length = 100, null=True)
     course_name = models.CharField(max_length = 100)
-    course_number = models.CharField(max_length = 100)
+    course_number = models.CharField(max_length = 5)
     course_url = models.CharField(max_length = 200)
     course_description = models.CharField(max_length = 500)
     course_institution = models.CharField(max_length = 100)
     def __str__(self):
+        return self.name
         return self.course_name
         return self.course_number
         return self.course_url
