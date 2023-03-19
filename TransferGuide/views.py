@@ -44,7 +44,7 @@ def SISFormHandler(request):
     if (request.method=="POST"):
         form = sisForm(request.POST)
         if form.is_valid():
-            term = "1" + str(form.cleaned_data['year']) + str(form.cleaned_data['term'])
+            term = "1" + str(form.cleaned_data['year'][-2:]) + str(form.cleaned_data['term'])
             instructor = "None"
             subject = "None"
             if (form.cleaned_data['instructor']!=""):
