@@ -1,0 +1,8 @@
+{% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
+{% bootstrap_javascript %}
+<h1 class = "text-center">Class Search Criteria</h1>
+
+<form action="" method="POST" class = "form-center">{% csrf_token %}
+    {% bootstrap_form form %}
+    <button type="submit">Submit</button>
+</form>

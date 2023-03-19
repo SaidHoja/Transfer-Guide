@@ -1,0 +1,10 @@
+<h1 class = "text-center">Search Result</h1>
+{% for key, value in renderdict.items %}
+    <h1>{{ key }}</h1>
+
+    {% for k, v in value.items %}
+      <h1>{{ k }}</h1>
+      <h1 > {{ v }}</h1>
+    {% endfor %}
+
+{% endfor %}
