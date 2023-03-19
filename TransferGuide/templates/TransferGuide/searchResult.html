@@ -1,0 +1,21 @@
+<h1 class = "text-center">Search Result</h1>
+
+<table class = "table">
+    <tr>
+        {% for header in field.headers %}
+            <th>{{ header }}</th>
+        {% endfor %}
+
+    </tr>
+
+
+    {% for value in field.rows %}
+        <tr>
+        {% for item in value %}
+            <td>{{ item }}</td>
+        {% endfor %}
+
+        </tr>
+    {% endfor %}
+
+</table>
