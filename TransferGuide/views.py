@@ -1,12 +1,13 @@
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
-
-from .forms import addCourseForm 
+import json, requests
+from .forms import addCourseForm, sisForm
 from .models import Course
 
+# Adding Courses by the Student
 def addCourse(request):
     if request.method == 'POST':
         form = addCourseForm(request.POST)
@@ -33,3 +34,36 @@ def addCourseList(request):
 
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')
+
+# Using the SIS API
+api_default_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01"
+
+
+def SISFormHandler(request):
+    form = sisForm()
+    if (request.method=="POST"):
+        form = sisForm(request.POST)
+        if form.is_valid():
+            term = "1" + str(form.cleaned_data['year']) + str(form.cleaned_data['term'])
+            instructor = "None"
+            subject = "None"
+            if (form.cleaned_data['instructor']!=""):
+                instructor = str(form.cleaned_data['instructor'])
+            if (form.cleaned_data['subject']!=""):
+                subject = str(form.cleaned_data['subject'])
+
+            return redirect('apiResult',term=term,instructor=instructor,subject=subject )
+    return render(request,'TransferGuide/sisForm.html', context = {'form':form})
+
+def apiResult(request, term,instructor, subject):
+    url = api_default_url + "&term=" + term
+    if (instructor!="None"):
+        url+= "&instructor=" + instructor
+    if (subject!="None"):
+        url+= "&subject=" +subject
+    print(url)
+    result = requests.get(url)
+    resultDict = result.json()
+    textDict = {'a': [ [1, 2] ], 'b': [ [3, 4] ],'c':[ [5,6]] }
+    return render(request,'TransferGuide/searchResult.html', {'renderdict': textDict})
+
