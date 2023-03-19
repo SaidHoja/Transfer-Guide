@@ -55,15 +55,31 @@ def SISFormHandler(request):
             return redirect('apiResult',term=term,instructor=instructor,subject=subject )
     return render(request,'TransferGuide/sisForm.html', context = {'form':form})
 
-def apiResult(request, term,instructor, subject):
+def generateURL(term,instructor,subject):
     url = api_default_url + "&term=" + term
-    if (instructor!="None"):
-        url+= "&instructor=" + instructor
-    if (subject!="None"):
-        url+= "&subject=" +subject
-    print(url)
+    if (instructor != "None"):
+        url += "&instructor=" + instructor
+    if (subject != "None"):
+        url += "&subject=" + subject
+    return url
+def apiResult(request, term,instructor, subject):
+    url = generateURL(term,instructor,subject)
+
     result = requests.get(url)
     resultDict = result.json()
-    textDict = {'a': [ [1, 2] ], 'b': [ [3, 4] ],'c':[ [5,6]] }
-    return render(request,'TransferGuide/searchResult.html', {'renderdict': textDict})
+    print(resultDict)
+    display = {'headers' : ['acad_group','subject_descr','descr','units'],
+              'rows': []}
+    i=-1
+    rows = []
+    for c in resultDict:
+        rows.append([])
+        i+=1
+        for item in display.get('headers'):
+            rows[i].append(c[item])
+    for elem in rows:
+        if (elem not in display.get('rows')):
+            display.get('rows').append(elem)
+    display['headers']= ['School','Subject', 'Course Title', 'Credits' ]
+    return render(request,'TransferGuide/searchResult.html', {'field': display})
 
