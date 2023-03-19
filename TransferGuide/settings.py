@@ -164,7 +164,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 # heroku id == 0
 # local id == 1
-SITE_ID = 0
+SITE_ID = 1
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
