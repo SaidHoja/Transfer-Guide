@@ -1,7 +1,9 @@
+
 {% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
 {% bootstrap_javascript %}
 <html>
 <h1 class = "text-center">Search Result</h1>
+<button type="submit"><a href="/accounts/login" style="text-decoration:none;color:black">Back</a></button>
 <body>
 <style>
 .center {
@@ -17,6 +19,9 @@
                 <th>{{ header }}</th>
             {% endfor %}
 
+<h1 class = "text-center">Search Results</h1>
+
+
         </tr>
     </thead>
 
@@ -29,7 +34,9 @@
 
         </tr>
     {% endfor %}
+
     </tbody>
 </table>
 </body>
 </html>
+
