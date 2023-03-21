@@ -31,6 +31,7 @@ urlpatterns = [
     path('addCourse/list', views.addCourseList, name='addCourseList'),
     path('sisRequest', views.SISFormHandler, name = 'sisFormHandler'),
     path('sisRequest/<str:term>/<str:instructor>/<str:subject>/', views.apiResult, name='apiResult'),
+    path('adminApproval',views.adminApproveCourses, name = 'adminApproveCourses'),
 
 
 ]
