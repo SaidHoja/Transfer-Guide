@@ -13,7 +13,7 @@ def addCourse(request):
         form = addCourseForm(request.POST)
         if form.is_valid():
             if request.user.is_authenticated:
-                username = request.user.username
+                username = request.user
                 course_institution = form.cleaned_data['course_institution']
                 course_name = form.cleaned_data['course_name']
                 course_dept = form.cleaned_data['course_dept']
@@ -29,8 +29,8 @@ def addCourse(request):
 
 
 def addCourseList(request):
-    allCourseRequests = Course.objects #.order_by('-pub_date')
-    return render(request, 'TransferGuide/addCourseList.html', {'allCourseRequests': allCourseRequests.all(), })
+    allCourseRequests = Course.objects.all().filter(username=request.user) #.order_by('-pub_date')
+    return render(request, 'TransferGuide/addCourseList.html', {'allCourseRequests': allCourseRequests, })
 
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')
@@ -82,4 +82,6 @@ def apiResult(request, term,instructor, subject):
             display.get('rows').append(elem)
     display['headers']= ['School','Subject', 'Course Title', 'Credits' ]
     return render(request,'TransferGuide/searchResult.html', {'field': display})
+
+#def adminApproveCourses:
 

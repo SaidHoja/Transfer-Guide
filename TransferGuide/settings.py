@@ -162,8 +162,8 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
-# heroku id == 0
-# local id == 1
+# heroku id == 1
+# local id == 0
 SITE_ID = 1
 
 LOGIN_REDIRECT_URL = '/'
