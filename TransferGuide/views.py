@@ -69,7 +69,7 @@ def apiResult(request, term,instructor, subject):
 
     result = requests.get(url)
     resultDict = result.json()
-    print(resultDict)
+    #print(resultDict)
     display = {'headers' : ['acad_group','subject_descr','descr','units'],
               'rows': []}
     i=-1

@@ -1,14 +1,26 @@
+{% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
+{% bootstrap_javascript %}
+<html>
 <h1 class = "text-center">Search Result</h1>
+<body>
+<style>
+.center {
+  margin: auto;
+  width: 60%;
+  padding: 10px;
+}
+</style>
+<table class = "table table-striped table-bordered center" >
+    <thead class = "thead-dark">
+        <tr>
+            {% for header in field.headers %}
+                <th>{{ header }}</th>
+            {% endfor %}
 
-<table class = "table">
-    <tr>
-        {% for header in field.headers %}
-            <th>{{ header }}</th>
-        {% endfor %}
+        </tr>
+    </thead>
 
-    </tr>
-
-
+    <tbody>
     {% for value in field.rows %}
         <tr>
         {% for item in value %}
@@ -17,5 +29,7 @@
 
         </tr>
     {% endfor %}
-
+    </tbody>
 </table>
+</body>
+</html>
