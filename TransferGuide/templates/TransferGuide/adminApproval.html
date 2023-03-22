@@ -1,0 +1,47 @@
+{% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
+{% bootstrap_javascript %}
+<style>
+.center {
+  margin: auto;
+  width: 60%;
+  padding: 10px;
+}
+</style>
+<div class="accordion center" id="courseAccordion" >
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="pendingHeading">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#pendingData" >
+        Pending Courses
+      </button>
+    </h2>
+    <div id="pendingData" class="accordion-collapse collapse" >
+      <div class="accordion-body">
+        <strong>PENDING COURSES HERE</strong>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="approvedHeading">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#approvedData">
+        Approved Courses
+      </button>
+    </h2>
+    <div id="approvedData" class="accordion-collapse collapse" >
+      <div class="accordion-body">
+        <strong>APPROVED COURSES HERE</strong>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="deniedHeading">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#deniedData">
+        Denied Courses
+      </button>
+    </h2>
+    <div id="deniedData" class="accordion-collapse collapse" >
+      <div class="accordion-body">
+          <strong>DENIED COURSES HERE</strong>
+      </div>
+    </div>
+  </div>
+</div>
