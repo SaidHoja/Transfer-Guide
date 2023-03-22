@@ -22,8 +22,9 @@ def addCourse(request):
                 course_number = form.cleaned_data['course_number']
                 course_grade = form.cleaned_data['course_grade']
                 course_dept_num = course_dept + " " + course_number
-                c = Course(username=username,course_institution=course_institution,course_name=course_name,
-                           course_dept_num=course_dept_num,course_grade=course_grade)
+                c = Course(username=username,course_institution=course_institution,
+                                          course_name=course_name,course_dept_num=course_dept_num,
+                                          course_grade=course_grade)
                 c.save()
             return HttpResponseRedirect(reverse('tryAgain'))
     form = addCourseForm()
@@ -31,16 +32,15 @@ def addCourse(request):
 
 
 def addCourseList(request):
-    username = request.user.username
+    username = request.user
     userCourses = Course.objects.filter(username=username)  # .order_by('-pub_date')
     return render(request, 'TransferGuide/addCourseList.html', {'allCourseRequests': userCourses.all(), })
-
+#
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')
 
 # Using the SIS API
 api_default_url = "https://sisuva.admin.virginia.edu/psc/ihprd/UVSS/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?institution=UVA01"
-
 
 def SISFormHandler(request):
     form = sisForm()
@@ -93,6 +93,4 @@ def adminApproveCourses(request):
         return redirect('errorNotAnAdmin')
     allCourseRequests = Course.objects.all()
     return render(request, 'TransferGuide/adminApproval.html')
-
-
 
