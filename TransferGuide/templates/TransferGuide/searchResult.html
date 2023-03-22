@@ -1,0 +1,42 @@
+
+{% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
+{% bootstrap_javascript %}
+<html>
+<h1 class = "text-center">Search Result</h1>
+<button type="submit"><a href="/accounts/login" style="text-decoration:none;color:black">Back</a></button>
+<body>
+<style>
+.center {
+  margin: auto;
+  width: 60%;
+  padding: 10px;
+}
+</style>
+<table class = "table table-striped table-bordered center" >
+    <thead class = "thead-dark">
+        <tr>
+            {% for header in field.headers %}
+                <th>{{ header }}</th>
+            {% endfor %}
+
+<h1 class = "text-center">Search Results</h1>
+
+
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for value in field.rows %}
+        <tr>
+        {% for item in value %}
+            <td>{{ item }}</td>
+        {% endfor %}
+
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+</body>
+</html>
+
