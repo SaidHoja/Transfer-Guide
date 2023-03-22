@@ -10,7 +10,7 @@ class Course(models.Model):
     course_name = models.CharField(max_length=100, null=True, blank=True)
     course_dept_num = models.CharField(max_length=100, null=True, blank=True)
     course_grade = models.CharField(max_length=1, null=True, blank=True)
-    approved = models.CharField(max_length=1,default="P")
+    status = models.CharField(max_length=1,default="P")
     def __str__(self):
         return str(self.username) + " " + str(self.course_name)
 
