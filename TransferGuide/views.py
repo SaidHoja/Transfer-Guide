@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
 import json, requests
-
+from django.core.exceptions import PermissionDenied
 from oauth_app.models import UserType
 from .forms import addCourseForm, sisForm
 from .models import Course
@@ -85,11 +85,9 @@ def apiResult(request, term,instructor, subject):
     display['headers']= ['School','Subject', 'Course Title', 'Credits' ]
     return render(request,'TransferGuide/searchResult.html', {'field': display})
 
-def errorNotAnAdmin(request):
-    return render(request,'index.html')
 def adminApproveCourses(request):
     if (UserType.objects.get(user=request.user).role != "Admin"):
-        return redirect('errorNotAnAdmin')
+        raise PermissionDenied("Only admin users may access this page.")
     pendingCourses = Course.objects.filter(status="P")
     approvedCourses = Course.objects.filter(status="A")
     deniedCourses = Course.objects.filter(status="D")
