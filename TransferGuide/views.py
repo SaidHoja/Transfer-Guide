@@ -28,8 +28,9 @@ def addCourse(request):
 
 
 def addCourseList(request):
-    allCourseRequests = Course.objects #.order_by('-pub_date')
-    return render(request, 'TransferGuide/addCourseList.html', {'allCourseRequests': allCourseRequests.all(), })
+    username = request.user.username
+    userCourses = Course.objects.filter(username=username)  # .order_by('-pub_date')
+    return render(request, 'TransferGuide/addCourseList.html', {'allCourseRequests': userCourses.all(), })
 
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')
