@@ -18,7 +18,20 @@
     </h2>
     <div id="pendingData" class="accordion-collapse collapse" >
       <div class="accordion-body">
-        <strong>PENDING COURSES HERE</strong>
+        {% if pendingCourses %}
+        <ul>
+        {% for course in pendingCourses %}
+        {{course.course_institution}}
+        <li> <b>{{course.course_name}} </b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ course.course_number}}</li>
+    	<pre>
+    		{{course.course_url}}
+    		{{course.course_description}}
+    	</pre>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>There are no course requests.</p>
+    {% endif %}
       </div>
     </div>
   </div>
