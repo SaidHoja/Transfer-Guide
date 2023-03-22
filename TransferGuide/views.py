@@ -91,7 +91,7 @@ def adminApproveCourses(request):
     if (UserType.objects.get(user=request.user).role != "Admin"):
         return redirect('errorNotAnAdmin')
     allCourseRequests = Course.objects.all()
-    return render(request, 'TransferGuide/tryAgain.html')
+    return render(request, 'TransferGuide/adminApproval.html')
 
 
 
