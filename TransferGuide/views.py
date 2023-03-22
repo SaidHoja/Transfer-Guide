@@ -90,8 +90,10 @@ def errorNotAnAdmin(request):
 def adminApproveCourses(request):
     if (UserType.objects.get(user=request.user).role != "Admin"):
         return redirect('errorNotAnAdmin')
-    allCourseRequests = Course.objects.all()
-    return render(request, 'TransferGuide/adminApproval.html')
+    pendingCourses = Course.objects.filter(status="P")
+    approvedCourses = Course.objects.filter(status="A")
+    deniedCourses = Course.objects.filter(status="D")
+    return render(request, 'TransferGuide/adminApproval.html', {'pendingCourses' : pendingCourses, 'approvedCourses' : approvedCourses, 'deniedCourses' : deniedCourses })
 
 
 
