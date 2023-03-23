@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from TransferGuide.models import Course
+from TransferGuide.models import Course, Viable_Course
 
 from oauth_app.models import UserType
 
@@ -24,3 +24,4 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(UserType)
 admin.site.register(Course)
+admin.site.register(Viable_Course)
