@@ -8,9 +8,14 @@ class addCourseForm(forms.Form):
     course_institution = forms.CharField(max_length=100)
     course_name = forms.CharField(max_length = 100)
     course_dept = forms.CharField(max_length=100)
-    course_number = forms.CharField(max_length=10)
+    course_number = forms.IntegerField(min_value=0, max_value=9999)
     course_grade = forms.CharField(max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
                                                                              ('F','F')]))
+    course_delivery = forms.CharField(max_length=10, widget=forms.Select(choices=[('IN-PERSON','IN-PERSON'), (
+        'ONLINE','ONLINE')]))
+    syllabus_url = forms.URLField()
+    credit_hours = forms.IntegerField(min_value=0, max_value=10)
+
 class sisForm(forms.Form):
     subject = forms.CharField(label='Subject (e.g. CS, ASTR, etc.)', max_length=5, required = False)
     term = forms.CharField(max_length=6,widget=forms.Select(choices=[(8, "FALL"), (3, "SPRING")]))
