@@ -43,7 +43,20 @@
     </h2>
     <div id="approvedData" class="accordion-collapse collapse" >
       <div class="accordion-body">
-        <strong>APPROVED COURSES HERE</strong>
+           {% if approvedCourses %}
+        <ul>
+        {% for course in approvedCourses %}
+        {{course.course_institution}}
+        <li> <b>{{course.course_name}} </b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ course.course_number}}</li>
+    	<pre>
+    		{{course.course_url}}
+    		{{course.course_description}}
+    	</pre>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>There are no course requests.</p>
+    {% endif %}
       </div>
     </div>
   </div>
@@ -55,7 +68,20 @@
     </h2>
     <div id="deniedData" class="accordion-collapse collapse" >
       <div class="accordion-body">
-          <strong>DENIED COURSES HERE</strong>
+             {% if deniedCourses %}
+        <ul>
+        {% for course in deniedCourses %}
+        {{course.course_institution}}
+        <li> <b>{{course.course_name}} </b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{ course.course_number}}</li>
+    	<pre>
+    		{{course.course_url}}
+    		{{course.course_description}}
+    	</pre>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>There are no course requests.</p>
+    {% endif %}
       </div>
     </div>
   </div>
