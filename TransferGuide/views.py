@@ -10,7 +10,7 @@ from .forms import addCourseForm, sisForm
 from .models import Course
 
 # Adding Courses by the Student
-def addCourse(request):
+def requestCourse(request):
     if request.method == 'POST':
         form = addCourseForm(request.POST)
         if form.is_valid():
@@ -29,18 +29,18 @@ def addCourse(request):
                            course_dept_num=course_dept_num,course_grade=course_grade,course_delivery=course_delivery,
                            syllabus_url=syllabus_url,credit_hours=credit_hours)
                 c.save()
-            return HttpResponseRedirect(reverse('TransferGuide/addCourse/list'))
+            return HttpResponseRedirect(reverse('requestCourseList'))
     form = addCourseForm()
-    return render(request, 'TransferGuide/addCourseForm.html', {'form': form})
+    return render(request, 'TransferGuide/requestCourseForm.html', {'form': form})
 
 
-def addCourseList(request):
+def requestCourseList(request):
     username = request.user
     user_courses = Course.objects.filter(username=username)  # .order_by('-pub_date')
     pending_courses = user_courses.filter(status="P")
     approved_courses = user_courses.filter(status="A")
     denied_courses = user_courses.filter(status="D")
-    return render(request, 'TransferGuide/addCourseList.html', {'pending_courses':pending_courses, 'approved_courses':approved_courses, 'deniedCourses':denied_courses})
+    return render(request, 'TransferGuide/requestCourseList.html', {'pending_courses':pending_courses, 'approved_courses':approved_courses, 'deniedCourses':denied_courses})
 #
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')
