@@ -29,15 +29,18 @@ def addCourse(request):
                            course_dept_num=course_dept_num,course_grade=course_grade,course_delivery=course_delivery,
                            syllabus_url=syllabus_url,credit_hours=credit_hours)
                 c.save()
-            # return HttpResponseRedirect(reverse('tryAgain'))
+            return HttpResponseRedirect(reverse('tryAgain'))
     form = addCourseForm()
     return render(request, 'TransferGuide/addCourseForm.html', {'form': form})
 
 
 def addCourseList(request):
     username = request.user
-    userCourses = Course.objects.filter(username=username)  # .order_by('-pub_date')
-    return render(request, 'TransferGuide/addCourseList.html', {'allCourseRequests': userCourses.all(), })
+    user_courses = Course.objects.filter(username=username)  # .order_by('-pub_date')
+    pending_courses = user_courses.filter(status="P")
+    approved_courses = user_courses.filter(status="A")
+    denied_courses = user_courses.filter(status="D")
+    return render(request, 'TransferGuide/addCourseList.html', {'pending_courses':pending_courses, 'approved_courses':approved_courses, 'deniedCourses':denied_courses})
 #
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')

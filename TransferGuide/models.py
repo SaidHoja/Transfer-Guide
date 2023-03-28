@@ -14,7 +14,7 @@ class Course(models.Model):
     course_delivery = models.CharField(max_length=10, null=True, blank=True)
     syllabus_url = models.URLField(null=True, blank=True)
     credit_hours = models.PositiveIntegerField(default=3, validators=[MinValueValidator(1), MaxValueValidator(10)])
-    approved = models.CharField(max_length=1,default="P")
+    status = models.CharField(max_length=1,default="P")
     def __str__(self):
         return str(self.username) + " " + str(self.course_name)
 
