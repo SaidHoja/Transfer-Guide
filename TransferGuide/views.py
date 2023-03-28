@@ -29,7 +29,7 @@ def addCourse(request):
                            course_dept_num=course_dept_num,course_grade=course_grade,course_delivery=course_delivery,
                            syllabus_url=syllabus_url,credit_hours=credit_hours)
                 c.save()
-            return HttpResponseRedirect(reverse('tryAgain'))
+            return HttpResponseRedirect(reverse('TransferGuide/addCourse/list'))
     form = addCourseForm()
     return render(request, 'TransferGuide/addCourseForm.html', {'form': form})
 
