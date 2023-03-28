@@ -25,15 +25,14 @@ def requestCourse(request):
                 syllabus_url = form.cleaned_data['syllabus_url']
                 credit_hours = form.cleaned_data['credit_hours']
                 course_dept_num = course_dept + " " + str(course_number)
-                c = Course(username=username,course_institution=course_institution,course_name=course_name,
+                if isRequestNew(username, course_name, course_dept_num, course_institution):
+                    c = Course(username=username,course_institution=course_institution,course_name=course_name,
                            course_dept_num=course_dept_num,course_grade=course_grade,course_delivery=course_delivery,
                            syllabus_url=syllabus_url,credit_hours=credit_hours)
-                c.save()
+                    c.save()
             return HttpResponseRedirect(reverse('requestCourseList'))
     form = addCourseForm()
     return render(request, 'TransferGuide/requestCourseForm.html', {'form': form})
-
-
 def requestCourseList(request):
     username = request.user
     user_courses = Course.objects.filter(username=username)  # .order_by('-pub_date')
@@ -41,7 +40,14 @@ def requestCourseList(request):
     approved_courses = user_courses.filter(status="A")
     denied_courses = user_courses.filter(status="D")
     return render(request, 'TransferGuide/requestCourseList.html', {'pending_courses':pending_courses, 'approved_courses':approved_courses, 'deniedCourses':denied_courses})
-#
+
+def isRequestNew(username, course_name, course_dept_num, course_institution):
+    user_courses = Course.objects.filter(username=username)
+    same_course_name = len(user_courses.filter(course_name=course_name)) == 0
+    same_dept_num = len(user_courses.filter(course_dept_num=course_dept_num)) == 0
+    same_institution = len(user_courses.filter(course_institution=course_institution)) == 0
+    return same_course_name and same_dept_num and same_institution
+
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')
 
