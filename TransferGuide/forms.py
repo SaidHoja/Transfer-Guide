@@ -2,12 +2,16 @@
 
 from django import forms
 import datetime
- 
+from django.core.exceptions import ValidationError
 # creating a form
-class addCourseForm(forms.Form):
+
+def validate_one_word(value):
+    if len(value.split()) != 1:
+        raise ValidationError("Please enter only one word.")
+class requestCourseForm(forms.Form):
     course_institution = forms.CharField(max_length=100)
     course_name = forms.CharField(max_length = 100)
-    course_dept = forms.CharField(max_length=100)
+    course_dept = forms.CharField(max_length=5, validators=[validate_one_word])
     course_number = forms.IntegerField(min_value=0, max_value=9999)
     course_grade = forms.CharField(max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
                                                                              ('F','F')]))
