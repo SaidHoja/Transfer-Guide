@@ -25,3 +25,6 @@ class sisForm(forms.Form):
         YEAR_CHOICES.append((y, y))
     year= forms.CharField(max_length=4, widget=forms.Select(choices=YEAR_CHOICES))
     instructor = forms.CharField(max_length=20, required = False)
+
+class statusForm(forms.Form):
+    status = forms.CharField(label ='Change Status?', max_length=1,widget=forms.Select(choices=[('P','P'),('A','A'),('D','D')]))
