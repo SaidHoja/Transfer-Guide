@@ -6,14 +6,15 @@ from django.utils import timezone
 import json, requests
 from django.core.exceptions import PermissionDenied
 from oauth_app.models import UserType
-from .forms import addCourseForm, sisForm, statusForm
+from .forms import requestCourseForm, sisForm
+from .forms import requestCourseForm, sisForm, statusForm
 from .models import Course
 from .filters import OrderCourses
 
 # Adding Courses by the Student
-def addCourse(request):
+def requestCourse(request):
     if request.method == 'POST':
-        form = addCourseForm(request.POST)
+        form = requestCourseForm(request.POST)
         if form.is_valid():
             if request.user.is_authenticated:
                 username = request.user
@@ -26,23 +27,28 @@ def addCourse(request):
                 syllabus_url = form.cleaned_data['syllabus_url']
                 credit_hours = form.cleaned_data['credit_hours']
                 course_dept_num = course_dept + " " + str(course_number)
-                c = Course(username=username,course_institution=course_institution,course_name=course_name,
+                if isRequestNew(username, course_dept_num, course_institution):
+                    c = Course(username=username,course_institution=course_institution,course_name=course_name,
                            course_dept_num=course_dept_num,course_grade=course_grade,course_delivery=course_delivery,
                            syllabus_url=syllabus_url,credit_hours=credit_hours)
-                c.save()
-            return HttpResponseRedirect(reverse('TransferGuide/addCourse/list'))
-    form = addCourseForm()
-    return render(request, 'TransferGuide/addCourseForm.html', {'form': form})
-
-
-def addCourseList(request):
+                    c.save()
+            return HttpResponseRedirect(reverse('requestCourseList'))
+    form = requestCourseForm()
+    return render(request, 'TransferGuide/requestCourseForm.html', {'form': form})
+def requestCourseList(request):
     username = request.user
     user_courses = Course.objects.filter(username=username)  # .order_by('-pub_date')
     pending_courses = user_courses.filter(status="P")
     approved_courses = user_courses.filter(status="A")
     denied_courses = user_courses.filter(status="D")
-    return render(request, 'TransferGuide/addCourseList.html', {'pending_courses':pending_courses, 'approved_courses':approved_courses, 'deniedCourses':denied_courses})
-#
+    return render(request, 'TransferGuide/requestCourseList.html', {'pending_courses':pending_courses, 'approved_courses':approved_courses, 'deniedCourses':denied_courses})
+
+def isRequestNew(username, course_dept_num, course_institution):
+    user_courses = Course.objects.filter(username=username)
+    same_dept_num = len(user_courses.filter(course_dept_num=course_dept_num)) == 0
+    same_institution = len(user_courses.filter(course_institution=course_institution)) == 0
+    return same_dept_num and same_institution
+
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')
 
