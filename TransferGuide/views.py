@@ -6,8 +6,9 @@ from django.utils import timezone
 import json, requests
 from django.core.exceptions import PermissionDenied
 from oauth_app.models import UserType
-from .forms import addCourseForm, sisForm
+from .forms import addCourseForm, sisForm, statusForm
 from .models import Course
+from .filters import OrderCourses
 
 # Adding Courses by the Student
 def addCourse(request):
@@ -95,8 +96,22 @@ def apiResult(request, term,instructor, subject):
 def adminApproveCourses(request):
     if (UserType.objects.get(user=request.user).role != "Admin"):
         raise PermissionDenied("Only admin users may access this page.")
-    pendingCourses = Course.objects.filter(status="P")
-    approvedCourses = Course.objects.filter(status="A")
-    deniedCourses = Course.objects.filter(status="D")
-    return render(request, 'TransferGuide/adminApproval.html', {'pendingCourses' : pendingCourses, 'approvedCourses' : approvedCourses, 'deniedCourses' : deniedCourses })
 
+    courses = Course.objects.filter()
+    coursesFilter = OrderCourses(request.GET, queryset=courses)
+    courses = coursesFilter.qs
+    return render(request, 'TransferGuide/adminApproval.html', { 'courses': courses, 'coursesFilter': coursesFilter})
+
+def coursePage(request, pk):
+
+    if (UserType.objects.get(user=request.user).role != "Admin"):
+        raise PermissionDenied("Only admin users may access this page.")
+    form = statusForm()
+    course = Course.objects.get(pk=pk)
+    if request.method == 'POST':
+        form = statusForm(request.POST)
+        if form.is_valid():
+            course.status=form.cleaned_data['status']
+            course.save()
+
+    return render(request, 'TransferGuide/coursePage.html', {'course': course, 'form':form})
