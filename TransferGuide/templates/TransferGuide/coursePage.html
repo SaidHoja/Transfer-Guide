@@ -1,0 +1,24 @@
+{% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
+{% bootstrap_javascript %}
+<html>
+    <p>{{course.username}} {{course.username.first_name}} {{course.username.last_name}}</p>
+    <p>{{course.course_institution}}</p>
+    <p>{{course.course_name}}</p>
+    <p>{{course.course_dept_num}}</p>
+    <p>{{course.course_dept_num}}</p>
+    <p>{{course.course_grade}}</p>
+    <p>{{course.course_delivery}}</p>
+    <p>{{course.syllabus_url}}</p>
+    <p>{{course.credit_hours}}</p>
+    <p>{{course.status}}</p>
+
+
+    <form method = "POST" >
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type = "submit">submit</button>
+    </form>
+
+
+
+</html>
