@@ -7,7 +7,7 @@ import json, requests
 from django.core.exceptions import PermissionDenied
 from oauth_app.models import UserType
 from .forms import requestCourseForm, sisForm
-from .forms import requestCourseForm, sisForm, statusForm
+from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm
 from .models import Course
 from .filters import OrderCourses
 
@@ -48,6 +48,10 @@ def isRequestNew(username, course_dept_num, course_institution):
     same_dept_num = len(user_courses.filter(course_dept_num=course_dept_num)) == 0
     same_institution = len(user_courses.filter(course_institution=course_institution)) == 0
     return same_dept_num and same_institution
+
+def submitViableCourse(request):
+    form = viableCourseForm();
+    return render(request, 'TransferGuide/viableCourseForm.html', {'form': form})
 
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')

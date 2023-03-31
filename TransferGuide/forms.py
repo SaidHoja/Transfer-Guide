@@ -20,6 +20,13 @@ class requestCourseForm(forms.Form):
     syllabus_url = forms.URLField()
     credit_hours = forms.IntegerField(min_value=0, max_value=10)
 
+class viableCourseForm(forms.Form):
+    course_institution = forms.CharField(max_length=100)
+    course_name = forms.CharField(max_length = 100)
+    course_dept = forms.CharField(max_length=5, validators=[validate_one_word])
+    course_number = forms.IntegerField(min_value=0, max_value=9999)
+    course_grade = forms.CharField(max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
+                                                                             ('F','F')]))
 class sisForm(forms.Form):
     subject = forms.CharField(label='Subject (e.g. CS, ASTR, etc.)', max_length=5, required = False)
     term = forms.CharField(max_length=6,widget=forms.Select(choices=[(8, "FALL"), (3, "SPRING")]))
