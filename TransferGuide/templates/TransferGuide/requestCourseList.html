@@ -121,6 +121,7 @@
             {% for course in approved_courses %}
               <h6>{{course.course_name}}</h6>
               <p>{{ course.course_institution }} <br> {{ course.course_dept_num}} </p>
+              <p> Equivalent UVA Course: {{ course.equivalent}} </p>
               {% endfor %}
             </ul>
           {% else %}
