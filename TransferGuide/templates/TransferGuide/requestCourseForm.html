@@ -1,12 +1,78 @@
-{% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_messages %}
 {% bootstrap_javascript %}
+{% load socialaccount %}
 
-<h1 class = "text-center">Request a course for credit.</h1>
+<div class="p-5 bg-primary text-warning text-center">
+  <h1>Request a Course for Credit</h1>
+    {% if user.is_authenticated %}
+        <p>{{ user.username }}, you can request a non-UVA course for UVA credit through this page</p>
+    {% else %}
+        <p>Welcome, please log in to coninue!</p>
+    {% endif %}
+</div>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <div class="container-fluid">
+         <ul class="navbar-nav">
+
+            <li class="nav-item me-4" >
+                {% if user.is_authenticated %}
+                <a class="nav-link disabled" href="{% provider_login_url 'google' %}">Login With Google</a>
+                {% else %}
+                <a class="nav-link active" href="{% provider_login_url 'google' %}">Login With Google</a>
+                {% endif %}
+            </li>
+
+            <li class="nav-item me-4">
+                {% if user.is_authenticated %}
+                <a class="nav-link active" href="/sisRequest">Find a Course at UVA</a>
+                {% else %}
+                <a class="nav-link disabled" href="/sisRequest">Find a Course at UVA</a>
+                {% endif %}
+            </li>
+
+            <li class="nav-item me-4">
+                {% if user.is_authenticated %}
+                <a class="nav-link active" href="/requestCourse">Request a Course for Credit</a>
+                {% else %}
+                <a class="nav-link disabled" href="/requestCourse">Request a Course for Credit</a>
+                {% endif %}
+            </li>
+
+             <li class="nav-item me-4">
+                {% if user.is_authenticated %}
+                <a class="nav-link active" href="/requestCourseList">Status of Credit Requests</a>
+                {% else %}
+                <a class="nav-link disabled" href="/requestCourseList">Status of Credit Requests</a>
+                {% endif %}
+            </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    {% if user.is_authenticated %}
+                    <a class="nav-link active" href="/logout"> Log Out</a>
+                    {% else %}
+                     <a class="nav-link disabled" href="/logout"> Log Out</a>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+</nav>
 
 <!--Submission form-->
-<form action="" method="post" class = "form-center">
-    {% csrf_token %}
-    {% bootstrap_form form %}
+{% if user.is_authenticated %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-sm-4">
+            <form action="" method="post" class = "form-center">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
 
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+</div>
+{% endif %}
