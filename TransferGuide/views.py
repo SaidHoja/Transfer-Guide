@@ -118,6 +118,7 @@ def coursePage(request, pk):
         form = statusForm(request.POST)
         if form.is_valid():
             course.status=form.cleaned_data['status']
+            course.equivalent=form.cleaned_data['equivalent']
             course.save()
 
     return render(request, 'TransferGuide/coursePage.html', {'course': course, 'form':form})

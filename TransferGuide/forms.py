@@ -32,9 +32,9 @@ class sisForm(forms.Form):
 
 class statusForm(forms.Form):
     status = forms.CharField(label ='Change Status?', max_length=1,widget=forms.Select(choices=[('P','P'),('A','A'),('D','D')]))
-    equivalent = forms.CharField(label='Equivalent UVA Course', max_length=12, required = False, help_text="Only fill out if approved.")
+    equivalent = forms.CharField(label='Equivalent UVA Course', max_length=30, required = False, help_text="Only fill out if approved.")
 
-    def equivalent_course(self):
-        if self.cleaned_data.get('status', None) == 'A':
-            if self.cleaned_data.get('equivalent', None) is not None:
-                pass
+#    def equivalent_course(self):
+ #       if self.cleaned_data.get('status', None) == 'A':
+ #           if self.cleaned_data.get('equivalent', None) is not None:
+ #               pass
