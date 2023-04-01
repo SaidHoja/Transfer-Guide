@@ -23,7 +23,7 @@ class requestCourseForm(forms.Form):
 class viableCourseForm(forms.Form):
     course_institution = forms.CharField(max_length=100)
     course_name = forms.CharField(max_length = 100)
-    course_dept = forms.CharField(max_length=5, validators=[validate_one_word])
+    course_dept = forms.CharField(max_length=6, validators=[validate_one_word])
     course_number = forms.IntegerField(min_value=0, max_value=9999)
     course_grade = forms.CharField(max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
                                                                              ('F','F')]))
