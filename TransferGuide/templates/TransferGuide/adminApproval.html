@@ -100,7 +100,7 @@
             <tr>
               <th>Course ID</th>
               <th>Institution</th>
-              <th>Subject</th>
+              <th>Course Number</th>
               <th>Course Title</th>
               <th>Submitted By</th>
               <th>Status</th>
@@ -110,7 +110,7 @@
           <tr>
             <td><a href = "courses/{{course.pk}}">{{course.pk}}</a></td>
             <td>{{course.course_institution}}</td>
-            <td>ASDASDAD</td>
+            <td>{{course.course_dept_num}}</td>
             <td>{{course.course_name}}</td>
             <td>{{course.username}}</td>
             <td>{{course.status}}</td>
