@@ -1,12 +1,44 @@
-{% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
-{% bootstrap_javascript %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Viable Course</title>
+</head>
+<body>
+    <h1>See if your course(s) are in our system</h1>
+    <form id="form-container" method="POST">
+        {% csrf_token %}
+        {{viable_course_formset.management_form}}
+        {% for form in viable_course_formset %}
+            <div class="viable-course-form">
+                {{form.as_p}}
+            </div>
+        {% endfor %}
+        <button id="add-form" type="button">Add Another Course</button>
+        <button type="submit">Create Birds</button>
+    </form>
+    <script>
+        let viableCourseForm = document.querySelectorAll(".viable-course-form")
+        let container = document.querySelector("#form-container")
+        let addButton = document.querySelector("#add-form")
+        let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
 
-<h1 class = "text-center">Request a course for credit.</h1>
+        let formNum = viableCourseForm.length-1
+        addButton.addEventListener('click', addForm)
 
-<!--Submission form-->
-<form action="" method="post" class = "form-center">
-    {% csrf_token %}
-    {% bootstrap_form form %}
+        function addForm(e){
+            e.preventDefault()
 
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+            let newForm = viableCourseForm[0].cloneNode(true)
+            let formRegex = RegExp(`form-(\\d){1}-`,'g')
+
+            formNum++
+            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+            container.insertBefore(newForm, addButton)
+
+            totalForms.setAttribute('value', `${formNum+1}`)
+        }
+    </script>
+    </body>
+</html>
