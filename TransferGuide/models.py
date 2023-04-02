@@ -15,6 +15,8 @@ class Course(models.Model):
     syllabus_url = models.URLField(null=True, blank=True)
     credit_hours = models.PositiveIntegerField(default=3, validators=[MinValueValidator(1), MaxValueValidator(10)])
     status = models.CharField(max_length=1,default="P")
+    equivalent = models.CharField(max_length=30,default="N/A")
+    why_denied = models.CharField(max_length=200,default="N/A")
     def __str__(self):
         return str(self.username) + " " + str(self.course_name)
 
