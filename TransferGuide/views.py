@@ -51,39 +51,22 @@ def isRequestNew(username, course_dept_num, course_institution):
 
 def submitViableCourse(request):
     formset = viableCourseFormSet()
+    if request.method == 'POST':
+        formset = viableCourseFormSet(data=request.POST)
+        if formset.is_valid():
+            for form in formset:
+                username = request.user
+                course_institution = form.cleaned_data['course_institution']
+                course_name = form.cleaned_data['course_name']
+                course_dept = form.cleaned_data['course_dept']
+                course_number = form.cleaned_data['course_number']
+                course_dept_num = course_dept + str(course_number)
+                course_grade = form.cleaned_data['course_grade']
+                v = Viable_Course(username=username,course_institution=course_institution,course_name=course_name,
+                                  course_dept_num=course_dept_num,course_grade=course_grade)
+                v.save()
+            # return HttpResponseRedirect(reverse('seeViableCourse'))
     return render(request, 'TransferGuide/viableCourseForm.html', {'viable_course_formset':formset})
-    # def post(self, *args, **kwargs):
-    #     formset = viableCourseFormSet(data=self.request.POST)
-    #     if formset.is_valid():
-    #         for form in formset:
-    #             username = request.user
-    #             course_institution = form.cleaned_data['course_institution']
-    #             course_name = form.cleaned_data['course_name']
-    #             course_dept = form.cleaned_data['course_dept']
-    #             course_number = form.cleaned_data['course_number']
-    #             course_dept_num = course_dept + str(course_number)
-    #             course_grade = form.cleaned_data['course_grade']
-    #             v = Viable_Course(username=username,course_institution=course_institution,course_name=course_name,
-    #                               course_dept_num=course_dept_num,course_grade=course_grade)
-    #             v.save()
-    #         return redirect(reverse_lazy("seeViableCourse"))
-    #     return self.render_to_response({'viable_course_formset':formset})
-    # if request.method == 'POST':
-    #     form = viableCourseForm(request.POST)
-    #     if form.is_valid():
-    #         if request.user.is_authenticated:
-    #             username = request.user
-    #             course_institution = form.cleaned_data['course_institution']
-    #             course_name = form.cleaned_data['course_name']
-    #             course_dept = form.cleaned_data['course_dept']
-    #             course_number = form.cleaned_data['course_number']
-    #             course_dept_num = course_dept + str(course_number)
-    #             course_grade = form.cleaned_data['course_grade']
-    #             v = Viable_Course(username=username,course_institution=course_institution,course_name=course_name,course_dept_num=course_dept_num,
-    #                               course_grade=course_grade)
-    #             v.save()
-    # form = viableCourseForm()
-    # return render(request, 'TransferGuide/viableCourseForm.html', {'form': form})
 
 def seeViableCourse():
     model = Viable_Course
