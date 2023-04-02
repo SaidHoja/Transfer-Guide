@@ -1,8 +1,10 @@
 #forms.py
 
 from django import forms
+from django.forms.formsets import formset_factory
 import datetime
 from django.core.exceptions import ValidationError
+from .models import Viable_Course
 # creating a form
 
 def validate_one_word(value):
@@ -27,6 +29,8 @@ class viableCourseForm(forms.Form):
     course_number = forms.IntegerField(min_value=0, max_value=9999)
     course_grade = forms.CharField(max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
                                                                              ('F','F')]))
+
+viableCourseFormSet = formset_factory(viableCourseForm, extra=1)
 class sisForm(forms.Form):
     subject = forms.CharField(label='Subject (e.g. CS, ASTR, etc.)', max_length=5, required = False)
     term = forms.CharField(max_length=6,widget=forms.Select(choices=[(8, "FALL"), (3, "SPRING")]))
