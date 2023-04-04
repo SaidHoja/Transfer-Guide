@@ -1,0 +1,22 @@
+{% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
+{% bootstrap_javascript %}
+<style>
+.center {
+  margin: auto;
+  width: 60%;
+  padding: 10px;
+}
+</style>
+<div id="acceptedData" >
+    <strong>ACCEPTED COURSES HERE</strong>
+        {% if accepted_courses %}
+        <ul>
+            {% for course in accepted_courses %}
+                <h6>{{course.course_name}}</h6>
+                <p>{{ course.course_institution }} <br> {{ course.course_dept_num}} </p>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p>None of the courses you entered are accepted at this institution.</p>
+        {% endif %}
+</div>

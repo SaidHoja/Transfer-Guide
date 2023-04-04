@@ -60,17 +60,49 @@ def submitViableCourse(request):
                 course_name = form.cleaned_data['course_name']
                 course_dept = form.cleaned_data['course_dept']
                 course_number = form.cleaned_data['course_number']
-                course_dept_num = course_dept + str(course_number)
+                course_dept_num = course_dept + " " + str(course_number)
                 course_grade = form.cleaned_data['course_grade']
                 v = Viable_Course(username=username,course_institution=course_institution,course_name=course_name,
                                   course_dept_num=course_dept_num,course_grade=course_grade)
                 v.save()
-            # return HttpResponseRedirect(reverse('seeViableCourse'))
+            return HttpResponseRedirect(reverse('seeViableCourse'))
     return render(request, 'TransferGuide/viableCourseForm.html', {'viable_course_formset':formset})
 
-def seeViableCourse():
-    model = Viable_Course
-    template = "viableCourseList.html"
+def seeViableCourse(request):
+    username = request.user
+    user_courses = Viable_Course.objects.filter(username=username)
+    acceptedCourses = []
+    for user_course in user_courses:
+        user_dept_num = user_course.course_dept_num
+        user_grade = translate_grade(user_course.course_grade)
+        matched_courses = Course.objects.filter(course_dept_num=user_dept_num)
+        approved_courses = matched_courses.filter(status='A')
+        for approved_course in approved_courses:
+            if approved_course.status == 'A':
+                approved_course_lowest_grade = find_lowest_grade(approved_courses)
+                if user_grade >= approved_course_lowest_grade:
+                    acceptedCourses.append(user_course)
+    return render(request, 'TransferGuide/viableCourseList.html', {'accepted_courses':acceptedCourses})
+
+def translate_grade(grade):
+    if grade == 'A':
+        return 90
+    elif grade == 'B':
+        return 80
+    elif grade == 'C':
+        return 70
+    elif grade == 'D':
+        return 60
+    else:
+        return 50
+
+def find_lowest_grade(approved_courses):
+    lowest_grade = 100
+    for approved_course in approved_courses:
+        approved_course_grade = translate_grade(approved_course.course_grade)
+        if approved_course_grade < lowest_grade:
+            lowest_grade = approved_course_grade
+    return lowest_grade
 
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')
