@@ -24,44 +24,6 @@ class Migration(migrations.Migration):
                 ('credit_hours', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(10)])),
             ],
         ),
-        migrations.RemoveField(
-            model_name='course',
-            name='course_dept_num',
-        ),
-        migrations.RemoveField(
-            model_name='course',
-            name='status',
-        ),
-        migrations.AddField(
-            model_name='course',
-            name='course_dept',
-            field=models.CharField(max_length=100, null=True),
-        ),
-        migrations.AddField(
-            model_name='course',
-            name='course_num',
-            field=models.PositiveIntegerField(null=True, validators=[django.core.validators.MinValueValidator(1)]),
-        ),
-        migrations.AlterField(
-            model_name='course',
-            name='course_delivery',
-            field=models.CharField(blank=True, max_length=10),
-        ),
-        migrations.AlterField(
-            model_name='course',
-            name='course_grade',
-            field=models.CharField(blank=True, max_length=1),
-        ),
-        migrations.AlterField(
-            model_name='course',
-            name='course_institution',
-            field=models.CharField(blank=True, max_length=100),
-        ),
-        migrations.AlterField(
-            model_name='course',
-            name='course_name',
-            field=models.CharField(blank=True, max_length=100),
-        ),
         migrations.CreateModel(
             name='Request',
             fields=[
