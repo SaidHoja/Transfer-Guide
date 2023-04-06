@@ -11,4 +11,4 @@ class OrderCourses(django_filters.FilterSet):
     class Meta:
         model = Course
         fields = '__all__'
-        exclude = 'credits, credit_hours,syllabus_url, course_delivery, course_grade, course_dept_num'
+        exclude = 'credits, credit_hours,syllabus_url, course_delivery, course_grade, course_dept_num, why_denied, equivalent'
