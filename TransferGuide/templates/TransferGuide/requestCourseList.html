@@ -1,5 +1,10 @@
-{% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_messages %}
 {% bootstrap_javascript %}
+{% load socialaccount %}
+
 <style>
 .center {
   margin: auto;
@@ -7,16 +12,89 @@
   padding: 10px;
 }
 </style>
-<div class="accordion center" id="courseAccordion" >
+<div class="p-5 bg-primary text-warning text-center">
+  <h1>Status of Credit Requests</h1>
+
+    {% if not user.is_authenticated %}
+        <p>Welcome, please log in to continue!</p>
+    {% elif user.usertype.role == 'Admin' %}
+        <p>Welcome {{ user.username }}, Admins do not have access to this page. Did you mean to go to the Review Course Requests page </p>
+    {% else %}
+         <p>{{ user.username }}, here are the courses you have request to receive credit at UVA.</p>
+    {% endif %}
+
+</div>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <div class="container-fluid">
+            {% if not user.is_authenticated %}
+                <ul class="navbar-nav">
+                    <li class="nav-item me-4" >
+                        <a class="nav-link active" href="{% provider_login_url 'google' %}">Login With Google</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="/logout"> Log Out</a>
+                    </li>
+                </ul>
+            {% elif user.usertype.role == 'Admin' %}
+                <ul class="navbar-nav">
+                    <li class="nav-item me-4" >
+                        <a class="nav-link disable" href="{% provider_login_url 'google' %}">Login With Google</a>
+                    </li>
+
+                    <li class="nav-item me-4">
+                         <a class="nav-link active" href="/sisRequest">Find a Course at UVA</a>
+                    </li>
+
+                    <li class="nav-item me-4" >
+                        <a class="nav-link active" href="/adminApproval">Review Transfer Credit Requests</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                     <a class="nav-link active" href="/logout"> Log Out</a>
+                    </li>
+                </ul>
+
+            {% else %}
+                <ul class="navbar-nav">
+                    <li class="nav-item me-4" >
+                    <a class="nav-link disabled" href="{% provider_login_url 'google' %}">Login With Google</a>
+                    </li>
+
+                     <li class="nav-item me-4">
+                         <a class="nav-link active" href="/sisRequest">Find a Course at UVA</a>
+                     </li>
+
+                    <li class="nav-item me-4">
+                     <a class="nav-link active" href="/requestCourse">Request a Course for Credit</a>
+                    </li>
+
+                    <li class="nav-item me-4">
+                    <a class="nav-link active" href="/requestCourseList">Status of Credit Requests</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                     <a class="nav-link active" href="/logout"> Log Out</a>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+</nav>
+
+
+<div class="container mt-5">
+  <div class="accordion center" id="courseAccordion" >
   <div class="accordion-item">
     <h2 class="accordion-header" id="pendingHeading">
       <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#pendingData" >
         Pending Courses
       </button>
     </h2>
-    <div id="pendingData" class="accordion-collapse collapse" >
+    <div id="pendingData" class="accordion-collapse expand" >
       <div class="accordion-body">
-        <strong>PENDING COURSES HERE</strong>
           {% if pending_courses %}
             <ul>
             {% for course in pending_courses %}
@@ -38,12 +116,12 @@
     </h2>
     <div id="approvedData" class="accordion-collapse collapse" >
       <div class="accordion-body">
-        <strong>APPROVED COURSES HERE</strong>
         {% if approved_courses %}
             <ul>
             {% for course in approved_courses %}
               <h6>{{course.course_name}}</h6>
-              <p>{{ course.course_institution }} <br> {{ course.course_dept_num}} </p>
+              <p>{{course.course_institution }} <br> {{course.course_dept_num}} </p>
+              <p> Equivalent UVA Course: {{course.equivalent}} </p>
               {% endfor %}
             </ul>
           {% else %}
@@ -60,12 +138,12 @@
     </h2>
     <div id="deniedData" class="accordion-collapse collapse" >
       <div class="accordion-body">
-          <strong>DENIED COURSES HERE</strong>
           {% if denied_courses %}
               <ul>
               {% for course in denied_courses %}
                 <h6>{{course.course_name}}</h6>
-                <p>{{ course.course_institution }} <br> {{ course.course_dept_num}} </p>
+                <p>{{course.course_institution }} <br> {{course.course_dept_num}} </p>
+                <p> Reason: {{course.why_denied}} </p>
                 {% endfor %}
               </ul>
             {% else %}
@@ -75,3 +153,6 @@
     </div>
   </div>
 </div>
+
+</div>
+
