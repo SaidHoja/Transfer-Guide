@@ -1,24 +1,105 @@
-{% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_messages %}
 {% bootstrap_javascript %}
-<html>
-    <p>{{course.username}} {{course.username.first_name}} {{course.username.last_name}}</p>
-    <p>{{course.course_institution}}</p>
-    <p>{{course.course_name}}</p>
-    <p>{{course.course_dept_num}}</p>
-    <p>{{course.course_dept_num}}</p>
-    <p>{{course.course_grade}}</p>
-    <p>{{course.course_delivery}}</p>
-    <p>{{course.syllabus_url}}</p>
-    <p>{{course.credit_hours}}</p>
-    <p>{{course.status}}</p>
+{% load socialaccount %}
 
+<div class="p-5 bg-primary text-warning text-center">
+  <h1> Transfer Request ID: {{course.pk}}</h1>
 
-    <form method = "POST" >
-        {% csrf_token %}
-        {% bootstrap_form form %}
-        <button type = "submit">submit</button>
-    </form>
+    {% if not user.is_authenticated %}
+        <p>Welcome, please log in to continue!</p>
+    {% elif user.usertype.role == 'Admin' %}
+        <p>Welcome {{ user.username }}, you can approve or deny transfer credits on this page.</p>
+    {% else %}
+         <p>{{ user.username }}, Students do not have access to this page.</p>
+    {% endif %}
 
+</div>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <div class="container-fluid">
+            {% if not user.is_authenticated %}
+                <ul class="navbar-nav">
+                    <li class="nav-item me-4" >
+                        <a class="nav-link active" href="{% provider_login_url 'google' %}">Login With Google</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="/logout"> Log Out</a>
+                    </li>
+                </ul>
+            {% elif user.usertype.role == 'Admin' %}
+                <ul class="navbar-nav">
+                    <li class="nav-item me-4" >
+                        <a class="nav-link disable" href="{% provider_login_url 'google' %}">Login With Google</a>
+                    </li>
 
+                    <li class="nav-item me-4">
+                         <a class="nav-link active" href="/sisRequest">Find a Course at UVA</a>
+                    </li>
 
-</html>
+                    <li class="nav-item me-4" >
+                        <a class="nav-link active" href="/adminApproval">Review Transfer Credit Requests</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                     <a class="nav-link active" href="/logout"> Log Out</a>
+                    </li>
+                </ul>
+
+            {% else %}
+                <ul class="navbar-nav">
+                    <li class="nav-item me-4" >
+                    <a class="nav-link disabled" href="{% provider_login_url 'google' %}">Login With Google</a>
+                    </li>
+
+                     <li class="nav-item me-4">
+                         <a class="nav-link active" href="/sisRequest">Find a Course at UVA</a>
+                     </li>
+
+                    <li class="nav-item me-4">
+                     <a class="nav-link active" href="/requestCourse">Request a Course for Credit</a>
+                    </li>
+
+                    <li class="nav-item me-4">
+                    <a class="nav-link active" href="/requestCourseList">Status of Credit Requests</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                     <a class="nav-link active" href="/logout"> Log Out</a>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+</nav>
+
+<div class="container mt-5">
+
+    <p>    Username: {{course.username}} </p>
+    <p>   Student Name: {{course.username.first_name}} {{course.username.last_name}} </p>
+    <p>    Institution: {{course.course_institution}}</p>
+    <p>    Course Name: {{course.course_name}}</p>
+    <p>       Dept Num: {{course.course_dept_num}}</p>
+    <p>          Grade: {{course.course_grade}}</p>
+    <p>       Delivery: {{course.course_delivery}}</p>
+    <p>   Syllabus URL: {{course.syllabus_url}}</p>
+    <p>   Credit Hours: {{course.credit_hours}}</p>
+    <p>Approval Status: {{course.status}}</p>
+    <p>Equivalent UVA Course: {{course.equivalent}}</p>
+    <p>Reason for Denying: {{course.why_denied}}</p>
+
+ <div class="row">
+        <div class="col-sm-3">
+            <form method = "POST" >
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <button type = "submit">submit</button>
+            </form>
+        </div>
+    </div>
+
+</div>
