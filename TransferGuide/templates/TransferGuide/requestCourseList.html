@@ -99,7 +99,7 @@
             <ul>
             {% for course in pending_courses %}
               <h6>{{course.course_name}}</h6>
-              <p>{{ course.course_institution }} <br> {{ course.course_dept}} </p>
+              <p>{{ course.course_institution }} <br> {{ course.course_dept}}&nbsp;{{course.course_num}}</p>
               {% endfor %}
             </ul>
           {% else %}
@@ -119,7 +119,7 @@
             <ul>
             {% for course in approved_courses %}
               <h6>{{course.course_name}}</h6>
-              <p>{{course.course_institution }} <br> {{course.course_dept_num}} </p>
+              <p>{{course.course_institution }} <br> {{course.course_dept}} &nbsp;{{course.course_num}}</p>
               <p> Equivalent UVA Course: {{course.equivalent}} </p>
               {% endfor %}
             </ul>
@@ -141,7 +141,7 @@
               <ul>
               {% for course in denied_courses %}
                 <h6>{{course.course_name}}</h6>
-                <p>{{course.course_institution }} <br> {{course.course_dept_num}} </p>
+                <p>{{course.course_institution }} <br> {{course.course_dept}}&nbsp;{{course.course_num}}</p>
                 <p> Reason: {{course.why_denied}} </p>
                 {% endfor %}
               </ul>
