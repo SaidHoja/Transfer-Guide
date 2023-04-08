@@ -26,11 +26,10 @@ def requestCourse(request):
                 course_delivery = form.cleaned_data['course_delivery']
                 syllabus_url = form.cleaned_data['syllabus_url']
                 credit_hours = form.cleaned_data['credit_hours']
-                course_dept_num = course_dept + " " + str(course_number)
-                if isRequestNew(username, course_dept_num, course_institution):
+                if isRequestNew(username, course_dept, course_number, course_institution):
                     c = Course(username=username,course_institution=course_institution,course_name=course_name,
-                           course_dept_num=course_dept_num,course_grade=course_grade,course_delivery=course_delivery,
-                           syllabus_url=syllabus_url,credit_hours=credit_hours)
+                           course_dept=course_dept,course_num=course_number,course_grade=course_grade,
+                           course_delivery=course_delivery,syllabus_url=syllabus_url,credit_hours=credit_hours)
                     c.save()
             return HttpResponseRedirect(reverse('requestCourseList'))
     form = requestCourseForm()
@@ -44,11 +43,12 @@ def requestCourseList(request):
     
     return render(request, 'TransferGuide/requestCourseList.html', {'pending_courses':pending_courses, 'approved_courses':approved_courses, 'denied_courses':denied_courses})
 
-def isRequestNew(username, course_dept_num, course_institution):
+def isRequestNew(username, course_dept, course_num, course_institution):
     user_courses = Course.objects.filter(username=username)
-    same_dept_num = len(user_courses.filter(course_dept_num=course_dept_num)) == 0
+    same_dept = len(user_courses.filter(course_dept=course_dept)) == 0
+    same_num = len(user_courses.filter(course_num=course_num)) == 0
     same_institution = len(user_courses.filter(course_institution=course_institution)) == 0
-    return same_dept_num and same_institution
+    return same_dept and same_institution and same_num
 
 def submitViableCourse(request):
     formset = viableCourseFormSet()
@@ -61,10 +61,9 @@ def submitViableCourse(request):
                 course_name = form.cleaned_data['course_name']
                 course_dept = form.cleaned_data['course_dept']
                 course_number = form.cleaned_data['course_number']
-                course_dept_num = course_dept + " " + str(course_number)
                 course_grade = form.cleaned_data['course_grade']
                 v = Viable_Course(username=username,course_institution=course_institution,course_name=course_name,
-                                  course_dept_num=course_dept_num,course_grade=course_grade)
+                                  course_dept=course_dept,course_num=course_number,course_grade=course_grade)
                 v.save()
             return HttpResponseRedirect(reverse('seeViableCourse'))
     return render(request, 'TransferGuide/viableCourseForm.html', {'viable_course_formset':formset})
@@ -74,9 +73,11 @@ def seeViableCourse(request):
     user_courses = Viable_Course.objects.filter(username=username)
     acceptedCourses = []
     for user_course in user_courses:
-        user_dept_num = user_course.course_dept_num
+        user_dept = user_course.course_dept
+        user_num = user_course.course_num
         user_grade = translate_grade(user_course.course_grade)
-        matched_courses = Course.objects.filter(course_dept_num=user_dept_num)
+        matched_courses = Course.objects.filter(course_dept=user_dept)
+        matched_courses = matched_courses.filter(course_num=user_num)
         approved_courses = matched_courses.filter(status='A')
         for approved_course in approved_courses:
             if approved_course.status == 'A':
