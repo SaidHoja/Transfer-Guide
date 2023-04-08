@@ -23,7 +23,7 @@ app_name = 'TransferGuide'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name="index.html")),
+    path('', views.index, name="home"),
     path('accounts/', include('allauth.urls')),
     path('logout', LogoutView.as_view()),
     path('requestCourse/', views.requestCourse, name='requestCourse'),
