@@ -99,7 +99,7 @@
             <ul>
             {% for course in pending_courses %}
               <h6>{{course.course_name}}</h6>
-              <p>{{ course.course_institution }} <br> {{ course.course_dept_num}} </p>
+              <p>{{ course.course_institution }} <br> {{ course.course_dept}} </p>
               {% endfor %}
             </ul>
           {% else %}
@@ -107,8 +107,7 @@
           {% endif %}
       </div>
     </div>
-  </div>
-  <div class="accordion-item">
+  </div><div class="accordion-item">
     <h2 class="accordion-header" id="approvedHeading">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#approvedData">
         Approved Courses
