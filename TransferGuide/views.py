@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied
 from oauth_app.models import UserType
 from .forms import requestCourseForm, sisForm, viableCourseFormSet
 from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm
-from .models import Course, Viable_Course
+from .models import Course, Viable_Course, Request
 from .filters import OrderCourses
 
 # Adding Courses by the Student
@@ -31,17 +31,29 @@ def requestCourse(request):
                            course_dept=course_dept,course_num=course_number,course_grade=course_grade,
                            course_delivery=course_delivery,syllabus_url=syllabus_url,credit_hours=credit_hours)
                     c.save()
+                    r = Request(foreign_course=c, credit_hours=credit_hours)
+                    r.save()
             return HttpResponseRedirect(reverse('requestCourseList'))
     form = requestCourseForm()
     return render(request, 'TransferGuide/requestCourseForm.html', {'form': form})
 def requestCourseList(request):
     username = request.user
-    user_courses = Course.objects.filter(username=username)  # .order_by('-pub_date')
-    pending_courses = user_courses.filter(status="P")
-    denied_courses = user_courses.filter(status="D")
-    approved_courses = user_courses.filter(status="A")
-    
-    return render(request, 'TransferGuide/requestCourseList.html', {'pending_courses':pending_courses, 'approved_courses':approved_courses, 'denied_courses':denied_courses})
+    user_courses = Request.objects.filter(foreign_course__username=username)  # .order_by('-pub_date')
+    pending_requests = user_courses.filter(status="P")
+    pending_courses = find_courses_from_request(pending_requests)
+    denied_requests = user_courses.filter(status="D")
+    denied_courses = find_courses_from_request(denied_requests)
+    approved_requests = user_courses.filter(status="A")
+    approved_courses = find_courses_from_request(approved_requests)
+    return render(request, 'TransferGuide/requestCourseList.html', {'pending_courses':pending_courses,
+                                                                    'approved_courses':approved_courses,
+                                                                    'deniedCourses':denied_courses})
+
+def find_courses_from_request(pending_requests):
+    courses = []
+    for req in pending_requests:
+        courses.append(req.foreign_course)
+    return courses
 
 def isRequestNew(username, course_dept, course_num, course_institution):
     user_courses = Course.objects.filter(username=username)
