@@ -13,10 +13,13 @@
         <ul>
             {% for course in accepted_courses %}
                 <h6>{{course.course_name}}</h6>
-                <p>{{ course.course_institution }} <br> {{ course.course_dept_num}} </p>
+                <p>{{ course.course_institution }} <br> {{ course.course_dept}}&nbsp{course.course_num}</p>
             {% endfor %}
         </ul>
         {% else %}
             <p>None of the courses you entered are accepted at this institution.</p>
         {% endif %}
+</div>
+<div>
+    <p>Total number of courses that can transfer: {{num_of_transfer_courses}} / {{num_of_courses}} </p>
 </div>
