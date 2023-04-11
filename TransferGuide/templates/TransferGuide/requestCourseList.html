@@ -95,11 +95,11 @@
     </h2>
     <div id="pendingData" class="accordion-collapse expand" >
       <div class="accordion-body">
-          {% if pending_courses %}
+          {% if pending_requests %}
             <ul>
-            {% for course in pending_courses %}
-              <h6>{{course.course_name}}</h6>
-              <p>{{ course.course_institution }} <br> {{ course.course_dept}}&nbsp;{{course.course_num}}</p>
+            {% for request in pending_requests %}
+              <h6>{{request.foreign_course.course_name}}</h6>
+              <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
               {% endfor %}
             </ul>
           {% else %}
@@ -115,12 +115,13 @@
     </h2>
     <div id="approvedData" class="accordion-collapse collapse" >
       <div class="accordion-body">
-        {% if approved_courses %}
+        {% if approved_requests %}
             <ul>
-            {% for course in approved_courses %}
-              <h6>{{course.course_name}}</h6>
-              <p>{{course.course_institution }} <br> {{course.course_dept}} &nbsp;{{course.course_num}}</p>
-              <p> Equivalent UVA Course: {{course.equivalent}} </p>
+            {% for request in approved_requests %}
+                <h6>{{request.foreign_course.course_name}}</h6>
+                <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}} &nbsp;{{request.foreign_course.course_num}}</p>
+                <p> Equivalent UVA Course: {{request.uva_course.course_name}} </p>
+                <p> Approved By: {{request.reviewed_by.user.username}}</p>
               {% endfor %}
             </ul>
           {% else %}
@@ -139,10 +140,11 @@
       <div class="accordion-body">
           {% if denied_courses %}
               <ul>
-              {% for course in denied_courses %}
-                <h6>{{course.course_name}}</h6>
-                <p>{{course.course_institution }} <br> {{course.course_dept}}&nbsp;{{course.course_num}}</p>
-                <p> Reason: {{course.why_denied}} </p>
+              {% for request in denied_requests %}
+                  <h6>{{request.foreign_course.course_name}}</h6>
+                  <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
+                  <p> Approved By: {{request.reviewed_by.user.username}}</p>
+                  <p> Reason: {{request.why_denied}} </p>
                 {% endfor %}
               </ul>
             {% else %}
