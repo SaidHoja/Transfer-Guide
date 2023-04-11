@@ -108,12 +108,13 @@
          </thead>
         {%for course in courses%}
           <tr>
-            <td><a href = "courses/{{course.pk}}">{{course.pk}}</a></td>
-            <td>{{course.course_institution}}</td>
-            <td>{{course.course_dept_num}}</td>
-            <td>{{course.course_name}}</td>
-            <td>{{course.username}}</td>
-            <td>{{course.status}}</td>
+              <td><a href = "courses/{{course.pk}}">{{course.pk}}</a></td>
+              <td>{{course.course_institution}}</td>
+              <td>{{course.course_dept}}</td>
+              <td>{{course.course_num}}</td>
+              <td>{{course.course_name}}</td>
+              <td>{{course.username}}</td>
+              <td>{{course.status}}</td>
           </tr>
         {%endfor%}
         </table>
