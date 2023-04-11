@@ -49,3 +49,6 @@ class statusForm(forms.Form):
  #       if self.cleaned_data.get('status', None) == 'A':
  #           if self.cleaned_data.get('equivalent', None) is not None:
  #               pass
+
+class searchCourseForm(forms.Form):
+    institution = forms.CharField(max_length=100)
