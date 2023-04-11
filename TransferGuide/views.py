@@ -201,13 +201,20 @@ def coursePage(request, pk):
     return render(request, 'TransferGuide/coursePage.html', {'course': course, 'form':form})
 
 def index(request):
-    username = request.user
-    own_requests = Request.objects.filter(reviewed_by=username)
-    pending_requests = Request.objects.filter(status='P')
-    accepted_requests = own_requests.filter(status='A')
-    denied_requests = own_requests.filter(status='D')
-    return render(request, 'index.html',{'pending_requests': pending_requests, 'accepted_requests': accepted_requests,
-                                             'denied_requests': denied_requests})
+    if request.user.is_authenticated:
+        username = request.user
+        user = UserType.objects.filter(user=username)
+        user = user.filter(role='Admin')
+        if len(user) == 1:
+            own_requests = Request.objects.filter(reviewed_by=username)
+            pending_requests = Request.objects.filter(status='P')
+            accepted_requests = own_requests.filter(status='A')
+            denied_requests = own_requests.filter(status='D')
+            return render(request, 'index.html',{'pending_requests': pending_requests, 'accepted_requests': accepted_requests,
+                                                'denied_requests': denied_requests})
+        else:
+            return render(request, 'index.html')
+    return render(request, 'index.html')
 
 
 
