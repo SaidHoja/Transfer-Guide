@@ -41,14 +41,14 @@ def requestCourseList(request):
     username = request.user
     user_courses = Request.objects.filter(foreign_course__username=username)  # .order_by('-pub_date')
     pending_requests = user_courses.filter(status="P")
-    pending_courses = find_courses_from_request(pending_requests)
+    # pending_courses = find_courses_from_request(pending_requests)
     denied_requests = user_courses.filter(status="D")
-    denied_courses = find_courses_from_request(denied_requests)
+    # denied_courses = find_courses_from_request(denied_requests)
     approved_requests = user_courses.filter(status="A")
-    approved_courses = find_courses_from_request(approved_requests)
-    return render(request, 'TransferGuide/requestCourseList.html', {'pending_courses':pending_courses,
-                                                                    'approved_courses':approved_courses,
-                                                                    'deniedCourses':denied_courses})
+    # approved_courses = find_courses_from_request(approved_requests)
+    return render(request, 'TransferGuide/requestCourseList.html', {'pending_requests':pending_requests,
+                                                                    'approved_requests':approved_requests,
+                                                                    'denied_requests':denied_requests})
 
 def find_courses_from_request(pending_requests):
     courses = []
