@@ -34,5 +34,6 @@ urlpatterns = [
     path('adminApproval',views.adminApproveCourses, name = 'adminApproveCourses'),
     path('courses/<int:pk>/', views.coursePage, name = 'coursePage'),
     path('submitViableCourse/', views.submitViableCourse, name = 'submitViableCourse'),
-    path('seeViableCourse/', views.seeViableCourse, name = 'seeViableCourse')
+    path('seeViableCourse/', views.seeViableCourse, name = 'seeViableCourse'),
+    path('searchForCourse/', views.searchForCourse, name = 'searchForCourse')
 ]

@@ -7,7 +7,7 @@ import json, requests
 from django.core.exceptions import PermissionDenied
 from oauth_app.models import UserType
 from .forms import requestCourseForm, sisForm, viableCourseFormSet
-from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm
+from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm
 from .models import Course, Viable_Course, Request, UserType
 from .filters import OrderCourses
 
@@ -199,6 +199,10 @@ def coursePage(request, pk):
             course.save()
 
     return render(request, 'TransferGuide/coursePage.html', {'course': course, 'form':form})
+
+def searchForCourse(request):
+    form = searchCourseForm()
+    return render(request, 'TransferGuide/searchCourse.html', {'form':form})
 
 def index(request):
     if request.user.is_authenticated:
