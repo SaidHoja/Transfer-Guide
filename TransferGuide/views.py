@@ -190,13 +190,14 @@ def coursePage(request, pk):
         raise PermissionDenied("Only admin users may access this page.")
     form = statusForm()
     course = Course.objects.get(pk=pk)
+    the_request = Request.objects.get(foreign_course__course_name=course.course_name)
     if request.method == 'POST':
         form = statusForm(request.POST)
         if form.is_valid():
-            course.status=form.cleaned_data['status']
-            course.equivalent=form.cleaned_data['equivalent']
-            course.why_denied=form.cleaned_data['why_denied']
-            course.save()
+            the_request.status=form.cleaned_data['status']
+            # course.equivalent=form.cleaned_data['equivalent'] # this line has gotta go but I don't know how
+            # the_request.why_denied=form.cleaned_data['why_denied'] # uncomment when field is actually available
+            the_request.save()
 
     return render(request, 'TransferGuide/coursePage.html', {'course': course, 'form':form})
 
