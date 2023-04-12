@@ -10,6 +10,7 @@ from .forms import requestCourseForm, sisForm, viableCourseFormSet
 from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm
 from .models import Course, Viable_Course, Request, UserType
 from .filters import OrderCourses
+import re
 
 # Adding Courses by the Student
 def requestCourse(request):
@@ -202,6 +203,29 @@ def coursePage(request, pk):
 
 def searchForCourse(request):
     form = searchCourseForm()
+    # select approved courses
+    result = Request.objects.all()
+    if request.method == 'POST':
+        form = searchCourseForm(request.POST)
+        if form.is_valid():
+            institution = form.cleaned_data['institution']
+            word = form.cleaned_data['word']
+            dept_num = form.cleaned_data['dept_num']
+            print(len(result))
+            if institution != "No Preference":
+                result = result.filter(foreign_course__course_institution=institution)
+            print(len(result))
+            if word != "":
+                result = result.filter(foreign_course__course_name__icontains=word)
+            print(len(result))
+            if dept_num != "":
+                raw_data = dept_num.split()
+                dept = raw_data[0]
+                num = raw_data[1]
+                result = result.filter(foreign_course__course_dept=dept)
+                result = result.filter(foreign_course__course_num=num)
+            print(len(result))
+        return render(request, 'TransferGuide/searchCourseResult.html', {'requests':result})
     return render(request, 'TransferGuide/searchCourse.html', {'form':form})
 
 def index(request):
