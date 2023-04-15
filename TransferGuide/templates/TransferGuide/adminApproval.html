@@ -98,7 +98,7 @@
         <table class = "table center table-striped table-bordered">
          <thead class = "thead-dark">
             <tr>
-              <th>Course ID</th>
+              <th>Request ID</th>
               <th>Institution</th>
               <th>Course Department</th>
               <th>Course Number</th>
@@ -107,15 +107,15 @@
               <th>Status</th>
             </tr>
          </thead>
-        {%for course in courses%}
+        {%for request in requests%}
           <tr>
-              <td><a href = "courses/{{course.pk}}">{{course.pk}}</a></td>
-              <td>{{course.course_institution}}</td>
-              <td>{{course.course_dept}}</td>
-              <td>{{course.course_num}}</td>
-              <td>{{course.course_name}}</td>
-              <td>{{course.username}}</td>
-              <td>{{course.status}}</td>
+              <td><a href = "request/{{request.pk}}">{{request.pk}}</a></td>
+              <td>{{request.foreign_course.course_institution}}</td>
+              <td>{{request.foreign_course.course_dept}}</td>
+              <td>{{request.foreign_course.course_num}}</td>
+              <td>{{request.foreign_course.course_name}}</td>
+              <td>{{request.foreign_course.username}}</td>
+              <td>{{request.status}}</td>
           </tr>
         {%endfor%}
         </table>

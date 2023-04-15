@@ -24,7 +24,8 @@ class UVA_Course(models.Model):
     course_num = models.PositiveIntegerField(null=False)
     credit_hours = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(10)])
 
-
+    def __str__(self):
+        return self.course_dept + " " + str(self.course_num) + " " + self.course_name
 class Request(models.Model):
     uva_course = models.ForeignKey(UVA_Course,null = True, on_delete=models.CASCADE);
     foreign_course = models.ForeignKey(Course, null = False, on_delete=models.CASCADE)
