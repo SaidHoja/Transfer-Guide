@@ -44,9 +44,10 @@ class sisForm(forms.Form):
     instructor = forms.CharField(max_length=20, required = False)
 
 class statusForm(forms.Form):
+    credits_approved = forms.IntegerField(label = "Approve for how many credits?", )
     status = forms.CharField(label ='Change Status?', max_length=1,widget=forms.Select(choices=[('P','Pending'),('A','Approve'),('D','Deny')]))
-    equivalent = forms.CharField(label='Equivalent UVA Course', max_length=30, required = False, help_text="Only fill out if approved.")
-    why_denied = forms.CharField(label="Reason for Denying Approval", max_length=200, required=False, help_text="Only fill out if denied.")
+    equivalent = forms.ModelChoiceField(queryset = UVA_Course.objects.all(), label='Equivalent UVA Course', required = False, help_text="Only fill out if approved.")
+    reviewer_comment = forms.CharField(label="Review Comment", max_length=200, required=False, help_text="Must fill out if denied.")
 #    def equivalent_course(self):
  #       if self.cleaned_data.get('status', None) == 'A':
  #           if self.cleaned_data.get('equivalent', None) is not None:
