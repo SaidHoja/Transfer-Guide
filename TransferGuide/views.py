@@ -183,24 +183,28 @@ def adminApproveCourses(request):
     courses = Course.objects.filter()
     coursesFilter = OrderCourses(request.GET, queryset=courses)
     courses = coursesFilter.qs
-    return render(request, 'TransferGuide/adminApproval.html', { 'courses': courses, 'coursesFilter': coursesFilter})
+    requests = []
+    for course in courses:
+        requests.append(Request.objects.get(foreign_course=course))
+    return render(request, 'TransferGuide/adminApproval.html', { 'courses': courses, 'coursesFilter': coursesFilter , 'requests' :requests})
 
-def coursePage(request, pk):
+def requestPage(request, pk):
 
     if (UserType.objects.get(user=request.user).role != "Admin"):
         raise PermissionDenied("Only admin users may access this page.")
     form = statusForm()
-    course = Course.objects.get(pk=pk)
+    the_request = Request.objects.get(pk=pk)
+    course = the_request.foreign_course
     the_request = Request.objects.get(foreign_course__course_name=course.course_name)
     if request.method == 'POST':
         form = statusForm(request.POST)
         if form.is_valid():
             the_request.status=form.cleaned_data['status']
-            # course.equivalent=form.cleaned_data['equivalent'] # this line has gotta go but I don't know how
-            # the_request.why_denied=form.cleaned_data['why_denied'] # uncomment when field is actually available
+            the_request.equivalent=form.cleaned_data['equivalent'] # this line has gotta go but I don't know how
+            the_request.reviewer_comment=form.cleaned_data['reviewer_comment'] # uncomment when field is actually available
             the_request.save()
 
-    return render(request, 'TransferGuide/coursePage.html', {'course': course, 'form':form})
+    return render(request, 'TransferGuide/requestPage.html', {'course': course, 'form':form})
 
 def searchForCourse(request):
     form = searchCourseForm()
