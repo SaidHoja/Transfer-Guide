@@ -120,8 +120,8 @@
             {% for request in approved_requests %}
                 <h6>{{request.foreign_course.course_name}}</h6>
                 <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}} &nbsp;{{request.foreign_course.course_num}}</p>
-                <p> Equivalent UVA Course: {{request.uva_course.course_name}} </p>
-                <p> Approved By: {{request.reviewed_by.user.username}}</p>
+                <p> Equivalent UVA Course: {{request.uva_course}} </p>
+                <p> Approved By: {{request.reviewed_by}}</p>
               {% endfor %}
             </ul>
           {% else %}
