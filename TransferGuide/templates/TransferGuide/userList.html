@@ -78,14 +78,32 @@
         </div>
 </nav>
 <div class =" d-flex justify-content-center">
+
 <div class="list-group">
 
     {% for k,v in userList.items %}
-    <li class="list-group-item"> {{k}} Role: {{v}}
-            <button type="button" class = "btn btn-primary">{% bs_icon 'pencil'%}</button>
+    <div class =" d-flex justify-content-center">
+    <li class="list-group-item w-100"> User: {{k}} Role: {{v}}
+
+        <div id="{{k}}" class="collapse">
+            <form action="" method = "POST" class = "form-center">
+                {% csrf_token %}
+                <input type="hidden"
+                name="user"
+                id="id_user"
+                       value={{k}}
+                maxlength="{{ form.name.field.max_length }}"
+                       ></input>
+
+                {{  form.newUserRole}}
+                <button type = "submit" class="btn btn-secondary">Submit</button>
+            </form>
+
+        </div>
+
     </li>
-
-
+    <button type="button" data-bs-toggle="collapse" data-bs-target="#{{k}}" class="btn btn-primary">{% bs_icon 'pencil'%} </button>
+    </div>
 
     {% endfor %}
 

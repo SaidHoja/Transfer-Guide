@@ -257,6 +257,21 @@ def allUsers(request):
     users = User.objects.all()
     userToType = {}
     userForm = editRoleForm()
+    if (request.method == "POST"):
+        userForm = editRoleForm(request.POST)
+        print("yes1")
+        if (userForm.is_valid()):
+            print("yes2")
+            try:
+                userToChange = User.objects.get(username = userForm.cleaned_data["user"])
+                userTypeToChange = UserType.objects.get(user = userToChange)
+                userToChange.role = userForm.cleaned_data["newUserRole"]
+                userToChange.save()
+            except UserType.DoesNotExist:
+                newUserType = UserType(user = User.objects.get(username=userForm.cleaned_data["user"]), role = userForm.cleaned_data["newUserRole"])
+                newUserType.save()
+
+
     for user in users:
         try:
             userToType.update({user: UserType.objects.get(user= user).role})
@@ -272,9 +287,7 @@ def addKnownTransfer(request):
 
     if (request.method == "POST"):
         form = KnownTransferForm(request.POST)
-        print("yes1")
         if (form.is_valid()):
-            print("yes2")
             the_request = Request()
             new_course = Course()
             new_course.username = request.user
