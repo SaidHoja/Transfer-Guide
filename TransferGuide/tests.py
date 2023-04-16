@@ -1,8 +1,9 @@
 import datetime
 from django.test import TestCase
 from django.urls import reverse
-from .models import Course
+from .models import Course, User, UVA_Course
 from .forms import requestCourseForm, searchCourseForm
+from .views import return_transfer_courses
 
 class FormViewTests(TestCase):
     def test_form_load(self):
@@ -104,6 +105,23 @@ class Search_Course_Form(TestCase):
         form_data = {"institution": "", "word": "", "dept_num": "ENGR 1000 1"}
         form = searchCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
+class Search_For_Course(TestCase):
+    def setup(self):
+        me = User.objects.get(username="emilychang")
+        self.instances.append(Course.objects.create(username=me, course_institution="Auburn University", course_name="Statics",
+                                                    course_dept="ENGR", course_num=2050, course_grade='A',
+                                                    course_delivery="IN-PERSON",syllabus_url="https://www.google.com/",
+                                                    credit_hours=3))
+        self.instances.append(Course.objects.create(username=me, course_institution="Northern Arizona University",
+                                                    course_name="Prin of Programming", course_dept="CSE", course_num=110,
+                                                    course_grade='B', course_delivery="IN-PERSON",syllabus_url="https://www.google.com/",
+                                                    credit_hours=3))
+        # self.instances.append(UVA_Course.objects.create(course_name=,course_dept=,course_num=,course_hours=)
+        # self.instances.append(UVA_Course.objects.create(course_name=, course_dept=, course_num=, course_hours=)
+    def tearDown(self):
+        for instance in self.instances:
+            instance.delete()
+
 # class CourseListTests(TestCase):
 #     def test_course_list_load(self):
 #         response = self.client.get(reverse('requestCourseList'))
