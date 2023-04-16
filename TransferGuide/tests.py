@@ -53,6 +53,8 @@ class Request_Course_Form(TestCase):
         form = requestCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
 
+class Request_New_Course(unittest.TestCase):
+
 class Viable_Course_Form(TestCase):
     def test_form_load(self):
         response = self.client.get(reverse('submitViableCourse'))
