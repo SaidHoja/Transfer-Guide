@@ -86,6 +86,21 @@ class Viable_Course_Form(TestCase):
                      'course_dept': 'M@TH', 'course_number': 1592, 'course_grade': 'B'}
         form = viableCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
+    def test_invalid_num_not_num(self):
+        form_data = {'course_institution': 'University of Central Arkansas', 'course_name': 'Calculus II',
+                     'course_dept': 'MATH', 'course_number':'AH', 'course_grade': 'B'}
+        form = viableCourseForm(data=form_data)
+        self.assertFalse(form.is_valid())
+    def test_invalid_num_is_negative(self):
+        form_data = {'course_institution': 'University of Central Arkansas', 'course_name': 'Calculus II',
+                     'course_dept': 'MATH', 'course_number': -1, 'course_grade': 'B'}
+        form = viableCourseForm(data=form_data)
+        self.assertFalse(form.is_valid())
+    def test_invalid_num_is_decimal(self):
+        form_data = {'course_institution': 'University of Central Arkansas', 'course_name': 'Calculus II',
+                     'course_dept': 'MATH', 'course_number': 1000.1, 'course_grade': 'B'}
+        form = viableCourseForm(data=form_data)
+        self.assertFalse(form.is_valid())
 #     def test_repeated_course(self):
 #         test_user = User.objects.get(username="emilychang")
 #         c = Course(username=test_user, course_institution="Auburn University", course_name="Statics",
