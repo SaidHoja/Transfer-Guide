@@ -13,7 +13,7 @@
         <ul>
             {% for course in accepted_courses %}
                 <h6>{{course.course_name}}</h6>
-                <p>{{ course.course_institution }} <br> {{ course.course_dept}}&nbsp{course.course_num}</p>
+                <p>{{ course.course_institution }} <br> {{ course.course_dept}}&nbsp{{course.course_num}}</p>
             {% endfor %}
         </ul>
         {% else %}
