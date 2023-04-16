@@ -74,6 +74,18 @@ class Viable_Course_Form(TestCase):
                      'course_dept': '', 'course_number': 1592, 'course_grade': 'B'}
         form = viableCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
+
+    def test_invalid_dept_too_many_words(self):
+        form_data = {'course_institution': 'University of Central Arkansas', 'course_name': 'Calculus II',
+                     'course_dept': 'MATH IS', 'course_number': 1592, 'course_grade': 'B'}
+        form = viableCourseForm(data=form_data)
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_dept_invalid_char(self):
+        form_data = {'course_institution': 'University of Central Arkansas', 'course_name': 'Calculus II',
+                     'course_dept': 'M@TH', 'course_number': 1592, 'course_grade': 'B'}
+        form = viableCourseForm(data=form_data)
+        self.assertFalse(form.is_valid())
 #     def test_repeated_course(self):
 #         test_user = User.objects.get(username="emilychang")
 #         c = Course(username=test_user, course_institution="Auburn University", course_name="Statics",
