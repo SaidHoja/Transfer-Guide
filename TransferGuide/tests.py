@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from .models import Course, User, UVA_Course, Request
 from .forms import requestCourseForm, searchCourseForm, viableCourseForm
-from .views import return_transfer_courses
+from .views import return_transfer_courses, isRequestNew
 import unittest
 
 class Request_Course_Form(TestCase):
@@ -61,20 +61,29 @@ class Request_New_Course(unittest.TestCase):
         me = User.objects.get(username="emilychang")
         person1 = User.objects.get(username="fyg6db")
         person2 = User.objects.get(username="dagim")
-        cls.instances.append(Course.objects.create(username=me, course_institution="University of Central Arkansas",
-                                                   course_name="Ordinary Diff Equations", course_dept="MATH",
-                                                   course_num=331, course_grade='A', course_delivery="IN-PERSON",
-                                                   syllabus_url="https://www.google.com/", credit_hours=3))
-        cls.instances.append(Course.objects.create(username=person1, course_institution="University of Central Arkansas",
-                                                   course_name="Ordinary Diff Equations", course_dept="MATH",
-                                                   course_num=331, course_grade='D', course_delivery="IN-PERSON",
-                                                   syllabus_url="https://www.google.com/", credit_hours=3))
-        cls.instances.append(Course.objects.create(username=person2, course_institution="University of Central Arkansas",
-                                                   course_name="Ordinary Diff Equations", course_dept="MATH",
-                                                   course_num=331, course_grade='C', course_delivery="IN-PERSON",
-                                                   syllabus_url="https://www.google.com/", credit_hours=3))
+        person3 = User.objects.get(username="suhayla")
+        cls.course1 = Course.objects.create(username=me, course_institution="University of Central Arkansas",
+                                            course_name="Ordinary Diff Equations", course_dept="MATH", course_num=331,
+                                            course_grade='A', course_delivery="IN-PERSON",
+                                            syllabus_url="https://www.google.com/", credit_hours=3)
+        cls.course2 = Course.objects.create(username=person1, course_institution="University of Central Arkansas",
+                                            course_name="Ordinary Diff Equations", course_dept="MATH", course_num=331,
+                                            course_grade='D', course_delivery="IN-PERSON",
+                                            syllabus_url="https://www.google.com/", credit_hours=3)
+        cls.course3 = Course.objects.create(username=person2, course_institution="University of Central Arkansas",
+                                            course_name="Ordinary Diff Equations", course_dept="MATH", course_num=331,
+                                            course_grade='C', course_delivery="IN-PERSON",
+                                            syllabus_url="https://www.google.com/", credit_hours=3)
+        cls.course4 = Course.objects.create(username=person3, course_institution="Harvard College",
+                                            course_name="Advanced Mathematics", course_dept="MATH", course_num=331,
+                                            course_grade='B', course_delivery="IN-PERSON",
+                                            syllabus_url="https://www.google.com/", credit_hours=3)
+        cls.instances.append(cls.course1)
+        cls.instances.append(cls.course2)
+        cls.instances.append(cls.course3)
+        cls.instances.append(cls.course4)
         cls.request1 = Request.objects.create(uva_course=UVA_Course.objects.get(course_dept="APMA", course_num=2130),
-                                              foreign_course=Course.objects.get(course_name="Ordinary Diff Equations", course_grade='A'),
+                                              foreign_course=Course.objects.get(course_name="Ordinary Diff Equations", course_grade='A',),
                                               status='A', credit_hours=3, reviewed_by=me)
         cls.request2 = Request.objects.create(uva_course=UVA_Course.objects.get(course_dept="APMA", course_num=2130),
                                               foreign_course=Course.objects.get(course_name="Ordinary Diff Equations", course_grade='D'),
@@ -82,13 +91,27 @@ class Request_New_Course(unittest.TestCase):
         cls.request3 = Request.objects.create(uva_course=UVA_Course.objects.get(course_dept="APMA", course_num=2130),
                                               foreign_course=Course.objects.get(course_name="Ordinary Diff Equations", course_grade='C'),
                                               status='P', credit_hours=3, reviewed_by=me)
+        cls.request4 = Request.objects.create(uva_course=UVA_Course.objects.get(course_dept="APMA", course_num=2130),
+                                              foreign_course=Course.objects.get(course_name="Advanced Mathematics"),
+                                              status='P', credit_hours=3, reviewed_by=me)
         cls.instances.append(cls.request1)
         cls.instances.append(cls.request2)
         cls.instances.append(cls.request3)
-        cls.request = Request.objects.filter(id__in=[cls.request1.id, cls.request2.id, cls.request3.id])
+        cls.instances.append(cls.request4)
+        cls.user_courses = Course.objects.filter(id__in=[cls.course1.id, cls.course2.id, cls.course3.id, cls.course4.id])
 
-    def test_sanity(self):
-        self.assertEqual(len(self.request), 3)
+    def test_new_course_equivalence(self):
+        self.assertTrue(isRequestNew(self.user_courses, "MATH", 251, "Fullerton College"))
+    def test_new_course_same_college(self):
+        self.assertTrue(isRequestNew(self.user_courses, "ENGR", 1624, "University of Central Arkansas"))
+    def test_new_course_same_dept(self):
+        self.assertTrue(isRequestNew(self.user_courses, "MATH", 1624, "Harvard College"))
+    def test_new_course_same_dept_num(self):
+        self.assertTrue(isRequestNew(self.user_courses, "MATH", 331, "Columbia University"))
+    def test_invalid_course_submitted_Before(self):
+        self.assertFalse(isRequestNew(self.user_courses, "MATH", 331, "Harvard College"))
+    def test_invalid_course_preapproved(self):
+        self.assertFalse(isRequestNew(self.user_courses, "MATH", 331, "University of Central Arkansas"))
     @classmethod
     def tearDownClass(cls):
         for instance in cls.instances:
@@ -141,16 +164,6 @@ class Viable_Course_Form(TestCase):
                      'course_dept': 'MATH', 'course_number': 1000.1, 'course_grade': 'B'}
         form = viableCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
-#     def test_repeated_course(self):
-#         test_user = User.objects.get(username="emilychang")
-#         c = Course(username=test_user, course_institution="Auburn University", course_name="Statics",
-#                    course_dept="ENGR", course_num=2050, course_grade='A', course_delivery="IN-PERSON",
-#                    syllabus_url="https://www.google.com/", credit_hours=3)
-#         c.save()
-#         form_data = {'course_institution': 'University of Virginia', 'course_name': 'Advanced Software Development',
-#                      'course_dept': 'C S', 'course_number': '1000', 'course_grade': 'A', 'course_delivery': 'IN-PERSON',
-#                      'syllabus_url': 'https://docs.djangoproject.com/en/4.1/topics/db/models/', 'credit_hours': '100'}
-#         c.delete()
 
 class LoginViewTests(TestCase):
     def test_login_load(self):
