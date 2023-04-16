@@ -36,4 +36,5 @@ urlpatterns = [
     path('submitViableCourse/', views.submitViableCourse, name = 'submitViableCourse'),
     path('seeViableCourse/', views.seeViableCourse, name = 'seeViableCourse'),
     path('searchForCourse/', views.searchForCourse, name = 'searchForCourse'),
+    path('userList/', views.allUsers, name = "userList"),
 ]
