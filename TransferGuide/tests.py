@@ -54,7 +54,45 @@ class Request_Course_Form(TestCase):
         self.assertFalse(form.is_valid())
 
 class Request_New_Course(unittest.TestCase):
+    instances = []
+    user_courses = []
+    @classmethod
+    def setUpClass(cls):
+        me = User.objects.get(username="emilychang")
+        person1 = User.objects.get(username="fyg6db")
+        person2 = User.objects.get(username="dagim")
+        cls.instances.append(Course.objects.create(username=me, course_institution="University of Central Arkansas",
+                                                   course_name="Ordinary Diff Equations", course_dept="MATH",
+                                                   course_num=331, course_grade='A', course_delivery="IN-PERSON",
+                                                   syllabus_url="https://www.google.com/", credit_hours=3))
+        cls.instances.append(Course.objects.create(username=person1, course_institution="University of Central Arkansas",
+                                                   course_name="Ordinary Diff Equations", course_dept="MATH",
+                                                   course_num=331, course_grade='D', course_delivery="IN-PERSON",
+                                                   syllabus_url="https://www.google.com/", credit_hours=3))
+        cls.instances.append(Course.objects.create(username=person2, course_institution="University of Central Arkansas",
+                                                   course_name="Ordinary Diff Equations", course_dept="MATH",
+                                                   course_num=331, course_grade='C', course_delivery="IN-PERSON",
+                                                   syllabus_url="https://www.google.com/", credit_hours=3))
+        cls.request1 = Request.objects.create(uva_course=UVA_Course.objects.get(course_dept="APMA", course_num=2130),
+                                              foreign_course=Course.objects.get(course_name="Ordinary Diff Equations", course_grade='A'),
+                                              status='A', credit_hours=3, reviewed_by=me)
+        cls.request2 = Request.objects.create(uva_course=UVA_Course.objects.get(course_dept="APMA", course_num=2130),
+                                              foreign_course=Course.objects.get(course_name="Ordinary Diff Equations", course_grade='D'),
+                                              status='D', credit_hours=3, reviewed_by=me)
+        cls.request3 = Request.objects.create(uva_course=UVA_Course.objects.get(course_dept="APMA", course_num=2130),
+                                              foreign_course=Course.objects.get(course_name="Ordinary Diff Equations", course_grade='C'),
+                                              status='P', credit_hours=3, reviewed_by=me)
+        cls.instances.append(cls.request1)
+        cls.instances.append(cls.request2)
+        cls.instances.append(cls.request3)
+        cls.request = Request.objects.filter(id__in=[cls.request1.id, cls.request2.id, cls.request3.id])
 
+    def test_sanity(self):
+        self.assertEqual(len(self.request), 3)
+    @classmethod
+    def tearDownClass(cls):
+        for instance in cls.instances:
+            instance.delete()
 class Viable_Course_Form(TestCase):
     def test_form_load(self):
         response = self.client.get(reverse('submitViableCourse'))
