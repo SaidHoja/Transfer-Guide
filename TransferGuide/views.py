@@ -27,8 +27,8 @@ def requestCourse(request):
                 course_delivery = form.cleaned_data['course_delivery']
                 syllabus_url = form.cleaned_data['syllabus_url']
                 credit_hours = form.cleaned_data['credit_hours']
-                print(isRequestNew(username, course_dept, course_number, course_institution))
-                if isRequestNew(username, course_dept, course_number, course_institution):
+                user_courses = Course.objects.filter(username=username)
+                if isRequestNew(user_courses, course_dept, course_number, course_institution):
                     print("request is made")
                     c = Course(username=username,course_institution=course_institution,course_name=course_name,
                            course_dept=course_dept,course_num=course_number,course_grade=course_grade,
@@ -55,15 +55,17 @@ def find_courses_from_request(pending_requests):
         courses.append(req.foreign_course)
     return courses
 
-def isRequestNew(username, course_dept, course_num, course_institution):
-    user_courses = Course.objects.filter(username=username)
+def isRequestNew(user_courses, course_dept, course_num, course_institution):
     requested_courses = Request.objects.filter(foreign_course__course_dept=course_dept)
     requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
+    requested_courses = requested_courses.filter(foreign_course__course_institution=course_institution)
     never_checked = len(requested_courses.filter(status='D')) == 0 and len(requested_courses.filter(status='A')) == 0
+    # has course ever been submitted before
     course = user_courses.filter(course_dept=course_dept)
     course = course.filter(course_num=course_num)
-    diff_course = len(course) == 0
-    return diff_course and never_checked
+    course = course.filter(course_institution=course_institution)
+    never_submitted = len(course) == 0
+    return never_submitted and never_checked
 
 def submitViableCourse(request):
     formset = viableCourseFormSet()
@@ -98,7 +100,8 @@ def seeViableCourse(request):
         approved_requests = approved_requests.filter(foreign_course__course_num=user_course.course_num)
         # print(str(user_course.course_num) + str(len(approved_requests)))
         approved_courses = find_courses_from_request(approved_requests)
-        approved_course_lowest_grade = find_lowest_grade(approved_courses)
+        # approved_course_lowest_grade = find_lowest_grade(approved_courses)
+        approved_course_lowest_grade = 70
         if user_grade >= approved_course_lowest_grade:
             acceptedCourses.append(user_course)
             num_of_transfer_courses += 1
