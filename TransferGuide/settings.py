@@ -28,6 +28,7 @@ ALLOWED_HOSTS = ['0.0.0.0', 'transfer-guide-b-23.herokuapp.com',
 
 # Application definition
 
+
 INSTALLED_APPS = [
     'TransferGuide.apps.TransferGuideConfig',
     'django.contrib.admin',
@@ -45,7 +46,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'bootstrap5',
     'django_filters',
+    'django_bootstrap_icons',
 ]
+BS_ICONS_BASE_URL = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

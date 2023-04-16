@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied
 from oauth_app.models import UserType
 from .forms import requestCourseForm, sisForm, viableCourseFormSet
 from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm
-from .models import Course, Viable_Course, Request, UserType
+from .models import Course, Viable_Course, Request, UserType, User
 from .filters import OrderCourses
 import re
 
@@ -200,7 +200,7 @@ def requestPage(request, pk):
         form = statusForm(request.POST)
         if form.is_valid():
             the_request.status=form.cleaned_data['status']
-            the_request.equivalent=form.cleaned_data['equivalent'] # this line has gotta go but I don't know how
+            the_request.uva_course=form.cleaned_data['equivalent'] # this line has gotta go but I don't know how
             the_request.reviewer_comment=form.cleaned_data['reviewer_comment'] # uncomment when field is actually available
             the_request.save()
 
@@ -250,5 +250,17 @@ def index(request):
     return render(request, 'index.html')
 
 
+def allUsers(request):
+    if (UserType.objects.get(user=request.user).role != "Admin"):
+        raise PermissionDenied("Only admin users may access this page.")
 
+    users = User.objects.all()
+    userToType = {}
+    for user in users:
+        try:
+            userToType.update({user: UserType.objects.get(user= user).role})
+        except UserType.DoesNotExist:
+            userToType.update({user:"None"})
+
+    return render(request,"TransferGuide/userList.html", context = { "userList":userToType })
 
