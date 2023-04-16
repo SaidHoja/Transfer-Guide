@@ -4,7 +4,7 @@ from django import forms
 from django.forms.formsets import formset_factory
 import datetime
 from django.core.exceptions import ValidationError
-from .models import Viable_Course, Course, Request, UVA_Course
+from .models import Viable_Course, Course, Request, UVA_Course, UserType, User
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 # creating a form
@@ -113,3 +113,23 @@ class searchCourseForm(forms.Form):
     #         self.fields['course_name'] = forms.CharField(label='Select a course name you want to search for',
     #                                                       max_length=100, widget=forms.Select(choices=result_list))
     #         print(True)
+
+class editRoleForm(forms.Form):
+    #newUserRole = forms.CharField(widget=forms.Select(choices=[("Student", "Student"), ["Admin","Admin"]]))
+    user = forms.ModelChoiceField(queryset=User.objects.all(), widget= forms.HiddenInput())
+
+class KnownTransferForm(forms.Form):
+    course_institution = forms.CharField(max_length=100)
+    course_name = forms.CharField(max_length = 100)
+    course_dept = forms.CharField(max_length=5, validators=[validate_one_word])
+    course_number = forms.IntegerField(min_value=0, max_value=9999)
+    course_grade = forms.CharField(label = "Minimum grade", max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
+                                                                             ('F','F')]))
+    course_delivery = forms.CharField(max_length=10, widget=forms.Select(choices=[('IN-PERSON','IN-PERSON'), (
+        'ONLINE','ONLINE')]))
+    syllabus_url = forms.URLField()
+    credit_hours = forms.IntegerField(min_value=0, max_value=10)
+    credits_approved = forms.IntegerField(label = "Approve for how many credits?", )
+    status = forms.CharField(label ='Denied or Approved?', max_length=1,widget=forms.Select(choices=[('A','Approve'),('D','Deny')]))
+    equivalent = forms.ModelChoiceField(queryset = UVA_Course.objects.all(), label='Equivalent UVA Course', required = False, help_text="Only fill out if approved.")
+    reviewer_comment = forms.CharField(label="Review Comment", max_length=200, required=False, help_text="Must fill out if denied.")
