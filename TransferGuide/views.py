@@ -42,15 +42,12 @@ def requestCourseList(request):
     username = request.user
     user_courses = Request.objects.filter(foreign_course__username=username)  # .order_by('-pub_date')
     pending_requests = user_courses.filter(status="P")
-    # pending_courses = find_courses_from_request(pending_requests)
     denied_requests = user_courses.filter(status="D")
-    # denied_courses = find_courses_from_request(denied_requests)
     approved_requests = user_courses.filter(status="A")
-    # approved_courses = find_courses_from_request(approved_requests)
     return render(request, 'TransferGuide/requestCourseList.html', {'pending_requests':pending_requests,
                                                                     'approved_requests':approved_requests,
                                                                     'denied_requests':denied_requests})
-
+# never used but thought might be helpful
 def find_courses_from_request(pending_requests):
     courses = []
     for req in pending_requests:
@@ -92,16 +89,17 @@ def seeViableCourse(request):
     num_of_courses = len(user_courses)
     acceptedCourses = []
     for user_course in user_courses:
+        user_grade = translate_grade(user_course.course_grade)
         approved_requests = Request.objects.filter(status='A')
         approved_requests = approved_requests.filter(foreign_course__course_dept=user_course.course_dept)
+        # print(user_course.course_dept + str(len(approved_requests)))
         approved_requests = approved_requests.filter(foreign_course__course_num=user_course.course_num)
+        # print(str(user_course.course_num) + str(len(approved_requests)))
         approved_courses = find_courses_from_request(approved_requests)
-        for approved_course in approved_courses:
-            if approved_course.status == 'A':
-                approved_course_lowest_grade = find_lowest_grade(approved_courses)
-                if user_grade >= approved_course_lowest_grade:
-                    acceptedCourses.append(user_course)
-                    num_of_transfer_courses += 1
+        approved_course_lowest_grade = find_lowest_grade(approved_courses)
+        if user_grade >= approved_course_lowest_grade:
+            acceptedCourses.append(user_course)
+            num_of_transfer_courses += 1
     return render(request, 'TransferGuide/viableCourseList.html', {'accepted_courses':acceptedCourses,
                                                                    'num_of_transfer_courses':num_of_transfer_courses,
                                                                    'num_of_courses':num_of_courses})
