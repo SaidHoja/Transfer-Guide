@@ -115,8 +115,8 @@ class searchCourseForm(forms.Form):
     #         print(True)
 
 class editRoleForm(forms.Form):
-    #newUserRole = forms.CharField(widget=forms.Select(choices=[("Student", "Student"), ["Admin","Admin"]]))
-    user = forms.ModelChoiceField(queryset=User.objects.all(), widget= forms.HiddenInput())
+    newUserRole = forms.CharField(label = "Change role" ,widget=forms.Select(choices=[("Student", "Student"), ["Admin","Admin"]]))
+    user = forms.CharField(widget= forms.HiddenInput())
 
 class KnownTransferForm(forms.Form):
     course_institution = forms.CharField(max_length=100)
