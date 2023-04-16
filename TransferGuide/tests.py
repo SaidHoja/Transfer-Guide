@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from .models import Course, User, UVA_Course, Request
-from .forms import requestCourseForm, searchCourseForm
+from .forms import requestCourseForm, searchCourseForm, viableCourseForm
 from .views import return_transfer_courses
 import unittest
 
@@ -53,6 +53,27 @@ class Request_Course_Form(TestCase):
         form = requestCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
 
+class Viable_Course_Form(TestCase):
+    def test_form_load(self):
+        response = self.client.get(reverse('submitViableCourse'))
+        self.assertEqual(response.status_code, 200)
+    def test_all_fields_filled(self):
+        form_data = {'course_institution':'University of Central Arkansas','course_name':'Calculus II',
+                     'course_dept':'MATH','course_number':1592,'course_grade':'B'}
+        form = viableCourseForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_most_fields_not_filled(self):
+        form_data = {'course_institution': '', 'course_name': '',
+                     'course_dept': '', 'course_number':0, 'course_grade': ''}
+        form = viableCourseForm(data=form_data)
+        self.assertFalse(form.is_valid())
+
+    def test_one_field_unfilled(self):
+        form_data = {'course_institution': 'University of Central Arkansas', 'course_name': 'Calculus II',
+                     'course_dept': '', 'course_number': 1592, 'course_grade': 'B'}
+        form = viableCourseForm(data=form_data)
+        self.assertFalse(form.is_valid())
 #     def test_repeated_course(self):
 #         test_user = User.objects.get(username="emilychang")
 #         c = Course(username=test_user, course_institution="Auburn University", course_name="Statics",
@@ -70,6 +91,9 @@ class LoginViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
 class Search_Course_Form(TestCase):
+    def test_form_load(self):
+        response = self.client.get(reverse('searchForCourse'))
+        self.assertEqual(response.status_code, 200)
     def test_blank_form(self):
         form_data = {"institution":"", "word":"", "dept_num":""}
         form = searchCourseForm(data=form_data)
