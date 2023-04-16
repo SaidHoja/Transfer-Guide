@@ -1,10 +1,10 @@
 import datetime
 from django.test import TestCase
 from django.urls import reverse
-from .models import Course
-from .forms import requestCourseForm
+from .models import Course, User
+from .forms import requestCourseForm, searchCourseForm
 
-class FormViewTests(TestCase):
+class Request_Course_Form(TestCase):
     def test_form_load(self):
         response = self.client.get(reverse('requestCourse'))
         self.assertEqual(response.status_code, 200)
@@ -49,10 +49,17 @@ class FormViewTests(TestCase):
                      'syllabus_url':'https://docs.djangoproject.com/en/4.1/topics/db/models/','credit_hours':'100'}
         form = requestCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
-# class TryAgainViewTests(TestCase):
-#     def test_try_again_load(self):
-#         response = self.client.get(reverse('tryAgain'))
-#         self.assertEqual(response.status_code, 200)
+
+#     def test_repeated_course(self):
+#         test_user = User.objects.get(username="emilychang")
+#         c = Course(username=test_user, course_institution="Auburn University", course_name="Statics",
+#                    course_dept="ENGR", course_num=2050, course_grade='A', course_delivery="IN-PERSON",
+#                    syllabus_url="https://www.google.com/", credit_hours=3)
+#         c.save()
+#         form_data = {'course_institution': 'University of Virginia', 'course_name': 'Advanced Software Development',
+#                      'course_dept': 'C S', 'course_number': '1000', 'course_grade': 'A', 'course_delivery': 'IN-PERSON',
+#                      'syllabus_url': 'https://docs.djangoproject.com/en/4.1/topics/db/models/', 'credit_hours': '100'}
+#         c.delete()
 
 class LoginViewTests(TestCase):
     def test_login_load(self):
