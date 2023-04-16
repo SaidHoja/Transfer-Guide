@@ -228,8 +228,8 @@ def searchForCourse(request):
                 raw_data = dept_num.split()
                 dept = raw_data[0]
                 num = raw_data[1]
-                result = result.filter(foreign_course__course_dept=dept)
-                result = result.filter(foreign_course__course_num=num)
+                result = result.filter(uva_course__course_dept__iregex=dept)
+                result = result.filter(uva_course__course_num=num)
             # print(len(result))
         return render(request, 'TransferGuide/searchCourseResult.html', {'requests':result})
     return render(request, 'TransferGuide/searchCourse.html', {'form':form})
