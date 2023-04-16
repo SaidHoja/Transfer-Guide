@@ -12,6 +12,8 @@ from django.dispatch import receiver
 def validate_one_word(value):
     if len(value.split()) != 1:
         raise ValidationError("Please enter only one word.")
+    if not value.isalpha():
+        raise ValidationError("Please enter a valid word. Uses characters A-Z")
 class requestCourseForm(forms.Form):
     course_institution = forms.CharField(max_length=100)
     course_name = forms.CharField(max_length = 100)
