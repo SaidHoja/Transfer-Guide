@@ -79,6 +79,7 @@ def submitViableCourse(request):
                 course_dept = form.cleaned_data['course_dept']
                 course_number = form.cleaned_data['course_number']
                 course_grade = form.cleaned_data['course_grade']
+                # error checking
                 v = Viable_Course(username=username,course_institution=course_institution,course_name=course_name,
                                   course_dept=course_dept,course_num=course_number,course_grade=course_grade)
                 v.save()
