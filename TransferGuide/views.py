@@ -202,6 +202,7 @@ def requestPage(request, pk):
             the_request.status=form.cleaned_data['status']
             the_request.uva_course=form.cleaned_data['equivalent'] # this line has gotta go but I don't know how
             the_request.reviewer_comment=form.cleaned_data['reviewer_comment'] # uncomment when field is actually available
+            the_request.reviewed_by = request.user
             the_request.save()
 
     return render(request, 'TransferGuide/requestPage.html', {'course': course, 'form':form})
