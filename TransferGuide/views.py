@@ -27,6 +27,7 @@ def requestCourse(request):
                 course_delivery = form.cleaned_data['course_delivery']
                 syllabus_url = form.cleaned_data['syllabus_url']
                 credit_hours = form.cleaned_data['credit_hours']
+                print(isRequestNew(username, course_dept, course_number, course_institution))
                 if isRequestNew(username, course_dept, course_number, course_institution):
                     print("request is made")
                     c = Course(username=username,course_institution=course_institution,course_name=course_name,
@@ -59,9 +60,10 @@ def isRequestNew(username, course_dept, course_num, course_institution):
     requested_courses = Request.objects.filter(foreign_course__course_dept=course_dept)
     requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
     never_checked = len(requested_courses.filter(status='D')) == 0 and len(requested_courses.filter(status='A')) == 0
-    same_dept = len(user_courses.filter(course_dept=course_dept)) == 0
-    same_num = len(user_courses.filter(course_num=course_num)) == 0
-    return same_dept and same_num and never_checked
+    course = user_courses.filter(course_dept=course_dept)
+    course = course.filter(course_num=course_num)
+    diff_course = len(course) == 0
+    return diff_course and never_checked
 
 def submitViableCourse(request):
     formset = viableCourseFormSet()
@@ -208,27 +210,27 @@ def requestPage(request, pk):
 def searchForCourse(request):
     form = searchCourseForm()
     # select approved courses
-    result = Request.objects.all()
+    result = Request.objects.filter(status='A')
     if request.method == 'POST':
         form = searchCourseForm(request.POST)
         if form.is_valid():
             institution = form.cleaned_data['institution']
             word = form.cleaned_data['word']
             dept_num = form.cleaned_data['dept_num']
-            print(len(result))
+            # print(len(result))
             if institution != "No Preference":
                 result = result.filter(foreign_course__course_institution=institution)
-            print(len(result))
+            # print(len(result))
             if word != "":
                 result = result.filter(foreign_course__course_name__icontains=word)
-            print(len(result))
+            # print(len(result))
             if dept_num != "":
                 raw_data = dept_num.split()
                 dept = raw_data[0]
                 num = raw_data[1]
                 result = result.filter(foreign_course__course_dept=dept)
                 result = result.filter(foreign_course__course_num=num)
-            print(len(result))
+            # print(len(result))
         return render(request, 'TransferGuide/searchCourseResult.html', {'requests':result})
     return render(request, 'TransferGuide/searchCourse.html', {'form':form})
 
