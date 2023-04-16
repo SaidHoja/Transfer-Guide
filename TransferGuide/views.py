@@ -27,8 +27,8 @@ def requestCourse(request):
                 course_delivery = form.cleaned_data['course_delivery']
                 syllabus_url = form.cleaned_data['syllabus_url']
                 credit_hours = form.cleaned_data['credit_hours']
-                print(isRequestNew(username, course_dept, course_number, course_institution))
-                if isRequestNew(username, course_dept, course_number, course_institution):
+                user_courses = Course.objects.filter(username=username)
+                if isRequestNew(user_courses, course_dept, course_number):
                     print("request is made")
                     c = Course(username=username,course_institution=course_institution,course_name=course_name,
                            course_dept=course_dept,course_num=course_number,course_grade=course_grade,
@@ -55,8 +55,7 @@ def find_courses_from_request(pending_requests):
         courses.append(req.foreign_course)
     return courses
 
-def isRequestNew(username, course_dept, course_num, course_institution):
-    user_courses = Course.objects.filter(username=username)
+def isRequestNew(user_courses, course_dept, course_num):
     requested_courses = Request.objects.filter(foreign_course__course_dept=course_dept)
     requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
     never_checked = len(requested_courses.filter(status='D')) == 0 and len(requested_courses.filter(status='A')) == 0
