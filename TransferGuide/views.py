@@ -7,7 +7,7 @@ import json, requests
 from django.core.exceptions import PermissionDenied
 from oauth_app.models import UserType
 from .forms import requestCourseForm, sisForm, viableCourseFormSet
-from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm
+from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm, editRoleForm, KnownTransferForm
 from .models import Course, Viable_Course, Request, UserType, User
 from .filters import OrderCourses
 import re
@@ -267,11 +267,55 @@ def allUsers(request):
 
     users = User.objects.all()
     userToType = {}
+    userForm = editRoleForm()
+    if (request.method == "POST"):
+        userForm = editRoleForm(request.POST)
+        print("yes1")
+        if (userForm.is_valid()):
+            print("yes2")
+            try:
+                userToChange = User.objects.get(username = userForm.cleaned_data["user"])
+                userTypeToChange = UserType.objects.get(user = userToChange)
+                userToChange.role = userForm.cleaned_data["newUserRole"]
+                userToChange.save()
+            except UserType.DoesNotExist:
+                newUserType = UserType(user = User.objects.get(username=userForm.cleaned_data["user"]), role = userForm.cleaned_data["newUserRole"])
+                newUserType.save()
+
+
     for user in users:
         try:
             userToType.update({user: UserType.objects.get(user= user).role})
         except UserType.DoesNotExist:
             userToType.update({user:"None"})
 
-    return render(request,"TransferGuide/userList.html", context = { "userList":userToType })
+    return render(request,"TransferGuide/userList.html", context = { "userList":userToType , "form" : userForm })
+
+def addKnownTransfer(request):
+    if (UserType.objects.get(user=request.user).role != "Admin"):
+        raise PermissionDenied("Only admin users may access this page.")
+    form = KnownTransferForm()
+
+    if (request.method == "POST"):
+        form = KnownTransferForm(request.POST)
+        if (form.is_valid()):
+            the_request = Request()
+            new_course = Course()
+            new_course.username = request.user
+            new_course.course_institution = form.cleaned_data['course_institution']
+            new_course.course_name = form.cleaned_data['course_name']
+            new_course.course_dept = form.cleaned_data['course_dept']
+            new_course.course_number = form.cleaned_data['course_number']
+            new_course.course_grade = form.cleaned_data['course_grade']
+            new_course.course_delivery = form.cleaned_data['course_delivery']
+            new_course.syllabus_url = form.cleaned_data['syllabus_url']
+            new_course.credit_hours = form.cleaned_data['credit_hours']
+            new_course.save()
+            the_request.foreign_course = new_course
+            the_request.status = form.cleaned_data['status']
+            the_request.uva_course = form.cleaned_data['equivalent']
+            the_request.reviewer_comment = form.cleaned_data['reviewer_comment']
+            the_request.save()
+
+    return render(request, "TransferGuide/knownTransferForm.html", {"form":form})
 

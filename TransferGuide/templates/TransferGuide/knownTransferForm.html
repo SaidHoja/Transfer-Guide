@@ -1,18 +1,17 @@
 {% load static %}
 {% load bootstrap5 %}
 {% bootstrap_css %}
-{% bootstrap_messages %}
 {% bootstrap_javascript %}
 {% load socialaccount %}
-{% load bootstrap_icons%}
+
 <html>
 <div class="p-5 bg-primary text-warning text-center">
-  <h1> Transfer Request ID: {{course.pk}}</h1>
+  <h1> Add Known Transfer</h1>
 
     {% if not user.is_authenticated %}
         <p>Welcome, please log in to continue!</p>
     {% elif user.usertype.role == 'Admin' %}
-        <p>Welcome {{ user.username }}, you can approve or deny transfer credits on this page.</p>
+        <p>Welcome {{ user.username }}, you can add a known transfer on this page</p>
     {% else %}
          <p>{{ user.username }}, Students do not have access to this page.</p>
     {% endif %}
@@ -68,12 +67,6 @@
                     <li class="nav-item me-4">
                     <a class="nav-link active" href="/requestCourseList">Status of Credit Requests</a>
                     </li>
-                    <li class="nav-item me-4">
-                        <a class="nav-link active" href="/submitViableCourse">Do Courses Transfer?</a>
-                    </li>
-                    <li class="nav-item me-4">
-                        <a class="nav-link active" href="/searchForCourse/">See Transfer Courses</a>
-                    </li>
                 </ul>
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
@@ -83,36 +76,10 @@
             {% endif %}
         </div>
 </nav>
-<div class =" d-flex justify-content-center">
+    <form method = "POST" class = "form-center">
+    {%csrf_token%}
+    {% bootstrap_form form%}
+    <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
 
-<div class="list-group">
-
-    {% for k,v in userList.items %}
-    <div class =" d-flex justify-content-center">
-    <li class="list-group-item w-100"> User: {{k}} Role: {{v}}
-
-        <div id="{{k}}" class="collapse">
-            <form action="" method = "POST" class = "form-center">
-                {% csrf_token %}
-                <input type="hidden"
-                name="user"
-                id="id_user"
-                       value={{k}}
-                maxlength="{{ form.name.field.max_length }}"
-                       ></input>
-
-                {{  form.newUserRole}}
-                <button type = "submit" class="btn btn-secondary">Submit</button>
-            </form>
-
-        </div>
-
-    </li>
-    <button type="button" data-bs-toggle="collapse" data-bs-target="#{{k}}" class="btn btn-primary">{% bs_icon 'pencil'%} </button>
-    </div>
-
-    {% endfor %}
-
-</div>
-</div>
 </html>

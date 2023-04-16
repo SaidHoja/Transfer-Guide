@@ -37,4 +37,7 @@ urlpatterns = [
     path('seeViableCourse/', views.seeViableCourse, name = 'seeViableCourse'),
     path('searchForCourse/', views.searchForCourse, name = 'searchForCourse'),
     path('userList/', views.allUsers, name = "userList"),
+    path('userList/<int:pk>', views.allUsers, name="userList"),
+    path('knownTransfer/', views.addKnownTransfer, name = "addKnownTransfer")
+
 ]
