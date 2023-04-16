@@ -32,6 +32,7 @@ class Request(models.Model):
     status = models.CharField(max_length = 1, default = "P", choices = [("A","A"),("D","D"),("P","P")])
     credit_hours =  models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(10)], null = True)
     reviewed_by = models.ForeignKey(User,null=True, on_delete=models.CASCADE)
+    reviewer_comment = models.CharField(max_length=300, null=True)
 
 class Viable_Course(models.Model):
     username = models.ForeignKey(User,on_delete = models.CASCADE)
