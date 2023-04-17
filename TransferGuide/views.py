@@ -56,16 +56,27 @@ def find_courses_from_request(pending_requests):
     return courses
 
 def isRequestNew(user_courses, course_dept, course_num, course_institution):
+    # has course ever been approved
     requested_courses = Request.objects.filter(foreign_course__course_dept=course_dept)
     requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
     requested_courses = requested_courses.filter(foreign_course__course_institution=course_institution)
-    never_checked = len(requested_courses.filter(status='D')) == 0 and len(requested_courses.filter(status='A')) == 0
+    never_approved = len(requested_courses.filter(status='A')) == 0
     # has course ever been submitted before
     course = user_courses.filter(course_dept=course_dept)
     course = course.filter(course_num=course_num)
     course = course.filter(course_institution=course_institution)
     never_submitted = len(course) == 0
-    return never_submitted and never_checked
+    # has course ever been denied outright (i.e. not just because of a low grade)
+    denied_requests = requested_courses.filter(status='D')
+    num_of_high_grades_in_denied_requests = 0
+    for denied_request in denied_requests:
+        if translate_grade(denied_request.foreign_course.course_grade) >= 70:
+            num_of_high_grades_in_denied_requests += 1
+    never_denied = num_of_high_grades_in_denied_requests == 0
+    print("never_submitted is " + str(never_submitted))
+    print("never_approved is " + str(never_approved))
+    print("never_denied is " + str(never_denied))
+    return never_submitted and never_approved and never_denied
 
 def submitViableCourse(request):
     formset = viableCourseFormSet()
