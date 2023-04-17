@@ -276,11 +276,14 @@ def allUsers(request):
             try:
                 userToChange = User.objects.get(username = userForm.cleaned_data["user"])
                 userTypeToChange = UserType.objects.get(user = userToChange)
-                userToChange.role = userForm.cleaned_data["newUserRole"]
-                userToChange.save()
+                userTypeToChange.role = userForm.cleaned_data["newUserRole"]
+                print(userForm.cleaned_data["newUserRole"])
+                userTypeToChange.save()
+                print("yes3")
             except UserType.DoesNotExist:
                 newUserType = UserType(user = User.objects.get(username=userForm.cleaned_data["user"]), role = userForm.cleaned_data["newUserRole"])
                 newUserType.save()
+                print("yes4")
 
 
     for user in users:
