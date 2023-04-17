@@ -87,7 +87,9 @@ def validate_dept_num(value):
             raise ValidationError("Enter only letters in the department (e.g. CS)")
         if raw_values[1].isnumeric():
            if int(raw_values[1]) < 1000:
-               raise ValidationError("Enter a valid UVA course number (> 1000)")
+               raise ValidationError("Enter a valid UVA course number (> 1,000)")
+           elif int(raw_values[1]) > 9999:
+               raise ValidationError("Enter a valid UVA course number (< 10,000)")
         else:
             raise ValidationError("Enter a valid number for the course number")
 
