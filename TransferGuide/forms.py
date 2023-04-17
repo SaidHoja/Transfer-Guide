@@ -94,7 +94,7 @@ def validate_dept_num(value):
 class searchCourseForm(forms.Form):
     institution = forms.CharField(label='Select an institution to transfer courses from', max_length=100,
                                   widget=forms.Select(choices=institution_as_widget()), required=False)
-    word = forms.CharField(label='Look for all classes that share this word. (e.g. Enter "anthropology" to look for Anthropology of Water',
+    word = forms.CharField(label='Look for all classes that share this word. (e.g. Enter "anthropology" to see the non-UVA class Anthropology of Water',
                            max_length=100, required=False)
     dept_num = forms.CharField(label='Input a UVA course department and number to see all transferable courses',
                                 max_length=13, validators=[validate_dept_num], required=False)
