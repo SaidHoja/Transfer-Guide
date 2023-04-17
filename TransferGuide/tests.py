@@ -206,6 +206,10 @@ class Search_Course_Form(TestCase):
         form_data = {"institution": "", "word": "", "dept_num": "ENGR 1"}
         form = searchCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
+    def test_invalid_num_too_big(self):
+        form_data = {"institution": "", "word": "", "dept_num": "ENGR 10000"}
+        form = searchCourseForm(data=form_data)
+        self.assertFalse(form.is_valid())
     def test_invalid_num_uses_letters(self):
         form_data = {"institution": "", "word": "", "dept_num": "ENGR IS"}
         form = searchCourseForm(data=form_data)
