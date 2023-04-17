@@ -199,7 +199,6 @@ def requestPage(request, pk):
     form = statusForm()
     the_request = Request.objects.get(pk=pk)
     course = the_request.foreign_course
-    the_request = Request.objects.get(foreign_course__course_name=course.course_name)
     if request.method == 'POST':
         form = statusForm(request.POST)
         if form.is_valid():
