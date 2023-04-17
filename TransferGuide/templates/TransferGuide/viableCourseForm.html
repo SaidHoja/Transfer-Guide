@@ -17,7 +17,7 @@
             </div>
         {% endfor %}
         <button id="add-form" type="button">Add Another Course</button>
-<!--        <button id="remove-form" type="button">Remove Last Course</button>-->
+        <button id="remove-form" type="button">Remove Last Course</button>
         <button type="submit">See Results</button>
     </form>
     <script>
@@ -43,15 +43,17 @@
             totalForms.setAttribute('value', `${formNum+1}`)
         }
 
-<!--        removeButton.addEventListener('click', removeForm)-->
+        removeButton.addEventListener('click', removeForm)
 
-<!--        function removeForm(e){-->
-<!--            e.preventDefault()-->
-<!--            let lastForm = viableCourseForm[viableCourseForm.length-1]-->
-<!--            lastForm.remove()-->
-<!--            formNum = viableCourseForm.length-1-->
-<!--            totalForms.setAttribute('value', `${viableCourseForm.length}`)-->
-<!--        }-->
+        function removeForm(e){
+            e.preventDefault()
+            let lastForm = viableCourseForm[viableCourseForm.length-1]
+            lastForm.remove()
+            formNum = viableCourseForm.length-1
+            viableCourseForm = document.querySelectorAll(".viable-course-form") // update the variable
+
+            totalForms.setAttribute('value', `${viableCourseForm.length}`)
+        }
     </script>
     </body>
 </html>
