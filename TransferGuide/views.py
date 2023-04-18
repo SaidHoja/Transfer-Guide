@@ -257,6 +257,7 @@ def requestPage(request, pk):
         form = statusForm(request.POST)
         if form.is_valid():
             the_request.status=form.cleaned_data['status']
+            the_request.credits_approved=form.cleaned_data['credits_approved']
             the_request.uva_course=form.cleaned_data['equivalent'] # this line has gotta go but I don't know how
             the_request.reviewer_comment=form.cleaned_data['reviewer_comment'] # uncomment when field is actually available
             the_request.reviewed_by = request.user
@@ -373,6 +374,7 @@ def addKnownTransfer(request):
             new_course.save()
             the_request.foreign_course = new_course
             the_request.status = form.cleaned_data['status']
+            the_request.credits_approved=form.cleaned_data['credits_approved']
             the_request.uva_course = form.cleaned_data['equivalent']
             the_request.reviewer_comment = form.cleaned_data['reviewer_comment']
             the_request.save()
