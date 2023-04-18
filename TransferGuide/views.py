@@ -29,20 +29,23 @@ def requestCourse(request):
                 syllabus_url = form.cleaned_data['syllabus_url']
                 credit_hours = form.cleaned_data['credit_hours']
                 user_courses = Course.objects.filter(username=username)
-
+                # print(wasCourseApproved(course_dept, course_number, course_institution))
+                # print(wasCourseDenied(course_dept, course_number, course_institution))
                 if wasCourseApproved(course_dept, course_number, course_institution):
                     if translate_grade(course_grade) >= 70:
                         raise ValidationError("This course has already been marked as pre-approved. Your score is high enough to transfer.")
                     else:
                         raise ValidationError("This course has already been marked as pre-approved. Your score is too low to transfer.")
                 elif wasCourseDenied(course_dept, course_number, course_institution):
-                    if getRequestCourseGrade(course_dept, course_number, course_institution) >= 70:
-                        raise ValidationError("This course was never approved because it did not align with UVA's high expectations for education.")
-                    else:
+                    # print("course denied")
+                    if deniedDueToLowGrade(course_dept, course_number, course_institution):
+                        # print("denied due to low grade")
                         if translate_grade(course_grade) >= 70:
                             raise ValidationError("This course has been reviewed. Your grade is high enough for your credit to transfer")
                         else:
                             raise ValidationError("This course has been reviewed. Your grade is too low for your credit to transfer.")
+                    else:
+                        raise ValidationError("This course was never approved because it did not align with UVA's high expectations for education.")
                 elif doesCourseExist(user_courses, course_dept, course_number, course_institution):
                     c = Course(
                         username=username,
@@ -68,7 +71,6 @@ def requestCourseList(request):
     user_courses = Request.objects.filter(foreign_course__username=username)  # .order_by('-pub_date')
     pending_requests = user_courses.filter(status="P")
     denied_requests = user_courses.filter(Q(status="D_LowGrade") | Q(status="D_BadFit"))
-    print(len(denied_requests))
     approved_requests = user_courses.filter(status="A")
     return render(request, 'TransferGuide/requestCourseList.html', {'pending_requests':pending_requests,
                                                                     'approved_requests':approved_requests,
@@ -98,16 +100,15 @@ def wasCourseDenied(course_dept, course_num, course_institution):
     requested_courses = Request.objects.filter(foreign_course__course_dept__iexact=course_dept)
     requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
     requested_courses = requested_courses.filter(foreign_course__course_institution__iexact=course_institution)
-    was_denied = len(requested_courses.filter(Q(status='D_lowGrade') | Q(status='D_BadFit'))) >= 1
+    was_denied = len(requested_courses.filter(Q(status='D_LowGrade') | Q(status='D_BadFit'))) >= 1
     return was_denied
 
-def getRequestCourseGrade(course_dept, course_num, course_institution):
+def deniedDueToLowGrade(course_dept, course_num, course_institution):
     requested_courses = Request.objects.filter(foreign_course__course_dept__iexact=course_dept)
     requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
     requested_courses = requested_courses.filter(foreign_course__course_institution__iexact=course_institution)
-    requested_course = requested_courses.first()
-    course = requested_course.foreign_course
-    return translate_grade(course.course_grade)
+    requested_courses = requested_courses.filter(status="D_LowGrade")
+    return len(requested_courses) > 0
 def getTransferCourse(course_dept, course_num, course_institution):
     courses = Course.objects.filter(course_dept__iexact=course_dept)
     courses = courses.filter(course_num=course_num)
