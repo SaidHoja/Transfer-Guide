@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from .models import Viable_Course, Course, Request, UVA_Course, UserType, User
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.db.models import Q
 # creating a form
 
 def validate_one_word(value):
@@ -60,7 +61,7 @@ class statusForm(forms.Form):
 def institution_as_widget():
     # only select courses that have been approved by staff
     set_of_institutes = set()
-    for request in Request.objects.all():
+    for request in Request.objects.filter(Q(status='A') | Q(status='D_LowGrade')):
         course = request.foreign_course
         set_of_institutes.add(course.course_institution)
     result = []
