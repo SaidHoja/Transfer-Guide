@@ -35,7 +35,7 @@ class Request(models.Model):
     reviewer_comment = models.CharField(max_length=300, null=True)
 
     def __str__(self):
-        return str(self.foreign_course) + " transfers to " + self.uva_course + " for " + self.credit_hours
+        return str(self.foreign_course) + " transfers to " + str(self.uva_course) + " for " + str(self.credit_hours)
 
 class Viable_Course(models.Model):
     username = models.ForeignKey(User,on_delete = models.CASCADE)
