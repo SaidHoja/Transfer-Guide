@@ -80,18 +80,20 @@ def mnemonic_as_widget():
 
 def validate_dept_num(value):
     raw_values = value.split()
-    if len(raw_values) != 2 and len(raw_values) != 0:
-        raise ValidationError("Enter only a department (e.g. CS) and course number (3240)")
+    if len(raw_values) > 2:
+        raise ValidationError("You can enter a department (e.g. CS) and course number (3240), only a department (e.g. CS), or leave this field blank.")
     else:
-        if not raw_values[0].isalpha():
-            raise ValidationError("Enter only letters in the department (e.g. CS)")
-        if raw_values[1].isnumeric():
-           if int(raw_values[1]) < 1000:
-               raise ValidationError("Enter a valid UVA course number (> 1,000)")
-           elif int(raw_values[1]) > 9999:
-               raise ValidationError("Enter a valid UVA course number (< 10,000)")
-        else:
-            raise ValidationError("Enter a valid number for the course number")
+        if len(raw_values) >= 1:
+            if not raw_values[0].isalpha():
+                raise ValidationError("Enter only letters in the department (e.g. CS)")
+        if len(raw_values) >= 2:
+            if raw_values[1].isnumeric():
+               if int(raw_values[1]) < 1000:
+                   raise ValidationError("Enter a valid UVA course number (> 1,000)")
+               elif int(raw_values[1]) > 9999:
+                   raise ValidationError("Enter a valid UVA course number (< 10,000)")
+            else:
+                raise ValidationError("Enter a valid number for the course number")
 
 class searchCourseForm(forms.Form):
     institution = forms.CharField(label='Select an institution to transfer courses from', max_length=100,
