@@ -292,17 +292,21 @@ def searchForCourse(request):
 
 def return_transfer_courses(dept_num, institution, result, word):
     if institution != "No Preference":
-        result = result.filter(foreign_course__course_institution=institution)
+        result = result.filter(foreign_course__course_institution__icontains=institution)
     # print(len(result))
     if word != "":
         result = result.filter(foreign_course__course_name__icontains=word)
-    # print(len(result))
+    print(result.last().uva_course.course_dept)
+    print(len(result))
     if dept_num != "":
         raw_data = dept_num.split()
-        dept = raw_data[0]
-        num = raw_data[1]
-        result = result.filter(uva_course__course_dept__iregex=dept)
-        result = result.filter(uva_course__course_num=num)
+        if len(raw_data) >= 1:
+            dept = raw_data[0]
+            result = result.filter(uva_course__course_dept__iexact=dept)
+            print(len(result))
+        if len(raw_data) >= 2:
+            num = raw_data[1]
+            result = result.filter(uva_course__course_num=num)
     return result
 
 
