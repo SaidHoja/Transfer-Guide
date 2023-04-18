@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from .models import Viable_Course, Course, Request, UVA_Course, UserType, User
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.db.models import Q
 # creating a form
 
 def validate_one_word(value):
@@ -47,7 +48,9 @@ class sisForm(forms.Form):
 
 class statusForm(forms.Form):
     credits_approved = forms.IntegerField(label = "Approve for how many credits?", )
-    status = forms.CharField(label ='Change Status?', max_length=1,widget=forms.Select(choices=[('P','Pending'),('A','Approve'),('D','Deny')]))
+    status = forms.CharField(label ='Change Status?', max_length=20,widget=forms.Select(choices=[('P','Pending'),('A','Approve'),
+                                                                                                ('D_LowGrade','Deny due to low grade'),
+                                                                                                ('D_BadFit', 'Deny due to course misalignment')]))
     equivalent = forms.ModelChoiceField(queryset = UVA_Course.objects.all(), label='Equivalent UVA Course', required = False, help_text="Only fill out if approved.")
     reviewer_comment = forms.CharField(label="Review Comment", max_length=200, required=False, help_text="Must fill out if denied.")
 #    def equivalent_course(self):
@@ -58,7 +61,7 @@ class statusForm(forms.Form):
 def institution_as_widget():
     # only select courses that have been approved by staff
     set_of_institutes = set()
-    for request in Request.objects.all():
+    for request in Request.objects.filter(Q(status='A') | Q(status='D_LowGrade')):
         course = request.foreign_course
         set_of_institutes.add(course.course_institution)
     result = []
@@ -80,18 +83,20 @@ def mnemonic_as_widget():
 
 def validate_dept_num(value):
     raw_values = value.split()
-    if len(raw_values) != 2 and len(raw_values) != 0:
-        raise ValidationError("Enter only a department (e.g. CS) and course number (3240)")
+    if len(raw_values) > 2:
+        raise ValidationError("You can enter a department (e.g. CS) and course number (3240), only a department (e.g. CS), or leave this field blank.")
     else:
-        if not raw_values[0].isalpha():
-            raise ValidationError("Enter only letters in the department (e.g. CS)")
-        if raw_values[1].isnumeric():
-           if int(raw_values[1]) < 1000:
-               raise ValidationError("Enter a valid UVA course number (> 1,000)")
-           elif int(raw_values[1]) > 9999:
-               raise ValidationError("Enter a valid UVA course number (< 10,000)")
-        else:
-            raise ValidationError("Enter a valid number for the course number")
+        if len(raw_values) >= 1:
+            if not raw_values[0].isalpha():
+                raise ValidationError("Enter only letters in the department (e.g. CS)")
+        if len(raw_values) >= 2:
+            if raw_values[1].isnumeric():
+               if int(raw_values[1]) < 1000:
+                   raise ValidationError("Enter a valid UVA course number (> 1,000)")
+               elif int(raw_values[1]) > 9999:
+                   raise ValidationError("Enter a valid UVA course number (< 10,000)")
+            else:
+                raise ValidationError("Enter a valid number for the course number")
 
 class searchCourseForm(forms.Form):
     institution = forms.CharField(label='Select an institution to transfer courses from', max_length=100,
@@ -134,6 +139,8 @@ class KnownTransferForm(forms.Form):
     syllabus_url = forms.URLField()
     credit_hours = forms.IntegerField(min_value=0, max_value=10)
     credits_approved = forms.IntegerField(label = "Approve for how many credits?", )
-    status = forms.CharField(label ='Denied or Approved?', max_length=1,widget=forms.Select(choices=[('A','Approve'),('D','Deny')]))
+    status = forms.CharField(label ='Denied or Approved?', max_length=20,widget=forms.Select(choices=[('A','Approve'),
+                                                                                                      ('D_LowGrade','Deny due to Low Grade'),
+                                                                                                      ('D_BadFit', 'Deny due to course misalignment')]))
     equivalent = forms.ModelChoiceField(queryset = UVA_Course.objects.all(), label='Equivalent UVA Course', required = False, help_text="Only fill out if approved.")
     reviewer_comment = forms.CharField(label="Review Comment", max_length=200, required=False, help_text="Must fill out if denied.")
