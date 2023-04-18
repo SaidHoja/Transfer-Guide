@@ -33,6 +33,7 @@ class Request(models.Model):
     credit_hours =  models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(10)], null = True)
     reviewed_by = models.ForeignKey(User,null=True, on_delete=models.CASCADE)
     reviewer_comment = models.CharField(max_length=300, null=True)
+    credits_approved = models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(10)], null = True) 
 
     def __str__(self):
         return str(self.foreign_course) + " transfers to " + str(self.uva_course) + " for " + str(self.credit_hours)
