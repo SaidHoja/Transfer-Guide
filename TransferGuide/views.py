@@ -152,8 +152,8 @@ def seeViableCourse(request):
     acceptedCourses = []
     for user_course in user_courses:
         user_grade = translate_grade(user_course.course_grade)
-        specific_requests = approved_requests.filter(foreign_course__course_institution=user_course.course_institution)
-        specific_requests = specific_requests.filter(foreign_course__course_dept=user_course.course_dept)
+        specific_requests = approved_requests.filter(foreign_course__course_institution__iexact=user_course.course_institution)
+        specific_requests = specific_requests.filter(foreign_course__course_dept__iexact=user_course.course_dept)
         specific_requests = specific_requests.filter(foreign_course__course_num=user_course.course_num)
         approved_course_lowest_grade = 70
         if len(specific_requests) > 0:
