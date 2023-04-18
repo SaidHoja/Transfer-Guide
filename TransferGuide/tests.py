@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from .models import Course, User, UVA_Course, Request
 from .forms import requestCourseForm, searchCourseForm, viableCourseForm
-from .views import return_transfer_courses, isRequestNew
+from .views import return_transfer_courses, doesCourseExist
 import unittest
 
 class Request_Course_Form(TestCase):
@@ -204,6 +204,10 @@ class Search_Course_Form(TestCase):
         self.assertFalse(form.is_valid())
     def test_invalid_num_too_small(self):
         form_data = {"institution": "", "word": "", "dept_num": "ENGR 1"}
+        form = searchCourseForm(data=form_data)
+        self.assertFalse(form.is_valid())
+    def test_invalid_num_too_big(self):
+        form_data = {"institution": "", "word": "", "dept_num": "ENGR 10000"}
         form = searchCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
     def test_invalid_num_uses_letters(self):
