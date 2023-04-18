@@ -288,8 +288,6 @@ def return_transfer_courses(dept_num, institution, result, word):
     # print(len(result))
     if word != "":
         result = result.filter(foreign_course__course_name__icontains=word)
-    print(result.last().uva_course.course_dept)
-    print(len(result))
     if dept_num != "":
         raw_data = dept_num.split()
         if len(raw_data) >= 1:
