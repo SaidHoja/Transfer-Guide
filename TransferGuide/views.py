@@ -147,20 +147,19 @@ def seeViableCourse(request):
     username = request.user
     user_courses = Viable_Course.objects.filter(username=username)
     num_of_courses = len(user_courses)
+    approved_requests = Request.objects.filter(Q(status='A') | Q(status='D_LowGrade'))
+    print(len(approved_requests))
     acceptedCourses = []
     for user_course in user_courses:
         user_grade = translate_grade(user_course.course_grade)
-        approved_requests = Request.objects.filter(status='A')
-        approved_requests = approved_requests.filter(foreign_course__course_dept=user_course.course_dept)
-        # print(user_course.course_dept + str(len(approved_requests)))
-        approved_requests = approved_requests.filter(foreign_course__course_num=user_course.course_num)
-        # print(str(user_course.course_num) + str(len(approved_requests)))
-        approved_courses = find_courses_from_request(approved_requests)
-        # approved_course_lowest_grade = find_lowest_grade(approved_courses)
+        specific_requests = approved_requests.filter(foreign_course__course_institution=user_course.course_institution)
+        specific_requests = specific_requests.filter(foreign_course__course_dept=user_course.course_dept)
+        specific_requests = specific_requests.filter(foreign_course__course_num=user_course.course_num)
         approved_course_lowest_grade = 70
-        if user_grade >= approved_course_lowest_grade:
-            acceptedCourses.append(user_course)
-            num_of_transfer_courses += 1
+        if len(specific_requests) > 0:
+            if user_grade >= approved_course_lowest_grade:
+                acceptedCourses.append(user_course)
+                num_of_transfer_courses += 1
     return render(request, 'TransferGuide/viableCourseList.html', {'accepted_courses':acceptedCourses,
                                                                    'num_of_transfer_courses':num_of_transfer_courses,
                                                                    'num_of_courses':num_of_courses})
