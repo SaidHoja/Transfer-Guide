@@ -46,13 +46,15 @@
         removeButton.addEventListener('click', removeForm)
 
         function removeForm(e){
-            e.preventDefault()
-            let lastForm = viableCourseForm[viableCourseForm.length-1]
-            lastForm.remove()
-            formNum = viableCourseForm.length-1
-            viableCourseForm = document.querySelectorAll(".viable-course-form") // update the variable
-
-            totalForms.setAttribute('value', `${viableCourseForm.length}`)
+            e.preventDefault();
+            let viableCourseForm = document.querySelectorAll(".viable-course-form");
+            if (viableCourseForm.length === 1) {
+                return;
+            }
+            let lastForm = viableCourseForm[viableCourseForm.length-1];
+            lastForm.remove();
+            formNum = viableCourseForm.length-1;
+            totalForms.setAttribute('value', `${viableCourseForm.length}`);
         }
     </script>
     </body>
