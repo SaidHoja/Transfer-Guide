@@ -128,6 +128,7 @@
                 <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}} &nbsp;{{request.foreign_course.course_num}}</p>
                 <p> Equivalent UVA Course: {{request.uva_course}} </p>
                 <p> Approved By: {{request.reviewed_by}}</p>
+                <p> Approved Credit Hours: {{request.credits_approved}}</p>
               {% endfor %}
             </ul>
           {% else %}
@@ -149,8 +150,8 @@
               {% for request in denied_requests %}
                   <h6>{{request.foreign_course.course_name}}</h6>
                   <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
-                  <p> Approved By: {{request.reviewed_by.user.username}}</p>
-                  <p> Reason: {{request.why_denied}} </p>
+                  <p> Denied By: {{request.reviewed_by}}</p>
+                  <p> Reason: {{request.reviewer_comment}} </p>
                 {% endfor %}
               </ul>
             {% else %}
