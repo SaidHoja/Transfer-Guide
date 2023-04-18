@@ -90,6 +90,11 @@
             <form action="" method="post" class = "form-center">
                 {% csrf_token %}
                 {% bootstrap_form form %}
+                {% if error %}
+                  <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                  </div>
+                {% endif %}
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
