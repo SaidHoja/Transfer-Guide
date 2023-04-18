@@ -144,7 +144,7 @@
     </h2>
     <div id="deniedData" class="accordion-collapse collapse" >
       <div class="accordion-body">
-          {% if denied_courses %}
+          {% if denied_requests %}
               <ul>
               {% for request in denied_requests %}
                   <h6>{{request.foreign_course.course_name}}</h6>

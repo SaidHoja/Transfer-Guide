@@ -29,7 +29,7 @@ class UVA_Course(models.Model):
 class Request(models.Model):
     uva_course = models.ForeignKey(UVA_Course,null = True, on_delete=models.CASCADE);
     foreign_course = models.ForeignKey(Course, null = False, on_delete=models.CASCADE)
-    status = models.CharField(max_length = 1, default = "P", choices = [("A","A"),("D","D"),("P","P")])
+    status = models.CharField(max_length = 10, default = "P", choices = [("A","A"),("D_LowGrade","D_LowGrade"),("D_BadFit","D_BadFit"),("P","P")])
     credit_hours =  models.PositiveIntegerField(validators=[MinValueValidator(0),MaxValueValidator(10)], null = True)
     reviewed_by = models.ForeignKey(User,null=True, on_delete=models.CASCADE)
     reviewer_comment = models.CharField(max_length=300, null=True)
