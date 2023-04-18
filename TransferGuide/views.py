@@ -31,11 +31,17 @@ def requestCourse(request):
 
                 if wasCourseApproved(course_dept, course_number, course_institution):
                     if translate_grade(course_grade) >= 70:
-                        print("validation error")
                         raise ValidationError("This course has already been marked as pre-approved. Your score is high enough to transfer.")
                     else:
-                        print("validation error")
                         raise ValidationError("This course has already been marked as pre-approved. Your score is too low to transfer.")
+                elif wasCourseDenied(course_dept, course_number, course_institution):
+                    if getRequestCourseGrade(course_dept, course_number, course_institution) >= 70:
+                        raise ValidationError("This course was never approved because it did not align with UVA's high expectations for education.")
+                    else:
+                        if translate_grade(course_grade) >= 70:
+                            raise ValidationError("This course has been reviewed. Your grade is high enough for your credit to transfer")
+                        else:
+                            raise ValidationError("This course has been reviewed. Your grade is too low for your credit to transfer.")
                 elif doesCourseExist(user_courses, course_dept, course_number, course_institution):
                     c = Course(
                         username=username,
@@ -61,6 +67,7 @@ def requestCourseList(request):
     user_courses = Request.objects.filter(foreign_course__username=username)  # .order_by('-pub_date')
     pending_requests = user_courses.filter(status="P")
     denied_requests = user_courses.filter(status="D")
+    print(len(denied_requests))
     approved_requests = user_courses.filter(status="A")
     return render(request, 'TransferGuide/requestCourseList.html', {'pending_requests':pending_requests,
                                                                     'approved_requests':approved_requests,
@@ -96,6 +103,20 @@ def wasCourseApproved(course_dept, course_num, course_institution):
     was_approved = len(requested_courses.filter(status='A')) >= 1
     return was_approved
 
+def wasCourseDenied(course_dept, course_num, course_institution):
+    requested_courses = Request.objects.filter(foreign_course__course_dept__iexact=course_dept)
+    requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
+    requested_courses = requested_courses.filter(foreign_course__course_institution__iexact=course_institution)
+    was_denied = len(requested_courses.filter(status='D')) >= 1
+    return was_denied
+
+def getRequestCourseGrade(course_dept, course_num, course_institution):
+    requested_courses = Request.objects.filter(foreign_course__course_dept__iexact=course_dept)
+    requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
+    requested_courses = requested_courses.filter(foreign_course__course_institution__iexact=course_institution)
+    requested_course = requested_courses.first()
+    course = requested_course.foreign_course
+    return translate_grade(course.course_grade)
 def getTransferCourse(course_dept, course_num, course_institution):
     courses = Course.objects.filter(course_dept__iexact=course_dept)
     courses = courses.filter(course_num=course_num)
