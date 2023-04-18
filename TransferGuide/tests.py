@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from .models import Course, User, UVA_Course, Request
 from .forms import requestCourseForm, searchCourseForm, viableCourseForm
-from .views import return_transfer_courses, isRequestNew
+from .views import return_transfer_courses, doesCourseExist
 import unittest
 
 class Request_Course_Form(TestCase):
