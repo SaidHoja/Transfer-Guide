@@ -17,8 +17,8 @@ from django.db.models import Q
 def requestCourse(request):
     if request.method == 'POST':
         form = requestCourseForm(request.POST)
-        try:
-            if form.is_valid():
+        if form.is_valid():
+            try:
                 username = request.user
                 course_institution = form.cleaned_data['course_institution']
                 course_name = form.cleaned_data['course_name']
@@ -28,10 +28,10 @@ def requestCourse(request):
                 course_delivery = form.cleaned_data['course_delivery']
                 syllabus_url = form.cleaned_data['syllabus_url']
                 credit_hours = form.cleaned_data['credit_hours']
-                user_courses = Course.objects.filter(username=username)
-                # print(wasCourseApproved(course_dept, course_number, course_institution))
-                # print(wasCourseDenied(course_dept, course_number, course_institution))
-                if not userSubmittedCourse(username, course_dept, course_number, course_institution, course_grade):
+
+                if userSubmittedCourse(username, course_dept, course_number, course_institution, course_grade):
+                    raise ValidationError("You sent this request before. Try again!")
+                else:
                     c = Course(username=username, course_institution=course_institution, course_name=course_name, course_dept=course_dept,
                         course_num=course_number, course_grade=course_grade, course_delivery=course_delivery, syllabus_url=syllabus_url,
                         credit_hours=credit_hours)
@@ -63,8 +63,8 @@ def requestCourse(request):
                                         reviewer_comment="Autodeclined - course does not align with UVA's educational values")
                             r.save()
                 return HttpResponseRedirect(reverse('requestCourseList'))
-        except ValidationError as e:
-            return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, 'error': e})
+            except ValidationError as e:
+                return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, 'error': e.message})
     form = requestCourseForm()
     return render(request, 'TransferGuide/requestCourseForm.html', {'form': form})
 def requestCourseList(request):
@@ -86,6 +86,7 @@ def find_courses_from_request(pending_requests):
 def userSubmittedCourse(username, course_dept, course_num, course_institution, course_grade):
     user_courses = Course.objects.filter(Q(username=username) & Q(course_dept=course_dept) & Q(course_num=course_num) &
                                          Q(course_institution=course_institution) & Q(course_grade=course_grade))
+    print(len(user_courses))
     return len(user_courses) > 0
 
 def doesCourseExist(user_courses, course_dept, course_num, course_institution):
