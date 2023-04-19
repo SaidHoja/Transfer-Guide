@@ -15,8 +15,12 @@ def validate_one_word(value):
         raise ValidationError("Please enter only one word.")
     if not value.isalpha():
         raise ValidationError("Please enter a valid word. Uses characters A-Z")
+
+def validate_non_uva(value):
+    if value.lower() == "university of virginia":
+        raise ValidationError("Please enter a non-UVA course.")
 class requestCourseForm(forms.Form):
-    course_institution = forms.CharField(max_length=100)
+    course_institution = forms.CharField(max_length=100, validators=[validate_non_uva])
     course_name = forms.CharField(max_length = 100)
     course_dept = forms.CharField(max_length=5, validators=[validate_one_word])
     course_number = forms.IntegerField(min_value=0, max_value=9999)
