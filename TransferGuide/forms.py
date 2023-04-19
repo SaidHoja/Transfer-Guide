@@ -51,16 +51,28 @@ class sisForm(forms.Form):
     instructor = forms.CharField(max_length=20, required = False)
 
 class statusForm(forms.Form):
-    credits_approved = forms.IntegerField(label = "Approve for how many credits?", )
+    credits_approved = forms.IntegerField(label = "Approve for how many credits?", required=False)
     status = forms.CharField(label ='Change Status?', max_length=20,widget=forms.Select(choices=[('P','Pending'),('A','Approve'),
                                                                                                 ('D_LowGrade','Deny due to low grade'),
                                                                                                 ('D_BadFit', 'Deny due to course misalignment')]))
     equivalent = forms.ModelChoiceField(queryset = UVA_Course.objects.all(), label='Equivalent UVA Course', required = False, help_text="Only fill out if approved.")
-    reviewer_comment = forms.CharField(label="Review Comment", max_length=200, required=False, help_text="Must fill out if denied.")
-#    def equivalent_course(self):
- #       if self.cleaned_data.get('status', None) == 'A':
- #           if self.cleaned_data.get('equivalent', None) is not None:
- #               pass
+    reviewer_comment = forms.CharField(label="Reviewer Comment", max_length=200, required=False)
+    def clean(self):
+        if self.cleaned_data.get('status') == 'A': # make sure equivalent course is provided when approved
+            if self.cleaned_data.get('equivalent') is None:
+                msg = forms.ValidationError("This field is required for approved courses.")
+                self.add_error('equivalent', msg)
+            if self.cleaned_data.get('credits_approved') is None:
+                msg = forms.ValidationError("This field is required for approved courses.")
+                self.add_error('credits_approved', msg)
+
+        # if self.cleaned_data.get('status') == 'D_LowGrade': # set default comments
+        #     if not self['reviewer_comment']:
+        #         self['reviewer_comment'] = "Grade is too low"
+        # if self.cleaned_data.get('status') == 'D_BadFit':
+        #     if not self['reviewer_comment']:
+        #         self['reviewer_comment'] = "Course does not meet standards"
+            
 
 def institution_as_widget():
     # only select courses that have been approved by staff
