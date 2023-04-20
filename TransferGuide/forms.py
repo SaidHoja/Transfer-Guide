@@ -32,16 +32,19 @@ class requestCourseForm(forms.Form):
     credit_hours = forms.IntegerField(min_value=0, max_value=10)
 
 class viableCourseForm(forms.Form):
-    course_institution = forms.CharField(max_length=100)
-    course_name = forms.CharField(max_length = 100)
-    course_dept = forms.CharField(max_length=6, validators=[validate_one_word])
+    course_institution = forms.CharField(max_length=100, validators=[validate_non_uva])
+    course_name = forms.CharField(max_length=100)
+    course_dept = forms.CharField(max_length=6, validators=[validate_one_word],
+                                  widget=forms.TextInput(attrs={'placeholder': 'Enter "CS", "ENGL", "APMA", "CHEM".'}))
     course_number = forms.IntegerField(min_value=0, max_value=9999)
     course_grade = forms.CharField(max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
                                                                              ('F','F')]))
 
 viableCourseFormSet = formset_factory(viableCourseForm, extra=1)
 class sisForm(forms.Form):
-    subject = forms.CharField(label='Subject (e.g. CS, ASTR, etc.)', max_length=5, required = False)
+    subject = forms.CharField(label='Subject', max_length=5, required = False,
+                              widget=forms.TextInput(attrs={'placeholder': 'Enter "CS", "ENGL", "APMA", "CHEM".'}),
+                              validators=[validate_one_word])
     term = forms.CharField(max_length=6,widget=forms.Select(choices=[(8, "FALL"), (3, "SPRING")]))
     YEAR_CHOICES = []
     for y in range(2000, (datetime.datetime.now().year + 1)):
