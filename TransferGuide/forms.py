@@ -8,9 +8,6 @@ from .models import Viable_Course, Course, Request, UVA_Course, UserType, User
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.db.models import Q
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
-from django import forms
 # creating a form
 
 def validate_one_word(value):
