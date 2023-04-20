@@ -1,3 +1,4 @@
+{% extends "TransferGuide/base.html" %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Viable Course</title>
 </head>
-<body>
+{% block banner %}
+    <div class="p-5 bg-primary text-warning text-center">
+      <h1>See If Your Schedule Transfers</h1>
 
+        {% if not user.is_authenticated %}
+            <p>Welcome, please log in to continue!</p>
+        {% elif user.usertype.role == 'Admin' %}
+            <p>Welcome {{ user.username }}, Admins do not have access to this page. </p>
+        {% else %}
+             <p>{{ user.username }}, enter in courses from your schedule.</p>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
     <h1>See if your course(s) are in our system</h1>
     <form id="form-container" method="POST">
         {% csrf_token %}
@@ -57,5 +71,4 @@
             totalForms.setAttribute('value', `${viableCourseForm.length}`);
         }
     </script>
-    </body>
-</html>
+{% endblock %}
