@@ -58,6 +58,7 @@
                 <p>You have not denied any course requests.</p>
             {% endif %}
     {%else%}
+    <div class="container mt-5">
         <h1>Current Status of Requests</h1>
         <h2>Courses Left Pending</h2>
             {% if pending_requests %}
@@ -92,6 +93,7 @@
             {% else %}
                 <p>You have not denied any course requests.</p>
             {% endif %}
+    </div>
     {%endif%}
 {% endblock %}
 </body>
