@@ -15,8 +15,12 @@ def validate_one_word(value):
         raise ValidationError("Please enter only one word.")
     if not value.isalpha():
         raise ValidationError("Please enter a valid word. Uses characters A-Z")
+
+def validate_non_uva(value):
+    if value.lower() == "university of virginia":
+        raise ValidationError("Please enter a non-UVA course.")
 class requestCourseForm(forms.Form):
-    course_institution = forms.CharField(max_length=100)
+    course_institution = forms.CharField(max_length=100, validators=[validate_non_uva])
     course_name = forms.CharField(max_length = 100)
     course_dept = forms.CharField(max_length=5, validators=[validate_one_word])
     course_number = forms.IntegerField(min_value=0, max_value=9999)
@@ -39,7 +43,6 @@ viableCourseFormSet = formset_factory(viableCourseForm, extra=1)
 class sisForm(forms.Form):
     subject = forms.CharField(label='Subject (e.g. CS, ASTR, etc.)', max_length=5, required = False)
     term = forms.CharField(max_length=6,widget=forms.Select(choices=[(8, "FALL"), (3, "SPRING")]))
-
     YEAR_CHOICES = []
     for y in range(2000, (datetime.datetime.now().year + 1)):
         YEAR_CHOICES.append((y, y))
@@ -80,6 +83,7 @@ def institution_as_widget():
     result.append(("No Preference", "No Preference"))
     for institute in set_of_institutes:
         result.append((institute, institute))
+    result = sorted(result, key=lambda x: (x[0] != 'No Preference', x))
     return result
 
 def mnemonic_as_widget():
@@ -113,10 +117,12 @@ def validate_dept_num(value):
 class searchCourseForm(forms.Form):
     institution = forms.CharField(label='Select an institution to transfer courses from', max_length=100,
                                   widget=forms.Select(choices=institution_as_widget()), required=False)
-    word = forms.CharField(label='Look for all classes that share this word. (e.g. Enter "anthropology" to see the non-UVA class Anthropology of Water',
+    word = forms.CharField(label='Look for all classes that share this word.',
+                           widget=forms.TextInput(attrs={'placeholder': 'Enter "anthropology" to see the non-UVA class Anthropology of Water'}),
                            max_length=100, required=False)
     dept_num = forms.CharField(label='Input a UVA course department and number to see all transferable courses',
-                                max_length=13, validators=[validate_dept_num], required=False)
+                               widget=forms.TextInput(attrs={'placeholder': 'Enter "APMA 2120" to see all courses that transfer to UVA\'s Calc 2 Class. Enter "APMA" to see all courses that transfer to UVA\'s APMA department'}),
+                               max_length=13, validators=[validate_dept_num], required=False)
     # def __init__(self, *args, **kwargs):
         # super().__init__(*args, **kwargs)
         #     self.fields['course_name'] = forms.CharField(max_length=50, required=True)

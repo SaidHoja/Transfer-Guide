@@ -1,3 +1,4 @@
+{% extends "TransferGuide/base.html" %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,57 +6,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Viable Course</title>
 </head>
-<body>
+{% block banner %}
+  <h1>See If Your Schedule Transfers</h1>
 
-    <h1>See if your course(s) are in our system</h1>
-    <form id="form-container" method="POST">
-        {% csrf_token %}
-        {{viable_course_formset.management_form}}
-        {% for form in viable_course_formset %}
-            <div class="viable-course-form">
-                {{form.as_p}}
-            </div>
-        {% endfor %}
-        <button id="add-form" type="button">Add Another Course</button>
-        <button id="remove-form" type="button">Remove Last Course</button>
-        <button type="submit">See Results</button>
-    </form>
-    <script>
-        let viableCourseForm = document.querySelectorAll(".viable-course-form")
-        let container = document.querySelector("#form-container")
-        let addButton = document.querySelector("#add-form")
-        let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
-        let removeButton = document.querySelector("#remove-form")
+    {% if not user.is_authenticated %}
+        <p>Welcome, please log in to continue!</p>
+    {% elif user.usertype.role == 'Admin' %}
+        <p>Welcome {{ user.username }}, Admins do not have access to this page. </p>
+    {% else %}
+         <p>{{ user.username }}, enter in courses from your schedule.</p>
+    {% endif %}
+{% endblock %}
 
-        let formNum = viableCourseForm.length-1
-        addButton.addEventListener('click', addForm)
+{% block content %}
+    <div class="container mt-5">
+        <p>See if your course(s) are in our system</p>
+        <form id="form-container" method="POST">
+            {% csrf_token %}
+            {{viable_course_formset.management_form}}
+            {% for form in viable_course_formset %}
+                <div class="viable-course-form">
+                    {{form.as_p}}
+                </div>
+            {% endfor %}
+            <button id="add-form" type="button" class="btn btn-primary">Add Another Course</button>
+            <button id="remove-form" type="button" class="btn btn-primary">Remove Last Course</button>
+            <button type="submit" class="btn btn-primary">See Results</button>
+        </form>
+        <script>
+            let viableCourseForm = document.querySelectorAll(".viable-course-form")
+            let container = document.querySelector("#form-container")
+            let addButton = document.querySelector("#add-form")
+            let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
+            let removeButton = document.querySelector("#remove-form")
 
-        function addForm(e){
-            e.preventDefault()
+            let formNum = viableCourseForm.length-1
+            addButton.addEventListener('click', addForm)
 
-            let newForm = viableCourseForm[0].cloneNode(true)
-            let formRegex = RegExp(`form-(\\d){1}-`,'g')
+            function addForm(e){
+                e.preventDefault()
 
-            formNum++
-            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
-            container.insertBefore(newForm, addButton)
+                let newForm = viableCourseForm[0].cloneNode(true)
+                let formRegex = RegExp(`form-(\\d){1}-`,'g')
 
-            totalForms.setAttribute('value', `${formNum+1}`)
-        }
+                formNum++
+                newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+                container.insertBefore(newForm, addButton)
 
-        removeButton.addEventListener('click', removeForm)
-
-        function removeForm(e){
-            e.preventDefault();
-            let viableCourseForm = document.querySelectorAll(".viable-course-form");
-            if (viableCourseForm.length === 1) {
-                return;
+                totalForms.setAttribute('value', `${formNum+1}`)
             }
-            let lastForm = viableCourseForm[viableCourseForm.length-1];
-            lastForm.remove();
-            formNum = viableCourseForm.length-1;
-            totalForms.setAttribute('value', `${viableCourseForm.length}`);
-        }
-    </script>
-    </body>
-</html>
+
+            removeButton.addEventListener('click', removeForm)
+
+            function removeForm(e){
+                e.preventDefault();
+                let viableCourseForm = document.querySelectorAll(".viable-course-form");
+                if (viableCourseForm.length === 1) {
+                    return;
+                }
+                let lastForm = viableCourseForm[viableCourseForm.length-1];
+                lastForm.remove();
+                formNum = viableCourseForm.length-1;
+                totalForms.setAttribute('value', `${viableCourseForm.length}`);
+            }
+        </script>
+    </div>
+{% endblock %}
