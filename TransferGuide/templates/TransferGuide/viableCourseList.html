@@ -1,5 +1,4 @@
-{% load static %}{% load bootstrap5 %}{% bootstrap_css %}{% bootstrap_messages %}
-{% bootstrap_javascript %}
+{% extends "TransferGuide/base.html" %}
 <style>
 .center {
   margin: auto;
@@ -7,20 +6,37 @@
   padding: 10px;
 }
 </style>
-<div id="acceptedData" >
-    <strong>ACCEPTED COURSES HERE</strong>
-        {% if accepted_courses %}
-        <ul>
-            {% for course in accepted_courses.values %}
-                <h6>{{course.course_name}}</h6>
-                <p>{{ course.course_institution }} <br> {{ course.course_dept}}&nbsp{{course.course_num}}</p>
-            {% endfor %}
-        </ul>
+
+{% block banner %}
+    <div class="p-5 bg-primary text-warning text-center">
+      <h1>Courses that Transfer From Schedule</h1>
+
+        {% if not user.is_authenticated %}
+            <p>Welcome, please log in to continue!</p>
+        {% elif user.usertype.role == 'Admin' %}
+            <p>Welcome {{ user.username }}, Admins do not have access to this page. </p>
         {% else %}
-            <p>None of the courses you entered are accepted at this institution.</p>
+             <p>{{ user.username }}, here are the courses that do transfer from your schedule.</p>
         {% endif %}
-</div>
-<div>
-    <p>Total number of courses that can transfer: {{num_of_transfer_courses}} / {{num_of_courses}} </p>
-    <button></button>
-</div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div id="acceptedData" >
+        <strong>ACCEPTED COURSES HERE</strong>
+            {% if accepted_courses %}
+            <ul>
+                {% for course in accepted_courses.values %}
+                    <h6>{{course.course_name}}</h6>
+                    <p>{{ course.course_institution }} <br> {{ course.course_dept}}&nbsp{{course.course_num}}</p>
+                {% endfor %}
+            </ul>
+            {% else %}
+                <p>None of the courses you entered are accepted at this institution.</p>
+            {% endif %}
+    </div>
+    <div>
+        <p>Total number of courses that can transfer: {{num_of_transfer_courses}} / {{num_of_courses}} </p>
+        <button></button>
+    </div>
+{% endblock %}
