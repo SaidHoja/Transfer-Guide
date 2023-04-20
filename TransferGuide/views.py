@@ -11,7 +11,7 @@ from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, sea
 from .models import Course, Viable_Course, Request, UserType, User
 from .filters import OrderCourses
 import re
-from django.db.models import Q
+from django.db.models import Q, F
 
 # Adding Courses by the Student
 def requestCourse(request):
@@ -290,7 +290,33 @@ def searchForCourse(request):
     return render(request, 'TransferGuide/searchCourse.html', {'form':form})
 
 
-def return_transfer_courses(dept_num, institution, result, word):
+# def return_transfer_courses(dept_num, institution, approved_requests, word):
+#     result = []
+#     if institution != "No Preference":
+#         approved_requests = approved_requests.filter(foreign_course__course_institution__icontains=institution)
+#     # print(len(approved_requests))
+#     if word != "":
+#         approved_requests = approved_requests.filter(foreign_course__course_name__icontains=word)
+#     if dept_num != "":
+#         raw_data = dept_num.split()
+#         if len(raw_data) >= 1:
+#             dept = raw_data[0]
+#             approved_requests = approved_requests.filter(uva_course__course_dept__iexact=dept)
+#             print(len(approved_requests))
+#         if len(raw_data) >= 2:
+#             num = raw_data[1]
+#             approved_requests = approved_requests.filter(uva_course__course_num=num)
+#     for request in approved_requests:
+#         transfer = request.foreign_course
+#         matched = approved_requests.filter(Q(foreign_course__course_institution=transfer.course_institution) &
+#                                            Q(foreign_course__course_dept=tranfer.course_dept) &
+#                                            Q(foreign_course__course_num=transfer.course_num))
+#         result.append(matched.first())
+#
+#     return approved_requests
+
+def return_transfer_courses(dept_num, institution, approved_requests, word):
+    result = approved_requests
     if institution != "No Preference":
         result = result.filter(foreign_course__course_institution__icontains=institution)
     # print(len(result))
@@ -305,9 +331,22 @@ def return_transfer_courses(dept_num, institution, result, word):
         if len(raw_data) >= 2:
             num = raw_data[1]
             result = result.filter(uva_course__course_num=num)
-    result.values('foreign_course__course_institution', 'foreign_course__course_name', 'uva_course__course_dept',
-                  'uva_course__course_num').distinct()
-    return result
+
+    # create a set of tuples with the unique combination of institution, dept, and num
+    unique_tuples = set((r.foreign_course.course_institution, r.foreign_course.course_dept, r.foreign_course.course_num) for r in result)
+
+    # create a list of the first matching request for each unique combination of institution, dept, and num
+    result_list = [result.filter(foreign_course__course_institution=t[0], foreign_course__course_dept=t[1], foreign_course__course_num=t[2]).first() for t in unique_tuples]
+
+    # filter out None values from the result_list
+    result_list = list(filter(None, result_list))
+
+    # create a QuerySet from the result_list
+    result_queryset = Request.objects.none()
+    for request in result_list:
+        result_queryset |= Request.objects.filter(pk=request.pk)
+
+    return result_queryset
 
 
 def index(request):
