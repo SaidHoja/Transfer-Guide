@@ -15,56 +15,55 @@ from django.db.models import Q, F
 
 # Adding Courses by the Student
 def requestCourse(request):
+    error = ""
     if request.method == 'POST':
         form = requestCourseForm(request.POST)
         if form.is_valid():
-            try:
-                username = request.user
-                course_institution = form.cleaned_data['course_institution']
-                course_name = form.cleaned_data['course_name']
-                course_dept = form.cleaned_data['course_dept']
-                course_number = form.cleaned_data['course_number']
-                course_grade = form.cleaned_data['course_grade']
-                course_delivery = form.cleaned_data['course_delivery']
-                syllabus_url = form.cleaned_data['syllabus_url']
-                credit_hours = form.cleaned_data['credit_hours']
+            username = request.user
+            course_institution = form.cleaned_data['course_institution']
+            course_name = form.cleaned_data['course_name']
+            course_dept = form.cleaned_data['course_dept']
+            course_number = form.cleaned_data['course_number']
+            course_grade = form.cleaned_data['course_grade']
+            course_delivery = form.cleaned_data['course_delivery']
+            syllabus_url = form.cleaned_data['syllabus_url']
+            credit_hours = form.cleaned_data['credit_hours']
 
-                if userSubmittedCourse(username, course_dept, course_number, course_institution, course_grade):
-                    raise ValidationError("You sent this request before. Try again!")
-                else:
-                    c = Course(username=username, course_institution=course_institution, course_name=course_name, course_dept=course_dept,
-                        course_num=course_number, course_grade=course_grade, course_delivery=course_delivery, syllabus_url=syllabus_url,
-                        credit_hours=credit_hours)
-                    c.save()
-                    if wasCourseApproved(course_dept, course_number, course_institution):
-                        uva_course = getUVACourse(course_dept, course_number, course_institution)
+            if userSubmittedCourse(username, course_dept, course_number, course_institution, course_grade):
+                error = "You sent this request before. Try again!"
+                return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, 'error': error})
+            else:
+                c = Course(username=username, course_institution=course_institution, course_name=course_name, course_dept=course_dept,
+                    course_num=course_number, course_grade=course_grade, course_delivery=course_delivery, syllabus_url=syllabus_url,
+                    credit_hours=credit_hours)
+                c.save()
+                if wasCourseApproved(course_dept, course_number, course_institution):
+                    uva_course = getUVACourse(course_dept, course_number, course_institution)
+                    if translate_grade(course_grade) >= 70:
+                        r = Request(uva_course=uva_course, foreign_course=c, status='A', credit_hours=credit_hours,
+                                    reviewer_comment="Autoapproved - grade is sufficient")
+                        r.save()
+                    else:
+                        r = Request(uva_course=uva_course, foreign_course=c, status='D', credit_hours=credit_hours,
+                                    reviewer_comment="Autodeclined - grade is too low")
+                        r.save()
+                elif wasCourseDenied(course_dept, course_number, course_institution):
+                    # print("course denied")
+                    uva_course = getUVACourse(course_dept, course_number, course_institution)
+                    if deniedDueToLowGrade(course_dept, course_number, course_institution):
                         if translate_grade(course_grade) >= 70:
                             r = Request(uva_course=uva_course, foreign_course=c, status='A', credit_hours=credit_hours,
                                         reviewer_comment="Autoapproved - grade is sufficient")
                             r.save()
                         else:
-                            r = Request(uva_course=uva_course, foreign_course=c, status='D', credit_hours=credit_hours,
+                            r = Request(uva_course=uva_course, foreign_course=c, status='D_LowGrade', credit_hours=credit_hours,
                                         reviewer_comment="Autodeclined - grade is too low")
                             r.save()
-                    elif wasCourseDenied(course_dept, course_number, course_institution):
-                        # print("course denied")
-                        uva_course = getUVACourse(course_dept, course_number, course_institution)
-                        if deniedDueToLowGrade(course_dept, course_number, course_institution):
-                            if translate_grade(course_grade) >= 70:
-                                r = Request(uva_course=uva_course, foreign_course=c, status='A', credit_hours=credit_hours,
-                                            reviewer_comment="Autoapproved - grade is sufficient")
-                                r.save()
-                            else:
-                                r = Request(uva_course=uva_course, foreign_course=c, status='D_LowGrade', credit_hours=credit_hours,
-                                            reviewer_comment="Autodeclined - grade is too low")
-                                r.save()
-                        else:
-                            r = Request(uva_course=uva_course, foreign_course=c, status='D_BadFit', credit_hours=credit_hours,
-                                        reviewer_comment="Autodeclined - course does not align with UVA's educational values")
-                            r.save()
-                return HttpResponseRedirect('/')
-            except ValidationError as e:
-                return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, 'error': e.message})
+                    else:
+                        r = Request(uva_course=uva_course, foreign_course=c, status='D_BadFit', credit_hours=credit_hours,
+                                    reviewer_comment="Autodeclined - course does not align with UVA's educational values")
+                        r.save()
+            return HttpResponseRedirect('/')
     form = requestCourseForm()
     return render(request, 'TransferGuide/requestCourseForm.html', {'form': form})
 def requestCourseList(request):
