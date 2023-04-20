@@ -60,7 +60,7 @@
     {%else%}
     <div class="container mt-5">
         <h5>Current Status of Requests</h5>
-        <p>Courses Left Pending</p>
+        <p>Courses left pending</p>
             {% if pending_requests %}
             <table class="table table-striped table-bordered center">
                 <thead class="thead-dark">
@@ -83,7 +83,7 @@
             {% else %}
                 <p>There are no pending course requests.</p>
             {% endif %}
-        <p>Courses that are Accepted</p>
+        <p>Courses that are accepted</p>
             {% if accepted_requests %}
                 <table class="table table-striped table-bordered center">
                     <thead class="thead-dark">
@@ -106,7 +106,7 @@
             {% else %}
                 <p>You have not accepted any course requests.</p>
             {% endif %}
-        <h2>Courses that have been Denied</h2>
+        <p>Courses that have been denied</p>
             {% if denied_requests %}
             <table class="table table-striped table-bordered center">
                 <thead class="thead-dark">

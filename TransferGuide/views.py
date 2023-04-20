@@ -62,7 +62,7 @@ def requestCourse(request):
                             r = Request(uva_course=uva_course, foreign_course=c, status='D_BadFit', credit_hours=credit_hours,
                                         reviewer_comment="Autodeclined - course does not align with UVA's educational values")
                             r.save()
-                return HttpResponseRedirect(reverse('requestCourseList'))
+                return HttpResponseRedirect('/')
             except ValidationError as e:
                 return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, 'error': e.message})
     form = requestCourseForm()
