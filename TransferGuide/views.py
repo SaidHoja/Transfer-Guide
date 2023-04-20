@@ -250,7 +250,8 @@ def adminApproveCourses(request):
     courses = coursesFilter.qs
     requests = []
     for course in courses:
-        requests.append(Request.objects.get(foreign_course=course))
+        for r in Request.objects.filter(foreign_course=course):
+            requests.append(r)
     return render(request, 'TransferGuide/adminApproval.html', { 'courses': courses, 'coursesFilter': coursesFilter , 'requests' :requests})
 
 def requestPage(request, pk):
