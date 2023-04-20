@@ -8,6 +8,9 @@ from .models import Viable_Course, Course, Request, UVA_Course, UserType, User
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.db.models import Q
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
+from django import forms
 # creating a form
 
 def validate_one_word(value):
@@ -32,8 +35,10 @@ class requestCourseForm(forms.Form):
     credit_hours = forms.IntegerField(min_value=0, max_value=10)
 
 class viableCourseForm(forms.Form):
-    course_institution = forms.CharField(max_length=100, validators=[validate_non_uva])
-    course_name = forms.CharField(max_length=100)
+    course_institution = forms.CharField(max_length=100, validators=[validate_non_uva],
+                                         widget=forms.TextInput(attrs={'placeholder': 'Enter the institution your course came from.'}))
+    course_name = forms.CharField(max_length=100,
+                                  widget=forms.TextInput(attrs={'placeholder': 'Enter the name of your course'}))
     course_dept = forms.CharField(max_length=6, validators=[validate_one_word],
                                   widget=forms.TextInput(attrs={'placeholder': 'Enter "CS", "ENGL", "APMA", "CHEM".'}))
     course_number = forms.IntegerField(min_value=0, max_value=9999)
