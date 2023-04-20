@@ -5,9 +5,10 @@
 {% bootstrap_javascript %}
 {% load socialaccount %}
 
-{% block banner %}
-{% endblock %}
-
+<div class="p-5 bg-primary text-warning text-center">
+    {% block banner %}
+    {% endblock %}
+</div>
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
         {% if not user.is_authenticated %}
