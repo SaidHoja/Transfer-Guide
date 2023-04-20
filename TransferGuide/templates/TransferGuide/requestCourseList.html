@@ -152,11 +152,7 @@
               {% for request in denied_requests %}
                   <h6>{{request.foreign_course.course_name}}</h6>
                   <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
-<<<<<<< HEAD
-                  <p> Approved By: {{request.reviewed_by.user.username}}</p>
-=======
-                  <p> Denied By: {{request.reviewed_by}}</p>
->>>>>>> main
+                  <p> Denied By: {{request.reviewed_by.user.username}}</p>
                   <p> Reason: {{request.reviewer_comment}} </p>
                 {% endfor %}
               </ul>
