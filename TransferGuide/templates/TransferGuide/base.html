@@ -9,6 +9,12 @@
     {% block banner %}
     {% endblock %}
 </div>
+<style>
+  .navbar-nav .nav-item.active {
+    background-color: #1b5e20;
+  }
+
+</style>
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
         {% if not user.is_authenticated %}
@@ -43,30 +49,31 @@
             </ul>
 
         {% else %}
-            <ul class="navbar-nav">
+            <ul class="nav navbar-nav">
                 <li class="nav-item me-4" >
                 <a class="nav-link disabled" href="{% provider_login_url 'google' %}">Login With Google</a>
                 </li>
 
-                <li class="nav-item me-4">
-                     <a class="nav-link active" href="/">Home</a>
+                <li class="nav-item me-4 {% if request.path == '/' %}active{% endif %}">
+                    <a class="nav-link active" href="/">Home</a>
+                </li>
+
+                 <li class="nav-item me-4 {% if request.path == '/sisRequest' %}active{% endif %}">
+                     <a class="nav-link active" href="/sisRequest">Find UVA Course</a>
                  </li>
 
-                 <li class="nav-item me-4">
-                     <a class="nav-link active" href="/sisRequest">Find a Course at UVA</a>
-                 </li>
-
-                <li class="nav-item me-4">
-                 <a class="nav-link active" href="/requestCourse">Request a Course for Credit</a>
+                <li class="nav-item me-4 {% if request.path == '/requestCourse/' %}active{% endif %}">
+                    <a class="nav-link active" href="/requestCourse">Request a Course for Credit</a>
                 </li>
 
 <!--                <li class="nav-item me-4">-->
 <!--                <a class="nav-link active" href="/requestCourseList">Status of Credit Requests</a>-->
 <!--                </li>-->
-                <li class="nav-item me-4">
+                <li class="nav-item me-4 {% if request.path == '/submitViableCourse/' %}active{% endif %}">
                     <a class="nav-link active" href="/submitViableCourse">Does Schedule Transfer</a>
                 </li>
-                <li class="nav-item me-4">
+
+                <li class="nav-item me-4 {% if request.path == '/searchForCourse/' %}active{% endif %}">
                     <a class="nav-link active" href="/searchForCourse/">Search Transfer Courses</a>
                 </li>
             </ul>
