@@ -34,7 +34,7 @@
             </ul>
             {% else %}
                 <p>There are no pending course requests.</p>
-          {% endif %}
+            {% endif %}
         <h2>Courses that I have approved</h2>
             {% if accepted_requests %}
             <ul>
@@ -45,7 +45,7 @@
             </ul>
             {% else %}
                 <p>You have not accepted any course requests.</p>
-          {% endif %}
+            {% endif %}
         <h2>Courses that I have denied</h2>
             {% if denied_requests %}
             <ul>
@@ -58,7 +58,40 @@
                 <p>You have not denied any course requests.</p>
             {% endif %}
     {%else%}
-
+        <h1>Current Status of Requests</h1>
+        <h2>Courses Left Pending</h2>
+            {% if pending_requests %}
+            <ul>
+            {% for request in pending_requests %}
+                <h6>{{request.foreign_course.course_name}}</h6>
+                <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
+            {% endfor %}
+            </ul>
+            {% else %}
+                <p>There are no pending course requests.</p>
+            {% endif %}
+        <h2>Courses that are Accepted</h2>
+            {% if accepted_requests %}
+            <ul>
+                {% for request in accepted_requests %}
+                    <h6>{{request.foreign_course.course_name}}</h6>
+                    <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
+                {% endfor %}
+            </ul>
+            {% else %}
+                <p>You have not accepted any course requests.</p>
+            {% endif %}
+        <h2>Courses that have been Denied</h2>
+            {% if denied_requests %}
+            <ul>
+                {% for request in denied_requests %}
+                    <h6>{{request.foreign_course.course_name}}</h6>
+                    <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
+                {% endfor %}
+            </ul>
+            {% else %}
+                <p>You have not denied any course requests.</p>
+            {% endif %}
     {%endif%}
 {% endblock %}
 </body>

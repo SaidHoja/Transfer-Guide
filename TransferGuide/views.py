@@ -339,15 +339,21 @@ def index(request):
         username = request.user
         user = UserType.objects.filter(user=username)
         user = user.filter(role='Admin')
+        pending_requests = Request.objects.none()
+        accepted_requests = Request.objects.none()
+        denied_requests = Request.objects.none()
         if len(user) == 1:
             own_requests = Request.objects.filter(reviewed_by=username)
             pending_requests = Request.objects.filter(status='P')
             accepted_requests = own_requests.filter(status='A')
             denied_requests = own_requests.filter(Q(status='D_BadFit') | Q(status='D_LowGrade'))
-            return render(request, 'index.html',{'pending_requests': pending_requests, 'accepted_requests': accepted_requests,
-                                                'denied_requests': denied_requests})
         else:
-            return render(request, 'index.html')
+            own_requests = Request.objects.filter(foreign_course__username=username)
+            pending_requests = own_requests.filter(status='P')
+            accepted_requests = own_requests.filter(status='A')
+            denied_requests = own_requests.filter(status='D')
+        return render(request, 'index.html', {'pending_requests': pending_requests, 'accepted_requests': accepted_requests,
+                                              'denied_requests': denied_requests})
     return render(request, 'index.html')
 
 
