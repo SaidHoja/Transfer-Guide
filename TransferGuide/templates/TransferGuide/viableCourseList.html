@@ -20,7 +20,8 @@
 {% endblock %}
 
 {% block content %}
-    <div id="acceptedData" >
+    <div class="container mt-5">
+        <div id="acceptedData" >
         <strong>ACCEPTED COURSES HERE</strong>
             {% if accepted_courses %}
             <ul>
@@ -37,4 +38,6 @@
         <p>Total number of courses that can transfer: {{num_of_transfer_courses}} / {{num_of_courses}} </p>
         <button></button>
     </div>
+    </div>
+
 {% endblock %}

@@ -8,6 +8,9 @@ from .models import Viable_Course, Course, Request, UVA_Course, UserType, User
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.db.models import Q
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
+from django import forms
 # creating a form
 
 def validate_one_word(value):
@@ -20,34 +23,41 @@ def validate_non_uva(value):
     if value.lower() == "university of virginia":
         raise ValidationError("Please enter a non-UVA course.")
 class requestCourseForm(forms.Form):
-    course_institution = forms.CharField(max_length=100, validators=[validate_non_uva])
-    course_name = forms.CharField(max_length = 100)
-    course_dept = forms.CharField(max_length=5, validators=[validate_one_word])
+    course_institution = forms.CharField(max_length=100, validators=[validate_non_uva],
+                                         widget=forms.TextInput(attrs={'placeholder': 'Enter the instutition your course is from.'}))
+    course_name = forms.CharField(max_length = 100, widget=forms.TextInput(attrs={'placeholder': 'Enter the name of your course'}))
+    course_dept = forms.CharField(max_length=5, validators=[validate_one_word], widget=forms.TextInput(attrs={'placeholder': 'Example: enter MATH for transfer course MATH 1000'}))
     course_number = forms.IntegerField(min_value=0, max_value=9999)
     course_grade = forms.CharField(max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
                                                                              ('F','F')]))
     course_delivery = forms.CharField(max_length=10, widget=forms.Select(choices=[('IN-PERSON','IN-PERSON'), (
         'ONLINE','ONLINE')]))
-    syllabus_url = forms.URLField()
+    syllabus_url = forms.URLField(widget=forms.TextInput(attrs={'placeholder': 'Enter homepage of course or link to syllabus.'}))
     credit_hours = forms.IntegerField(min_value=0, max_value=10)
 
 class viableCourseForm(forms.Form):
-    course_institution = forms.CharField(max_length=100)
-    course_name = forms.CharField(max_length = 100)
-    course_dept = forms.CharField(max_length=6, validators=[validate_one_word])
+    course_institution = forms.CharField(max_length=100, validators=[validate_non_uva],
+                                         widget=forms.TextInput(attrs={'placeholder': 'Enter the institution your course came from.'}))
+    course_name = forms.CharField(max_length=100,
+                                  widget=forms.TextInput(attrs={'placeholder': 'Enter the name of your course'}))
+    course_dept = forms.CharField(max_length=6, validators=[validate_one_word],
+                                  widget=forms.TextInput(attrs={'placeholder': 'Enter "CS", "ENGL", "APMA", "CHEM".'}))
     course_number = forms.IntegerField(min_value=0, max_value=9999)
     course_grade = forms.CharField(max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
                                                                              ('F','F')]))
 
 viableCourseFormSet = formset_factory(viableCourseForm, extra=1)
 class sisForm(forms.Form):
-    subject = forms.CharField(label='Subject (e.g. CS, ASTR, etc.)', max_length=5, required = False)
+    subject = forms.CharField(label='Subject', max_length=5, required = False,
+                              widget=forms.TextInput(attrs={'placeholder': 'Enter "CS", "ENGL", "APMA", "CHEM".'}),
+                              validators=[validate_one_word])
     term = forms.CharField(max_length=6,widget=forms.Select(choices=[(8, "FALL"), (3, "SPRING")]))
     YEAR_CHOICES = []
     for y in range(2000, (datetime.datetime.now().year + 1)):
         YEAR_CHOICES.append((y, y))
     year= forms.CharField(max_length=4, widget=forms.Select(choices=YEAR_CHOICES))
-    instructor = forms.CharField(max_length=20, required = False)
+    instructor = forms.CharField(max_length=20, required = False,
+                                 widget=forms.TextInput(attrs={'placeholder': 'Enter last name of instructor.'}))
 
 class statusForm(forms.Form):
     credits_approved = forms.IntegerField(label = "Approve for how many credits?", required=False)
