@@ -331,21 +331,16 @@ def return_transfer_courses(dept_num, institution, approved_requests, word):
         if len(raw_data) >= 2:
             num = raw_data[1]
             result = result.filter(uva_course__course_num=num)
-
     # create a set of tuples with the unique combination of institution, dept, and num
     unique_tuples = set((r.foreign_course.course_institution, r.foreign_course.course_dept, r.foreign_course.course_num) for r in result)
-
     # create a list of the first matching request for each unique combination of institution, dept, and num
     result_list = [result.filter(foreign_course__course_institution=t[0], foreign_course__course_dept=t[1], foreign_course__course_num=t[2]).first() for t in unique_tuples]
-
     # filter out None values from the result_list
     result_list = list(filter(None, result_list))
-
     # create a QuerySet from the result_list
     result_queryset = Request.objects.none()
     for request in result_list:
         result_queryset |= Request.objects.filter(pk=request.pk)
-
     return result_queryset
 
 
