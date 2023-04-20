@@ -84,8 +84,9 @@ def find_courses_from_request(pending_requests):
     return courses
 
 def userSubmittedCourse(username, course_dept, course_num, course_institution, course_grade):
-    user_courses = Course.objects.filter(Q(username=username) & Q(course_dept=course_dept) & Q(course_num=course_num) &
-                                         Q(course_institution=course_institution) & Q(course_grade=course_grade))
+    user_courses = Course.objects.filter(Q(username=username) & Q(course_dept__iexact=course_dept) &
+                                         Q(course_num=course_num) & Q(course_institution__iexact=course_institution)
+                                         & Q(course_grade=course_grade))
     print(len(user_courses))
     return len(user_courses) > 0
 
