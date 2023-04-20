@@ -59,37 +59,73 @@
             {% endif %}
     {%else%}
     <div class="container mt-5">
-        <h1>Current Status of Requests</h1>
-        <h2>Courses Left Pending</h2>
+        <h5>Current Status of Requests</h5>
+        <p>Courses Left Pending</p>
             {% if pending_requests %}
-            <ul>
-            {% for request in pending_requests %}
-                <h6>{{request.foreign_course.course_name}}</h6>
-                <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
-            {% endfor %}
-            </ul>
+            <table class="table table-striped table-bordered center">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Transfer Course Name</th>
+                        <th>Transfer Course Code</th>
+                        <th>Transfer Institution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in pending_requests %}
+                    <tr>
+                        <td>{{request.foreign_course.course_name}}</td>
+                        <td>{{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</td>
+                        <td>{{request.foreign_course.course_institution }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             {% else %}
                 <p>There are no pending course requests.</p>
             {% endif %}
-        <h2>Courses that are Accepted</h2>
+        <p>Courses that are Accepted</p>
             {% if accepted_requests %}
-            <ul>
-                {% for request in accepted_requests %}
-                    <h6>{{request.foreign_course.course_name}}</h6>
-                    <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
-                {% endfor %}
-            </ul>
+                <table class="table table-striped table-bordered center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Transfer Course Name</th>
+                            <th>Transfer Course Code</th>
+                            <th>Transfer Institution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in accepted_requests %}
+                        <tr>
+                            <td>{{request.foreign_course.course_name}}</td>
+                            <td>{{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</td>
+                            <td>{{request.foreign_course.course_institution }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             {% else %}
                 <p>You have not accepted any course requests.</p>
             {% endif %}
         <h2>Courses that have been Denied</h2>
             {% if denied_requests %}
-            <ul>
-                {% for request in denied_requests %}
-                    <h6>{{request.foreign_course.course_name}}</h6>
-                    <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
-                {% endfor %}
-            </ul>
+            <table class="table table-striped table-bordered center">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Transfer Course Name</th>
+                        <th>Transfer Course Code</th>
+                        <th>Transfer Institution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in denied_requests %}
+                    <tr>
+                        <td>{{request.foreign_course.course_name}}</td>
+                        <td>{{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</td>
+                        <td>{{request.foreign_course.course_institution }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             {% else %}
                 <p>You have not denied any course requests.</p>
             {% endif %}
