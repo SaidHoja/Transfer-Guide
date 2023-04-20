@@ -1,10 +1,12 @@
+{% extends "TransferGuide/base.html" %}
+
 {% load static %}
 {% load bootstrap5 %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
 {% load socialaccount %}
 
-<div class="p-5 bg-primary text-warning text-center">
+{% block banner %}
   <h1>Search for a Course</h1>
 
     {% if not user.is_authenticated %}
@@ -14,97 +16,34 @@
     {% else %}
          <p>{{ user.username }}, you can search for all transfer courses that can be transferred from a university, course mnemonic, course number, common words, etc.</p>
     {% endif %}
+{% endblock %}
 
-</div>
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-        <div class="container-fluid">
-            {% if not user.is_authenticated %}
-                <ul class="navbar-nav">
-                    <li class="nav-item me-4" >
-                        <a class="nav-link active" href="{% provider_login_url 'google' %}">Login With Google</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="/logout"> Log Out</a>
-                    </li>
-                </ul>
-            {% elif user.usertype.role == 'Admin' %}
-                <ul class="navbar-nav">
-                    <li class="nav-item me-4" >
-                        <a class="nav-link disable" href="{% provider_login_url 'google' %}">Login With Google</a>
-                    </li>
-
-                    <li class="nav-item me-4">
-                         <a class="nav-link active" href="/sisRequest">Find a Course at UVA</a>
-                    </li>
-
-                    <li class="nav-item me-4" >
-                        <a class="nav-link active" href="/adminApproval">Review Transfer Credit Requests</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                     <a class="nav-link active" href="/logout"> Log Out</a>
-                    </li>
-                </ul>
-
-            {% else %}
-                <ul class="navbar-nav">
-                    <li class="nav-item me-4" >
-                    <a class="nav-link disabled" href="{% provider_login_url 'google' %}">Login With Google</a>
-                    </li>
-
-                     <li class="nav-item me-4">
-                         <a class="nav-link active" href="/sisRequest">Find a Course at UVA</a>
-                     </li>
-
-                    <li class="nav-item me-4">
-                     <a class="nav-link active" href="/requestCourse">Request a Course for Credit</a>
-                    </li>
-
-                    <li class="nav-item me-4">
-                    <a class="nav-link active" href="/requestCourseList">Status of Credit Requests</a>
-                    </li>
-                    <li class="nav-item me-4">
-                        <a class="nav-link active" href="/submitViableCourse">Do Courses Transfer?</a>
-                    </li>
-                    <li class="nav-item me-4">
-                        <a class="nav-link active" href="/searchForCourse/">See Transfer Courses</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                     <a class="nav-link active" href="/logout"> Log Out</a>
-                    </li>
-                </ul>
-            {% endif %}
-        </div>
-</nav>
-
-<!--Submission form-->
-{% if user.is_authenticated %}
-<div class="container mt-5">
-    <p>The following transfer courses fit your requirements.</p>
-    <table class = "table table-striped table-bordered center" >
-        <thead class = "thead-dark">
-            <tr>
-                <th>Transfer Course Name</th>
-                <th>Transfer Course Code</th>
-                <th>Transfer Institution</th>
-                <th>Equivalent UVA Course</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in requests %}
-            <tr>
-                <td>{{request.foreign_course.course_name}}</td>
-                <td>{{request.foreign_course.course_dept}} {{request.foreign_course.course_num}}</td>
-                <td>{{request.foreign_course.course_institution}}</td>
-                <td>{{request.uva_course.course_name}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-{% endif %}
+{% block content %}
+    <!--Submission form-->
+    <div class="container mt-5">
+    {% if user.is_authenticated %}
+        <p>The following transfer courses fit your requirements.</p>
+        <table class = "table table-striped table-bordered center" >
+            <thead class = "thead-dark">
+                <tr>
+                    <th>Transfer Course Name</th>
+                    <th>Transfer Course Code</th>
+                    <th>Transfer Institution</th>
+                    <th>Equivalent UVA Course</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in requests %}
+                <tr>
+                    <td>{{request.foreign_course.course_name}}</td>
+                    <td>{{request.foreign_course.course_dept}} {{request.foreign_course.course_num}}</td>
+                    <td>{{request.foreign_course.course_institution}}</td>
+                    <td>{{request.uva_course.course_name}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary"><a href="/searchForCourse" style="text-decoration:none;color:white">Continue Searching</a></button>
+    </div>
+    {% endif %}
+{% endblock %}

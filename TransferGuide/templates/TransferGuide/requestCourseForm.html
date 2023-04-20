@@ -1,12 +1,14 @@
+{% extends "TransferGuide/base.html" %}
+
 {% load static %}
 {% load bootstrap5 %}
 {% bootstrap_css %}
+{% bootstrap_messages %}
 {% bootstrap_javascript %}
 {% load socialaccount %}
 
-<div class="p-5 bg-primary text-warning text-center">
+{% block banner %}
   <h1>Request a Course for Credit</h1>
-
     {% if not user.is_authenticated %}
         <p>Welcome, please log in to continue!</p>
     {% elif user.usertype.role == 'Admin' %}
@@ -14,92 +16,28 @@
     {% else %}
          <p>{{ user.username }}, you can request a non-UVA course for UVA credit through this page</p>
     {% endif %}
+{% endblock %}
 
-</div>
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-        <div class="container-fluid">
-            {% if not user.is_authenticated %}
-                <ul class="navbar-nav">
-                    <li class="nav-item me-4" >
-                        <a class="nav-link active" href="{% provider_login_url 'google' %}">Login With Google</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="/logout"> Log Out</a>
-                    </li>
-                </ul>
-            {% elif user.usertype.role == 'Admin' %}
-                <ul class="navbar-nav">
-                    <li class="nav-item me-4" >
-                        <a class="nav-link disable" href="{% provider_login_url 'google' %}">Login With Google</a>
-                    </li>
-
-                    <li class="nav-item me-4">
-                         <a class="nav-link active" href="/sisRequest">Find a Course at UVA</a>
-                    </li>
-
-                    <li class="nav-item me-4" >
-                        <a class="nav-link active" href="/adminApproval">Review Transfer Credit Requests</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                     <a class="nav-link active" href="/logout"> Log Out</a>
-                    </li>
-                </ul>
-
-            {% else %}
-                <ul class="navbar-nav">
-                    <li class="nav-item me-4" >
-                    <a class="nav-link disabled" href="{% provider_login_url 'google' %}">Login With Google</a>
-                    </li>
-
-                     <li class="nav-item me-4">
-                         <a class="nav-link active" href="/sisRequest">Find a Course at UVA</a>
-                     </li>
-
-                    <li class="nav-item me-4">
-                     <a class="nav-link active" href="/requestCourse">Request a Course for Credit</a>
-                    </li>
-
-                    <li class="nav-item me-4">
-                    <a class="nav-link active" href="/requestCourseList">Status of Credit Requests</a>
-                    </li>
-                    <li class="nav-item me-4">
-                        <a class="nav-link active" href="/submitViableCourse">Do Courses Transfer?</a>
-                    </li>
-                    <li class="nav-item me-4">
-                        <a class="nav-link active" href="/searchForCourse/">See Transfer Courses</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                     <a class="nav-link active" href="/logout"> Log Out</a>
-                    </li>
-                </ul>
-            {% endif %}
-        </div>
-</nav>
-
+{% block content %}
 <!--Submission form-->
-{% if user.is_authenticated %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-sm-4">
-            <form action="" method="post" class = "form-center">
-                {% csrf_token %}
-                {% bootstrap_form form %}
-                {% if error %}
-                  <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                  </div>
-                {% endif %}
-                <button type="submit" class="btn btn-primary">Submit</button>
-                 <button type="submit" class="btn btn-primary"><a href="/requestCourse" style="text-decoration:none;color:white">Clear Form</a></button>
-            </form>
+    {% if user.is_authenticated %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-sm-4">
+                <form action="" method="post" class = "form-center">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    {% if error %}
+                      <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                      </div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary"><a href="/requestCourse" style="text-decoration:none;color:white">Clear Form</a></button>
+                </form>
+            </div>
         </div>
     </div>
+    {% endif %}
+{% endblock %}
 
-</div>
-{% endif %}
