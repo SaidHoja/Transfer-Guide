@@ -131,45 +131,35 @@ def getUVACourse(course_dept, course_num, course_institution):
 
 def submitViableCourse(request):
     formset = viableCourseFormSet()
+    num_of_courses = 0
+    num_of_transfer_courses = 0
+    approved_requests = Request.objects.filter(Q(status='A') | Q(status='D_LowGrade'))
+    accepted_courses = {}
     if request.method == 'POST':
         formset = viableCourseFormSet(data=request.POST)
         if formset.is_valid():
             for form in formset:
-                username = request.user
                 course_institution = form.cleaned_data['course_institution']
                 course_name = form.cleaned_data['course_name']
                 course_dept = form.cleaned_data['course_dept']
                 course_number = form.cleaned_data['course_number']
                 course_grade = form.cleaned_data['course_grade']
-                # error checking
-                v = Viable_Course(username=username,course_institution=course_institution,course_name=course_name,
-                                  course_dept=course_dept,course_num=course_number,course_grade=course_grade)
-                v.save()
-            return HttpResponseRedirect(reverse('seeViableCourse'))
+                num_of_courses += 1
+                specific_requests = approved_requests.filter(foreign_course__course_institution__iexact=course_institution)
+                specific_requests = specific_requests.filter(foreign_course__course_dept__iexact=course_dept)
+                specific_requests = specific_requests.filter(foreign_course__course_num=course_number)
+                approved_course_lowest_grade = 70
+                if len(specific_requests) > 0:
+                    if translate_grade(course_grade) >= approved_course_lowest_grade:
+                        num_of_transfer_courses += 1
+                        new_course = {num_of_transfer_courses: {'course_institution': course_institution,
+                                                                'course_name': course_name,
+                                                                'course_dept': course_dept, 'course_number': course_number}}
+                        accepted_courses.update(new_course)
+            return render(request, 'TransferGuide/viableCourseList.html', {'accepted_courses': accepted_courses,
+                                                                           'num_of_transfer_courses': num_of_transfer_courses,
+                                                                           'num_of_courses': num_of_courses})
     return render(request, 'TransferGuide/viableCourseForm.html', {'viable_course_formset':formset})
-
-def seeViableCourse(request):
-    num_of_transfer_courses = 0
-    num_of_courses = 0
-    username = request.user
-    user_courses = Viable_Course.objects.filter(username=username)
-    num_of_courses = len(user_courses)
-    approved_requests = Request.objects.filter(Q(status='A') | Q(status='D_LowGrade'))
-    print(len(approved_requests))
-    acceptedCourses = []
-    for user_course in user_courses:
-        user_grade = translate_grade(user_course.course_grade)
-        specific_requests = approved_requests.filter(foreign_course__course_institution__iexact=user_course.course_institution)
-        specific_requests = specific_requests.filter(foreign_course__course_dept__iexact=user_course.course_dept)
-        specific_requests = specific_requests.filter(foreign_course__course_num=user_course.course_num)
-        approved_course_lowest_grade = 70
-        if len(specific_requests) > 0:
-            if user_grade >= approved_course_lowest_grade:
-                acceptedCourses.append(user_course)
-                num_of_transfer_courses += 1
-    return render(request, 'TransferGuide/viableCourseList.html', {'accepted_courses':acceptedCourses,
-                                                                   'num_of_transfer_courses':num_of_transfer_courses,
-                                                                   'num_of_courses':num_of_courses})
 
 def translate_grade(grade):
     if grade == 'A':
