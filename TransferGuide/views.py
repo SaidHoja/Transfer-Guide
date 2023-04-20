@@ -276,7 +276,7 @@ def requestPage(request, pk):
 def searchForCourse(request):
     form = searchCourseForm()
     # select approved courses
-    requests = Request.objects.filter(Q(status='A') | Q(status='D_LowGrade'))
+    approved_requests = Request.objects.filter(Q(status='A') | Q(status='D_LowGrade'))
     if request.method == 'POST':
         form = searchCourseForm(request.POST)
         if form.is_valid():
@@ -284,7 +284,7 @@ def searchForCourse(request):
             word = form.cleaned_data['word']
             dept_num = form.cleaned_data['dept_num']
             # print(len(result))
-            result = return_transfer_courses(dept_num, institution, requests, word)
+            result = return_transfer_courses(dept_num, institution, approved_requests, word)
             # print(len(result))
         return render(request, 'TransferGuide/searchCourseResult.html', {'requests':result})
     return render(request, 'TransferGuide/searchCourse.html', {'form':form})
@@ -305,6 +305,8 @@ def return_transfer_courses(dept_num, institution, result, word):
         if len(raw_data) >= 2:
             num = raw_data[1]
             result = result.filter(uva_course__course_num=num)
+    result.values('foreign_course__course_institution', 'foreign_course__course_name', 'uva_course__course_dept',
+                  'uva_course__course_num').distinct()
     return result
 
 
