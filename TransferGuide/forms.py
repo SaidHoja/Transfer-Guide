@@ -84,6 +84,7 @@ def institution_as_widget():
     result.append(("No Preference", "No Preference"))
     for institute in set_of_institutes:
         result.append((institute, institute))
+    result = sorted(result, key=lambda x: (x[0] != 'No Preference', x))
     return result
 
 def mnemonic_as_widget():
