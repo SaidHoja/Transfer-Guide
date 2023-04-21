@@ -71,6 +71,7 @@ def requestCourseList(request):
     user_courses = Request.objects.filter(foreign_course__username=username)  # .order_by('-pub_date')
     pending_requests = user_courses.filter(status="P")
     denied_requests = user_courses.filter(Q(status="D_LowGrade") | Q(status="D_BadFit"))
+    print(len(denied_requests))
     approved_requests = user_courses.filter(status="A")
     return render(request, 'TransferGuide/requestCourseList.html', {'pending_requests':pending_requests,
                                                                     'approved_requests':approved_requests,
@@ -351,7 +352,7 @@ def index(request):
             own_requests = Request.objects.filter(foreign_course__username=username)
             pending_requests = own_requests.filter(status='P')
             accepted_requests = own_requests.filter(status='A')
-            denied_requests = own_requests.filter(status='D')
+            denied_requests = own_requests.filter(Q(status='D_BadFit') | Q(status='D_LowGrade'))
         return render(request, 'index.html', {'pending_requests': pending_requests, 'accepted_requests': accepted_requests,
                                               'denied_requests': denied_requests})
     return render(request, 'index.html')
