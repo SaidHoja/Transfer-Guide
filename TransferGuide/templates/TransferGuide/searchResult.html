@@ -1,24 +1,24 @@
 {% extends "TransferGuide/base.html" %}
-
 {% load static %}
 {% load bootstrap5 %}
 {% bootstrap_css %}
-{% bootstrap_messages %}
 {% bootstrap_javascript %}
 {% load socialaccount %}
-
 <html>
 {% block banner %}
+
   <h1>SIS Search Results</h1>
     {% if user.is_authenticated %}
         <p>{{ user.username }}, we found the following classes with the criteria you have given.</p>
     {% else %}
         <p>Welcome, please log in to coninue!</p>
     {% endif %}
+
 {% endblock %}
 
-<body>
 {% block content %}
+{% if user.is_authenticated %}
+<body>
 <div class="container mt-5">
     <style>
         .center {
@@ -49,8 +49,10 @@
 
     </tbody>
 </div>
+
 </table>
-{% endblock %}
 </body>
+{% endif %}
+{% endblock %}
 </html>
 

@@ -1,5 +1,4 @@
 {% extends "TransferGuide/base.html" %}
-
 {% load static %}
 {% load bootstrap5 %}
 {% bootstrap_css %}
@@ -7,7 +6,7 @@
 {% load socialaccount %}
 
 {% block banner %}
-  <h1>Search for a Course</h1>
+  <h1>Search for Courses that Transfer</h1>
 
     {% if not user.is_authenticated %}
         <p>Welcome, please log in to continue!</p>
@@ -16,22 +15,23 @@
     {% else %}
          <p>{{ user.username }}, you can search for all transfer courses that can be transferred from a university, course mnemonic, course number, common words, etc.</p>
     {% endif %}
+
 {% endblock %}
 
 {% block content %}
-    <!--Submission form-->
-    {% if user.is_authenticated %}
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-sm-12">
-                <form action="" method="post" class = "form-center">
-                    {% csrf_token %}
-                    {% bootstrap_form form %}
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
+<!--Submission form-->
+{% if user.is_authenticated and user.usertype.role == 'Student' %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-sm-4">
+            <form action="" method="post" class = "form-center">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
         </div>
     </div>
-    {% endif %}
-{% endblock %}
 
+</div>
+{% endif %}
+{% endblock %}

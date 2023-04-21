@@ -1,11 +1,10 @@
 {% extends "TransferGuide/base.html" %}
-<style>
-.center {
-  margin: auto;
-  width: 60%;
-  padding: 10px;
-}
-</style>
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% load socialaccount %}
+
 
 {% block banner %}
   <h1>Courses that Transfer From Schedule</h1>
@@ -20,24 +19,24 @@
 {% endblock %}
 
 {% block content %}
+{% if user.is_authenticated and user.usertype.role == 'Student' %}
     <div class="container mt-5">
         <div id="acceptedData" >
         <strong>ACCEPTED COURSES HERE</strong>
             {% if accepted_courses %}
             <ul>
                 {% for course in accepted_courses.values %}
-                    <h6>{{course.course_name}}</h6>
-                    <p>{{ course.course_institution }} <br> {{ course.course_dept}}&nbsp{{course.course_num}}</p>
+                    <div class="card-body">
+                        <h6 class="card-title">{{course.course_name}}</h6>
+                        <p class="card-text"> {{ course.course_institution }} <br> {{ course.course_dept}}&nbsp{{course.course_num}}</p>
+                    </div>
                 {% endfor %}
             </ul>
+             <p>Total number of courses that can transfer: {{num_of_transfer_courses}} / {{num_of_courses}} </p>
             {% else %}
                 <p>None of the courses you entered are accepted at this institution.</p>
             {% endif %}
     </div>
-    <div>
-        <p>Total number of courses that can transfer: {{num_of_transfer_courses}} / {{num_of_courses}} </p>
-        <button></button>
     </div>
-    </div>
-
+{% endif %}
 {% endblock %}

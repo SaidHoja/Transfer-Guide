@@ -1,48 +1,52 @@
 {% extends "TransferGuide/base.html" %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit Viable Course</title>
-</head>
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% load socialaccount %}
+
 {% block banner %}
-  <h1>See If Your Schedule Transfers</h1>
+  <h1>Do your Credits Transfer?</h1>
 
     {% if not user.is_authenticated %}
         <p>Welcome, please log in to continue!</p>
     {% elif user.usertype.role == 'Admin' %}
-        <p>Welcome {{ user.username }}, Admins do not have access to this page. </p>
+        <p>Welcome {{ user.username }}, Admins do not have access to this page. Did you mean to go to the Review Course Requests page </p>
     {% else %}
-         <p>{{ user.username }}, enter in courses from your schedule.</p>
+         <p>{{ user.username }}, you can request a non-UVA course for UVA credit through this page</p>
     {% endif %}
+
 {% endblock %}
 
 {% block content %}
-    <style>
-        input[type=text] {
-            width: 80%;
-            padding: 3px 5px;
-            margin: 4px 0;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-    </style>
-    <div class="container mt-12">
-        <p>See if your course(s) are in our system</p>
+{% if user.is_authenticated and user.usertype.role == 'Student' %}
+<body>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-sm-5">
         <form id="form-container" method="POST">
-            {% csrf_token %}
-            {{viable_course_formset.management_form}}
-            {% for form in viable_course_formset %}
-                <div class="viable-course-form">
-                    {{form.as_p}}
-                </div>
-            {% endfor %}
-            <button id="add-form" type="button" class="btn btn-primary">Add Another Course</button>
-            <button id="remove-form" type="button" class="btn btn-primary">Remove Last Course</button>
-            <button type="submit" class="btn btn-primary">See Results</button>
+                {% csrf_token %}
+                {{viable_course_formset.management_form}}
+
+                {% for form in viable_course_formset %}
+                    <div class="viable-course-form">
+                        <div class="card-body">
+                        {{form.as_p}}
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <button id="add-form" type="button" class="btn btn-primary">Add Another Course</button>
+                <button id="remove-form" type="button" class="btn btn-primary">Remove Last Course</button>
+                <button type="submit" class="btn btn-primary">See Results</button>
         </form>
-        <script>
+            </div>
+
+        </div>
+    </div>
+</div>
+    <script>
             let viableCourseForm = document.querySelectorAll(".viable-course-form")
             let container = document.querySelector("#form-container")
             let addButton = document.querySelector("#add-form")
@@ -79,5 +83,7 @@
                 totalForms.setAttribute('value', `${viableCourseForm.length}`);
             }
         </script>
-    </div>
+    </body>
+{% endif %}
 {% endblock %}
+</html>
