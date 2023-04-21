@@ -22,7 +22,7 @@
 {% block content %}
 {% if user.is_authenticated and user.usertype.role == 'Admin' %}
 <div class="container mt-5">
-    <div class="col-sm-3">
+    <div class="col-sm-4">
     <form method = "POST" class = "form-center">
         {%csrf_token%}
         {% bootstrap_form form%}
