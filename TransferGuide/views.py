@@ -4,46 +4,73 @@ from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
 import json, requests
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from oauth_app.models import UserType
 from .forms import requestCourseForm, sisForm, viableCourseFormSet
 from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm, editRoleForm, KnownTransferForm
 from .models import Course, Viable_Course, Request, UserType, User
 from .filters import OrderCourses
 import re
+from django.db.models import Q, F
 
 # Adding Courses by the Student
 def requestCourse(request):
+    error = ""
     if request.method == 'POST':
         form = requestCourseForm(request.POST)
         if form.is_valid():
-            if request.user.is_authenticated:
-                username = request.user
-                course_institution = form.cleaned_data['course_institution']
-                course_name = form.cleaned_data['course_name']
-                course_dept = form.cleaned_data['course_dept']
-                course_number = form.cleaned_data['course_number']
-                course_grade = form.cleaned_data['course_grade']
-                course_delivery = form.cleaned_data['course_delivery']
-                syllabus_url = form.cleaned_data['syllabus_url']
-                credit_hours = form.cleaned_data['credit_hours']
-                user_courses = Course.objects.filter(username=username)
-                if isRequestNew(user_courses, course_dept, course_number, course_institution):
-                    print("request is made")
-                    c = Course(username=username,course_institution=course_institution,course_name=course_name,
-                           course_dept=course_dept,course_num=course_number,course_grade=course_grade,
-                           course_delivery=course_delivery,syllabus_url=syllabus_url,credit_hours=credit_hours)
-                    c.save()
-                    r = Request(foreign_course=c, credit_hours=credit_hours)
-                    r.save()
-            return HttpResponseRedirect(reverse('requestCourseList'))
+            username = request.user
+            course_institution = form.cleaned_data['course_institution']
+            course_name = form.cleaned_data['course_name']
+            course_dept = form.cleaned_data['course_dept']
+            course_number = form.cleaned_data['course_number']
+            course_grade = form.cleaned_data['course_grade']
+            course_delivery = form.cleaned_data['course_delivery']
+            syllabus_url = form.cleaned_data['syllabus_url']
+            credit_hours = form.cleaned_data['credit_hours']
+
+            if userSubmittedCourse(username, course_dept, course_number, course_institution, course_grade):
+                error = "You sent this request before. Try again!"
+                return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, 'error': error})
+            else:
+                c = Course(username=username, course_institution=course_institution, course_name=course_name, course_dept=course_dept,
+                    course_num=course_number, course_grade=course_grade, course_delivery=course_delivery, syllabus_url=syllabus_url,
+                    credit_hours=credit_hours)
+                c.save()
+                if wasCourseApproved(course_dept, course_number, course_institution):
+                    uva_course = getUVACourse(course_dept, course_number, course_institution)
+                    if translate_grade(course_grade) >= 70:
+                        r = Request(uva_course=uva_course, foreign_course=c, status='A', credit_hours=credit_hours,
+                                    reviewer_comment="Autoapproved - grade is sufficient")
+                        r.save()
+                    else:
+                        r = Request(uva_course=uva_course, foreign_course=c, status='D', credit_hours=credit_hours,
+                                    reviewer_comment="Autodeclined - grade is too low")
+                        r.save()
+                elif wasCourseDenied(course_dept, course_number, course_institution):
+                    # print("course denied")
+                    uva_course = getUVACourse(course_dept, course_number, course_institution)
+                    if deniedDueToLowGrade(course_dept, course_number, course_institution):
+                        if translate_grade(course_grade) >= 70:
+                            r = Request(uva_course=uva_course, foreign_course=c, status='A', credit_hours=credit_hours,
+                                        reviewer_comment="Autoapproved - grade is sufficient")
+                            r.save()
+                        else:
+                            r = Request(uva_course=uva_course, foreign_course=c, status='D_LowGrade', credit_hours=credit_hours,
+                                        reviewer_comment="Autodeclined - grade is too low")
+                            r.save()
+                    else:
+                        r = Request(uva_course=uva_course, foreign_course=c, status='D_BadFit', credit_hours=credit_hours,
+                                    reviewer_comment="Autodeclined - course does not align with UVA's educational values")
+                        r.save()
+            return HttpResponseRedirect('/')
     form = requestCourseForm()
     return render(request, 'TransferGuide/requestCourseForm.html', {'form': form})
 def requestCourseList(request):
     username = request.user
     user_courses = Request.objects.filter(foreign_course__username=username)  # .order_by('-pub_date')
     pending_requests = user_courses.filter(status="P")
-    denied_requests = user_courses.filter(status="D")
+    denied_requests = user_courses.filter(Q(status="D_LowGrade") | Q(status="D_BadFit"))
     approved_requests = user_courses.filter(status="A")
     return render(request, 'TransferGuide/requestCourseList.html', {'pending_requests':pending_requests,
                                                                     'approved_requests':approved_requests,
@@ -55,60 +82,84 @@ def find_courses_from_request(pending_requests):
         courses.append(req.foreign_course)
     return courses
 
-def isRequestNew(user_courses, course_dept, course_num, course_institution):
-    requested_courses = Request.objects.filter(foreign_course__course_dept=course_dept)
-    requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
-    requested_courses = requested_courses.filter(foreign_course__course_institution=course_institution)
-    never_checked = len(requested_courses.filter(status='D')) == 0 and len(requested_courses.filter(status='A')) == 0
-    # has course ever been submitted before
-    course = user_courses.filter(course_dept=course_dept)
+def userSubmittedCourse(username, course_dept, course_num, course_institution, course_grade):
+    user_courses = Course.objects.filter(Q(username=username) & Q(course_dept__iexact=course_dept) &
+                                         Q(course_num=course_num) & Q(course_institution__iexact=course_institution)
+                                         & Q(course_grade=course_grade))
+    print(len(user_courses))
+    return len(user_courses) > 0
+
+def doesCourseExist(user_courses, course_dept, course_num, course_institution):
+    course = user_courses.filter(course_dept__iexact=course_dept)
     course = course.filter(course_num=course_num)
-    course = course.filter(course_institution=course_institution)
+    course = course.filter(course_institution__iexact=course_institution)
     never_submitted = len(course) == 0
-    return never_submitted and never_checked
+    return never_submitted
+
+def wasCourseApproved(course_dept, course_num, course_institution):
+    requested_courses = Request.objects.filter(foreign_course__course_dept__iexact=course_dept)
+    requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
+    requested_courses = requested_courses.filter(foreign_course__course_institution__iexact=course_institution)
+    was_approved = len(requested_courses.filter(status='A')) >= 1
+    return was_approved
+
+def wasCourseDenied(course_dept, course_num, course_institution):
+    requested_courses = Request.objects.filter(foreign_course__course_dept__iexact=course_dept)
+    requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
+    requested_courses = requested_courses.filter(foreign_course__course_institution__iexact=course_institution)
+    was_denied = len(requested_courses.filter(Q(status='D_LowGrade') | Q(status='D_BadFit'))) >= 1
+    return was_denied
+
+def deniedDueToLowGrade(course_dept, course_num, course_institution):
+    requested_courses = Request.objects.filter(foreign_course__course_dept__iexact=course_dept)
+    requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
+    requested_courses = requested_courses.filter(foreign_course__course_institution__iexact=course_institution)
+    requested_courses = requested_courses.filter(status="D_LowGrade")
+    return len(requested_courses) > 0
+def getTransferCourse(course_dept, course_num, course_institution):
+    courses = Course.objects.filter(course_dept__iexact=course_dept)
+    courses = courses.filter(course_num=course_num)
+    courses = courses.filter(course_institution__iexact=course_institution)
+    return courses.first()
+
+def getUVACourse(course_dept, course_num, course_institution):
+    requested_courses = Request.objects.filter(foreign_course__course_dept__iexact=course_dept)
+    requested_courses = requested_courses.filter(foreign_course__course_num=course_num)
+    requested_courses = requested_courses.filter(foreign_course__course_institution__iexact=course_institution)
+    first_request = requested_courses.first()
+    return first_request.uva_course
 
 def submitViableCourse(request):
     formset = viableCourseFormSet()
+    num_of_courses = 0
+    num_of_transfer_courses = 0
+    approved_requests = Request.objects.filter(Q(status='A') | Q(status='D_LowGrade'))
+    accepted_courses = {}
     if request.method == 'POST':
         formset = viableCourseFormSet(data=request.POST)
         if formset.is_valid():
             for form in formset:
-                username = request.user
                 course_institution = form.cleaned_data['course_institution']
                 course_name = form.cleaned_data['course_name']
                 course_dept = form.cleaned_data['course_dept']
                 course_number = form.cleaned_data['course_number']
                 course_grade = form.cleaned_data['course_grade']
-                # error checking
-                v = Viable_Course(username=username,course_institution=course_institution,course_name=course_name,
-                                  course_dept=course_dept,course_num=course_number,course_grade=course_grade)
-                v.save()
-            return HttpResponseRedirect(reverse('seeViableCourse'))
+                num_of_courses += 1
+                specific_requests = approved_requests.filter(foreign_course__course_institution__iexact=course_institution)
+                specific_requests = specific_requests.filter(foreign_course__course_dept__iexact=course_dept)
+                specific_requests = specific_requests.filter(foreign_course__course_num=course_number)
+                approved_course_lowest_grade = 70
+                if len(specific_requests) > 0:
+                    if translate_grade(course_grade) >= approved_course_lowest_grade:
+                        num_of_transfer_courses += 1
+                        new_course = {num_of_transfer_courses: {'course_institution': course_institution,
+                                                                'course_name': course_name,
+                                                                'course_dept': course_dept, 'course_number': course_number}}
+                        accepted_courses.update(new_course)
+            return render(request, 'TransferGuide/viableCourseList.html', {'accepted_courses': accepted_courses,
+                                                                           'num_of_transfer_courses': num_of_transfer_courses,
+                                                                           'num_of_courses': num_of_courses})
     return render(request, 'TransferGuide/viableCourseForm.html', {'viable_course_formset':formset})
-
-def seeViableCourse(request):
-    num_of_transfer_courses = 0
-    num_of_courses = 0
-    username = request.user
-    user_courses = Viable_Course.objects.filter(username=username)
-    num_of_courses = len(user_courses)
-    acceptedCourses = []
-    for user_course in user_courses:
-        user_grade = translate_grade(user_course.course_grade)
-        approved_requests = Request.objects.filter(status='A')
-        approved_requests = approved_requests.filter(foreign_course__course_dept=user_course.course_dept)
-        # print(user_course.course_dept + str(len(approved_requests)))
-        approved_requests = approved_requests.filter(foreign_course__course_num=user_course.course_num)
-        # print(str(user_course.course_num) + str(len(approved_requests)))
-        approved_courses = find_courses_from_request(approved_requests)
-        # approved_course_lowest_grade = find_lowest_grade(approved_courses)
-        approved_course_lowest_grade = 70
-        if user_grade >= approved_course_lowest_grade:
-            acceptedCourses.append(user_course)
-            num_of_transfer_courses += 1
-    return render(request, 'TransferGuide/viableCourseList.html', {'accepted_courses':acceptedCourses,
-                                                                   'num_of_transfer_courses':num_of_transfer_courses,
-                                                                   'num_of_courses':num_of_courses})
 
 def translate_grade(grade):
     if grade == 'A':
@@ -189,7 +240,8 @@ def adminApproveCourses(request):
     courses = coursesFilter.qs
     requests = []
     for course in courses:
-        requests.append(Request.objects.get(foreign_course=course))
+        for r in Request.objects.filter(foreign_course=course):
+            requests.append(r)
     return render(request, 'TransferGuide/adminApproval.html', { 'courses': courses, 'coursesFilter': coursesFilter , 'requests' :requests})
 
 def requestPage(request, pk):
@@ -203,6 +255,7 @@ def requestPage(request, pk):
         form = statusForm(request.POST)
         if form.is_valid():
             the_request.status=form.cleaned_data['status']
+            the_request.credits_approved=form.cleaned_data['credits_approved']
             the_request.uva_course=form.cleaned_data['equivalent'] # this line has gotta go but I don't know how
             the_request.reviewer_comment=form.cleaned_data['reviewer_comment'] # uncomment when field is actually available
             the_request.reviewed_by = request.user
@@ -213,7 +266,7 @@ def requestPage(request, pk):
 def searchForCourse(request):
     form = searchCourseForm()
     # select approved courses
-    result = Request.objects.filter(status='A')
+    approved_requests = Request.objects.filter(Q(status='A') | Q(status='D_LowGrade'))
     if request.method == 'POST':
         form = searchCourseForm(request.POST)
         if form.is_valid():
@@ -221,26 +274,64 @@ def searchForCourse(request):
             word = form.cleaned_data['word']
             dept_num = form.cleaned_data['dept_num']
             # print(len(result))
-            result = return_transfer_courses(dept_num, institution, result, word)
+            result = return_transfer_courses(dept_num, institution, approved_requests, word)
             # print(len(result))
         return render(request, 'TransferGuide/searchCourseResult.html', {'requests':result})
     return render(request, 'TransferGuide/searchCourse.html', {'form':form})
 
 
-def return_transfer_courses(dept_num, institution, result, word):
+# def return_transfer_courses(dept_num, institution, approved_requests, word):
+#     result = []
+#     if institution != "No Preference":
+#         approved_requests = approved_requests.filter(foreign_course__course_institution__icontains=institution)
+#     # print(len(approved_requests))
+#     if word != "":
+#         approved_requests = approved_requests.filter(foreign_course__course_name__icontains=word)
+#     if dept_num != "":
+#         raw_data = dept_num.split()
+#         if len(raw_data) >= 1:
+#             dept = raw_data[0]
+#             approved_requests = approved_requests.filter(uva_course__course_dept__iexact=dept)
+#             print(len(approved_requests))
+#         if len(raw_data) >= 2:
+#             num = raw_data[1]
+#             approved_requests = approved_requests.filter(uva_course__course_num=num)
+#     for request in approved_requests:
+#         transfer = request.foreign_course
+#         matched = approved_requests.filter(Q(foreign_course__course_institution=transfer.course_institution) &
+#                                            Q(foreign_course__course_dept=tranfer.course_dept) &
+#                                            Q(foreign_course__course_num=transfer.course_num))
+#         result.append(matched.first())
+#
+#     return approved_requests
+
+def return_transfer_courses(dept_num, institution, approved_requests, word):
+    result = approved_requests
     if institution != "No Preference":
-        result = result.filter(foreign_course__course_institution=institution)
+        result = result.filter(foreign_course__course_institution__icontains=institution)
     # print(len(result))
     if word != "":
         result = result.filter(foreign_course__course_name__icontains=word)
-    # print(len(result))
     if dept_num != "":
         raw_data = dept_num.split()
-        dept = raw_data[0]
-        num = raw_data[1]
-        result = result.filter(uva_course__course_dept__iregex=dept)
-        result = result.filter(uva_course__course_num=num)
-    return result
+        if len(raw_data) >= 1:
+            dept = raw_data[0]
+            result = result.filter(uva_course__course_dept__iexact=dept)
+            print(len(result))
+        if len(raw_data) >= 2:
+            num = raw_data[1]
+            result = result.filter(uva_course__course_num=num)
+    # create a set of tuples with the unique combination of institution, dept, and num
+    unique_tuples = set((r.foreign_course.course_institution, r.foreign_course.course_dept, r.foreign_course.course_num) for r in result)
+    # create a list of the first matching request for each unique combination of institution, dept, and num
+    result_list = [result.filter(foreign_course__course_institution=t[0], foreign_course__course_dept=t[1], foreign_course__course_num=t[2]).first() for t in unique_tuples]
+    # filter out None values from the result_list
+    result_list = list(filter(None, result_list))
+    # create a QuerySet from the result_list
+    result_queryset = Request.objects.none()
+    for request in result_list:
+        result_queryset |= Request.objects.filter(pk=request.pk)
+    return result_queryset
 
 
 def index(request):
@@ -248,15 +339,21 @@ def index(request):
         username = request.user
         user = UserType.objects.filter(user=username)
         user = user.filter(role='Admin')
+        pending_requests = Request.objects.none()
+        accepted_requests = Request.objects.none()
+        denied_requests = Request.objects.none()
         if len(user) == 1:
             own_requests = Request.objects.filter(reviewed_by=username)
             pending_requests = Request.objects.filter(status='P')
             accepted_requests = own_requests.filter(status='A')
-            denied_requests = own_requests.filter(status='D')
-            return render(request, 'index.html',{'pending_requests': pending_requests, 'accepted_requests': accepted_requests,
-                                                'denied_requests': denied_requests})
+            denied_requests = own_requests.filter(Q(status='D_BadFit') | Q(status='D_LowGrade'))
         else:
-            return render(request, 'index.html')
+            own_requests = Request.objects.filter(foreign_course__username=username)
+            pending_requests = own_requests.filter(status='P')
+            accepted_requests = own_requests.filter(status='A')
+            denied_requests = own_requests.filter(status='D')
+        return render(request, 'index.html', {'pending_requests': pending_requests, 'accepted_requests': accepted_requests,
+                                              'denied_requests': denied_requests})
     return render(request, 'index.html')
 
 
@@ -315,6 +412,7 @@ def addKnownTransfer(request):
             new_course.save()
             the_request.foreign_course = new_course
             the_request.status = form.cleaned_data['status']
+            the_request.credits_approved=form.cleaned_data['credits_approved']
             the_request.uva_course = form.cleaned_data['equivalent']
             the_request.reviewer_comment = form.cleaned_data['reviewer_comment']
             the_request.save()
