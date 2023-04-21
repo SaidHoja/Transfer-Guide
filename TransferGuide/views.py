@@ -3,11 +3,12 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
+from django.contrib import messages
 import json, requests
 from django.core.exceptions import PermissionDenied, ValidationError
 from oauth_app.models import UserType
 from .forms import requestCourseForm, sisForm, viableCourseFormSet
-from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm, editRoleForm, KnownTransferForm
+from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm, editRoleForm, KnownTransferForm, approveForm
 from .models import Course, Viable_Course, Request, UserType, User
 from .filters import OrderCourses
 import re
@@ -249,18 +250,34 @@ def requestPage(request, pk):
     if (UserType.objects.get(user=request.user).role != "Admin"):
         raise PermissionDenied("Only admin users may access this page.")
     form = statusForm()
+    approved_form = None
     the_request = Request.objects.get(pk=pk)
     course = the_request.foreign_course
     if request.method == 'POST':
-        form = statusForm(request.POST)
-        if form.is_valid():
-            the_request.status=form.cleaned_data['status']
-            the_request.credits_approved=form.cleaned_data['credits_approved']
-            the_request.uva_course=form.cleaned_data['equivalent'] # this line has gotta go but I don't know how
-            the_request.reviewer_comment=form.cleaned_data['reviewer_comment'] # uncomment when field is actually available
-            the_request.reviewed_by = request.user
-            the_request.save()
-    return render(request, 'TransferGuide/requestPage.html', {'course': course, 'form':form})
+        if ('status-submit' in request.POST):
+            print("status submit part")
+            form = statusForm(request.POST)
+            if (form.is_valid()):
+                the_request.status = form.cleaned_data['status']
+                the_request.reviewed_by = request.user
+                the_request.save()
+                if (form.cleaned_data['status'] == "D_LowGrade" or form.cleaned_data['status'] == "D_BadFit"):
+                    print("denied part")
+                    url = reverse(adminApproveCourses)
+                 #   messages.success(request, "Status succesfully changed to denied")
+                    return HttpResponseRedirect(url)
+                if (form.cleaned_data['status'] == "A"):
+                    print("approved part")
+                    approved_form = approveForm()
+        if ('approve-submit' in request.POST):
+            approved_form = approveForm()
+            if (approved_form.is_valid()):
+                the_request.credits_approved = form.cleaned_data['credits_approved']
+                the_request.uva_course = form.cleaned_data['equivalent']  # this line has gotta go but I don't know how
+                the_request.reviewer_comment = form.cleaned_data['reviewer_comment']  # uncomment when field is actually available
+                the_request.reviewed_by = request.user
+                the_request.save()
+    return render(request, 'TransferGuide/requestPage.html', {'course': course, 'form':form, 'approveForm':approved_form})
 
 def searchForCourse(request):
     form = searchCourseForm()
