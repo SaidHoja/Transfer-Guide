@@ -46,7 +46,7 @@
          </thead>
         {%for request in requests%}
           <tr>
-              <td><a href = "request/{{request.pk}}">{{request.pk}}</a></td>
+              <td><a href = "/request/{{request.pk}}">{{request.pk}}</a></td>
               <td>{{request.foreign_course.course_institution}}</td>
               <td>{{request.foreign_course.course_dept}}</td>
               <td>{{request.foreign_course.course_num}}</td>

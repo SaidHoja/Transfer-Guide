@@ -246,7 +246,6 @@ def adminApproveCourses(request):
     return render(request, 'TransferGuide/adminApproval.html', { 'courses': courses, 'coursesFilter': coursesFilter , 'requests' :requests})
 
 def requestPage(request, pk):
-
     if (UserType.objects.get(user=request.user).role != "Admin"):
         raise PermissionDenied("Only admin users may access this page.")
     form = statusForm()
@@ -261,7 +260,6 @@ def requestPage(request, pk):
             the_request.reviewer_comment=form.cleaned_data['reviewer_comment'] # uncomment when field is actually available
             the_request.reviewed_by = request.user
             the_request.save()
-
     return render(request, 'TransferGuide/requestPage.html', {'course': course, 'form':form})
 
 def searchForCourse(request):
