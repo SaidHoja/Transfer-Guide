@@ -41,13 +41,13 @@
                 <form method = "POST">
                     {%csrf_token %}
                     {%bootstrap_form approveForm%}
-                    <button type = "submit" name = "approve-submit">submit</button>
+                    <button type = "submit" class = "button btn-primary" name = "approve-submit">Submit</button>
                 </form>
             {%else%}
                 <form method = "POST" >
                     {% csrf_token %}
                     {% bootstrap_form form %}
-                <button type = "submit" name = "status-submit">submit</button>
+                <button type = "submit" name = "status-submit" class = "button btn-primary">Submit</button>
                 </form>
             {%endif%}
         </div>
