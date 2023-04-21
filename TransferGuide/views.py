@@ -147,9 +147,22 @@ def submitViableCourse(request):
     num_of_transfer_courses = 0
     approved_requests = Request.objects.filter(Q(status='A') | Q(status='D_LowGrade'))
     accepted_courses = {}
+    error = ""
     if request.method == 'POST':
         formset = viableCourseFormSet(data=request.POST)
         if formset.is_valid():
+            list_of_courses = []
+            for form in formset:
+                course_institution = form.cleaned_data['course_institution']
+                course_dept = form.cleaned_data['course_dept']
+                course_number = form.cleaned_data['course_number']
+                query = course_institution + " " + course_dept + " " + str(course_number)
+                if query not in list_of_courses:
+                    list_of_courses.append(query)
+                else:
+                    error = "At least two of the courses you inputted are duplicates. Please try again"
+                    return render(request, 'TransferGuide/viableCourseForm.html', {'viable_course_formset': formset,
+                                                                                   'error':error})
             for form in formset:
                 course_institution = form.cleaned_data['course_institution']
                 course_name = form.cleaned_data['course_name']
