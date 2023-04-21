@@ -125,7 +125,7 @@ class searchCourseForm(forms.Form):
     institution = forms.CharField(label='Select an institution to transfer courses from', max_length=100,
                                   widget=forms.Select(choices=institution_as_widget()), required=False)
     word = forms.CharField(label='Look for all classes that share this word.',
-                           widget=forms.TextInput(attrs={'placeholder': 'Enter "anthropology" to see the non-UVA class Anthropology of Water'}),
+                           widget=forms.TextInput(attrs={'placeholder': 'Enter "astrophysics" to see the Dartmouth\'s Introduction to Astrophysics.'}),
                            max_length=100, required=False)
     dept_num = forms.CharField(label='Input a UVA course department and number to see all transferable courses',
                                widget=forms.TextInput(attrs={'placeholder': 'Enter "APMA 2120" to see all courses that transfer to UVA\'s Calc 2 Class. Enter "APMA" to see all courses that transfer to UVA\'s APMA department'}),

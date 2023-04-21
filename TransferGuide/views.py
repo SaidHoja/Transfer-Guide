@@ -12,6 +12,7 @@ from .models import Course, Viable_Course, Request, UserType, User
 from .filters import OrderCourses
 import re
 from django.db.models import Q, F
+# from fuzzywuzzy import fuzz
 
 # Adding Courses by the Student
 def requestCourse(request):
@@ -70,6 +71,9 @@ def requestCourse(request):
                         r = Request(uva_course=uva_course, foreign_course=c, status='D_BadFit', credit_hours=credit_hours,
                                     reviewer_comment="Autodeclined - course does not align with UVA's educational values")
                         r.save()
+                else:
+                    r = Request(foreign_course=c, credit_hours=credit_hours)
+                    r.save()
             return HttpResponseRedirect('/')
     form = requestCourseForm()
     return render(request, 'TransferGuide/requestCourseForm.html', {'form': form})
