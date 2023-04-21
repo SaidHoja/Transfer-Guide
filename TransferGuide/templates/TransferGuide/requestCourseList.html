@@ -1,19 +1,11 @@
 {% extends "TransferGuide/base.html" %}
-
 {% load static %}
 {% load bootstrap5 %}
 {% bootstrap_css %}
-{% bootstrap_messages %}
 {% bootstrap_javascript %}
 {% load socialaccount %}
 
-<style>
-.center {
-  margin: auto;
-  width: 60%;
-  padding: 10px;
-}
-</style>
+
 {% block banner %}
   <h1>Status of Credit Requests</h1>
 
@@ -26,78 +18,80 @@
     {% endif %}
 {% endblock %}
 
+
 {% block content %}
-    <div class="container mt-5">
-      <div class="accordion center" id="courseAccordion" >
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="pendingHeading">
-          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#pendingData" >
-            Pending Courses
-          </button>
-        </h2>
-        <div id="pendingData" class="accordion-collapse expand" >
-          <div class="accordion-body">
-              {% if pending_requests %}
-                <ul>
-                {% for request in pending_requests %}
+{% if user.is_authenticated and user.usertype.role == 'Student' %}
+<div class="container mt-5">
+  <div class="accordion center" id="courseAccordion" >
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="pendingHeading">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#pendingData" >
+        Pending Courses
+      </button>
+    </h2>
+    <div id="pendingData" class="accordion-collapse expand" >
+      <div class="accordion-body">
+          {% if pending_requests %}
+            <ul>
+            {% for request in pending_requests %}
+              <h6>{{request.foreign_course.course_name}}</h6>
+              <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>There are no pending course requests.</p>
+          {% endif %}
+      </div>
+    </div>
+  </div><div class="accordion-item">
+    <h2 class="accordion-header" id="approvedHeading">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#approvedData">
+        Approved Courses
+      </button>
+    </h2>
+    <div id="approvedData" class="accordion-collapse collapse" >
+      <div class="accordion-body">
+        {% if approved_requests %}
+            <ul>
+            {% for request in approved_requests %}
+                <h6>{{request.foreign_course.course_name}}</h6>
+                <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}} &nbsp;{{request.foreign_course.course_num}}</p>
+                <p> Equivalent UVA Course: {{request.uva_course}} </p>
+                <p> Approved By: {{request.reviewed_by}}</p>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>There are no approved course requests.</p>
+          {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="deniedHeading">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#deniedData">
+        Denied Courses
+      </button>
+    </h2>
+    <div id="deniedData" class="accordion-collapse collapse" >
+      <div class="accordion-body">
+          {% if denied_courses %}
+              <ul>
+              {% for request in denied_requests %}
                   <h6>{{request.foreign_course.course_name}}</h6>
                   <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
-                  {% endfor %}
-                </ul>
-              {% else %}
-                <p>There are no pending course requests.</p>
-              {% endif %}
-          </div>
-        </div>
-      </div><div class="accordion-item">
-        <h2 class="accordion-header" id="approvedHeading">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#approvedData">
-            Approved Courses
-          </button>
-        </h2>
-        <div id="approvedData" class="accordion-collapse collapse" >
-          <div class="accordion-body">
-            {% if approved_requests %}
-                <ul>
-                {% for request in approved_requests %}
-                    <h6>{{request.foreign_course.course_name}}</h6>
-                    <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}} &nbsp;{{request.foreign_course.course_num}}</p>
-                    <p> Equivalent UVA Course: {{request.uva_course}} </p>
-                    <p> Approved By: {{request.reviewed_by}}</p>
-                    {% if request.reviewer_comment %}
-                        <p> Comments: {{request.reviewer_comment}} </p>
-                    {% endif %}
-                  {% endfor %}
-                </ul>
-              {% else %}
-                <p>There are no approved course requests.</p>
-              {% endif %}
-          </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="deniedHeading">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#deniedData">
-            Denied Courses
-          </button>
-        </h2>
-        <div id="deniedData" class="accordion-collapse collapse" >
-          <div class="accordion-body">
-              {% if denied_requests %}
-                  <ul>
-                  {% for request in denied_requests %}
-                      <h6>{{request.foreign_course.course_name}}</h6>
-                      <p>{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
-                      <p> Denied By: {{request.reviewed_by.user.username}}</p>
-                      <p> Reason: {{request.reviewer_comment}} </p>
-                    {% endfor %}
-                  </ul>
-                {% else %}
-                  <p>There are no denied course requests.</p>
-                {% endif %}
-          </div>
-        </div>
+                  <p> Approved By: {{request.reviewed_by.user.username}}</p>
+                  <p> Reason: {{request.why_denied}} </p>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p>There are no denied course requests.</p>
+            {% endif %}
       </div>
     </div>
-    </div>
+  </div>
+</div>
+
+</div>
+{% endif %}
 {% endblock %}
+
