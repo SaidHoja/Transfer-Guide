@@ -1,89 +1,26 @@
+{% extends "TransferGuide/base.html" %}
 {% load static %}
-{% load socialaccount %}
 {% load bootstrap5 %}
+{% load socialaccount %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
 
-<div class="p-5 bg-primary text-warning text-center">
+{% block banner %}
   <h1>Find a Course at UVA</h1>
 
     {% if user.is_authenticated %}
-        <p>{{ user.username }}, you can search UVA classes through this page</p>
+        <p>{{ user.username }}, you can search UVA classes through this page.</p>
     {% else %}
         <p>Welcome, please log in to continue!</p>
     {% endif %}
-</div>
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-        <div class="container-fluid">
-            {% if not user.is_authenticated %}
-                <ul class="navbar-nav">
-                    <li class="nav-item me-4" >
-                        <a class="nav-link active" href="{% provider_login_url 'google' %}">Login With Google</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="/logout"> Log Out</a>
-                    </li>
-                </ul>
-            {% elif user.usertype.role == 'Admin' %}
-                <ul class="navbar-nav">
-                    <li class="nav-item me-4" >
-                        <a class="nav-link disable" href="{% provider_login_url 'google' %}">Login With Google</a>
-                    </li>
+{% endblock %}
 
-                    <li class="nav-item me-4">
-                         <a class="nav-link active" href="/sisRequest">Find a Course at UVA</a>
-                    </li>
-
-                    <li class="nav-item me-4" >
-                        <a class="nav-link active" href="/adminApproval">Review Transfer Credit Requests</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                     <a class="nav-link active" href="/logout"> Log Out</a>
-                    </li>
-                </ul>
-
-            {% else %}
-                <ul class="navbar-nav">
-                    <li class="nav-item me-4" >
-                    <a class="nav-link disabled" href="{% provider_login_url 'google' %}">Login With Google</a>
-                    </li>
-
-                     <li class="nav-item me-4">
-                         <a class="nav-link active" href="/sisRequest">Find a Course at UVA</a>
-                     </li>
-
-                    <li class="nav-item me-4">
-                     <a class="nav-link active" href="/requestCourse">Request a Course for Credit</a>
-                    </li>
-
-                    <li class="nav-item me-4">
-                    <a class="nav-link active" href="/requestCourseList">Status of Credit Requests</a>
-                    </li>
-                    <li class="nav-item me-4">
-                        <a class="nav-link active" href="/submitViableCourse">Do Courses Transfer?</a>
-                    </li>
-                    <li class="nav-item me-4">
-                        <a class="nav-link active" href="/searchForCourse/">See Transfer Courses</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                     <a class="nav-link active" href="/logout"> Log Out</a>
-                    </li>
-                </ul>
-            {% endif %}
-        </div>
-</nav>
-
+{% block content %}
 <!--Submission form-->
 {% if user.is_authenticated %}
 <div class="container mt-5">
     <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <form action="" method="post" class = "form-center">
                 {% csrf_token %}
                 {% bootstrap_form form %}
@@ -94,3 +31,4 @@
 
 </div>
 {% endif %}
+{% endblock %}

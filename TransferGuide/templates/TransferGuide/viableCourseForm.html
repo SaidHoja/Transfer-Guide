@@ -1,59 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit Viable Course</title>
-</head>
+{% extends "TransferGuide/base.html" %}
+{% load static %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% load socialaccount %}
+
+{% block banner %}
+  <h1>Do your Credits Transfer?</h1>
+
+    {% if not user.is_authenticated %}
+        <p>Welcome, please log in to continue!</p>
+    {% elif user.usertype.role == 'Admin' %}
+        <p>Welcome {{ user.username }}, Admins do not have access to this page. Did you mean to go to the Review Course Requests page </p>
+    {% else %}
+         <p>{{ user.username }}, you can request a non-UVA course for UVA credit through this page</p>
+    {% endif %}
+
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.usertype.role == 'Student' %}
 <body>
 
-    <h1>See if your course(s) are in our system</h1>
-    <form id="form-container" method="POST">
-        {% csrf_token %}
-        {{viable_course_formset.management_form}}
-        {% for form in viable_course_formset %}
-            <div class="viable-course-form">
-                {{form.as_p}}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-sm-5">
+        <form id="form-container" method="POST">
+                {% csrf_token %}
+                {{viable_course_formset.management_form}}
+
+                {% for form in viable_course_formset %}
+                    <div class="viable-course-form">
+                        <div class="card-body">
+                        {{form.as_p}}
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <button id="add-form" type="button" class="btn btn-primary">Add Another Course</button>
+                <button id="remove-form" type="button" class="btn btn-primary">Remove Last Course</button>
+                <button type="submit" class="btn btn-primary">See Results</button>
+        </form>
             </div>
-        {% endfor %}
-        <button id="add-form" type="button">Add Another Course</button>
-        <button id="remove-form" type="button">Remove Last Course</button>
-        <button type="submit">See Results</button>
-    </form>
+
+        </div>
+    </div>
+</div>
     <script>
-        let viableCourseForm = document.querySelectorAll(".viable-course-form")
-        let container = document.querySelector("#form-container")
-        let addButton = document.querySelector("#add-form")
-        let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
-        let removeButton = document.querySelector("#remove-form")
+            let viableCourseForm = document.querySelectorAll(".viable-course-form")
+            let container = document.querySelector("#form-container")
+            let addButton = document.querySelector("#add-form")
+            let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
+            let removeButton = document.querySelector("#remove-form")
 
-        let formNum = viableCourseForm.length-1
-        addButton.addEventListener('click', addForm)
+            let formNum = viableCourseForm.length-1
+            addButton.addEventListener('click', addForm)
 
-        function addForm(e){
-            e.preventDefault()
+            function addForm(e){
+                e.preventDefault()
 
-            let newForm = viableCourseForm[0].cloneNode(true)
-            let formRegex = RegExp(`form-(\\d){1}-`,'g')
+                let newForm = viableCourseForm[0].cloneNode(true)
+                let formRegex = RegExp(`form-(\\d){1}-`,'g')
 
-            formNum++
-            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
-            container.insertBefore(newForm, addButton)
+                formNum++
+                newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+                container.insertBefore(newForm, addButton)
 
-            totalForms.setAttribute('value', `${formNum+1}`)
-        }
+                totalForms.setAttribute('value', `${formNum+1}`)
+            }
 
-        removeButton.addEventListener('click', removeForm)
+            removeButton.addEventListener('click', removeForm)
 
-        function removeForm(e){
-            e.preventDefault()
-            let lastForm = viableCourseForm[viableCourseForm.length-1]
-            lastForm.remove()
-            formNum = viableCourseForm.length-1
-            viableCourseForm = document.querySelectorAll(".viable-course-form") // update the variable
-
-            totalForms.setAttribute('value', `${viableCourseForm.length}`)
-        }
-    </script>
+            function removeForm(e){
+                e.preventDefault();
+                let viableCourseForm = document.querySelectorAll(".viable-course-form");
+                if (viableCourseForm.length === 1) {
+                    return;
+                }
+                let lastForm = viableCourseForm[viableCourseForm.length-1];
+                lastForm.remove();
+                formNum = viableCourseForm.length-1;
+                totalForms.setAttribute('value', `${viableCourseForm.length}`);
+            }
+        </script>
     </body>
+{% endif %}
+{% endblock %}
 </html>

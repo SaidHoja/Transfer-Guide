@@ -261,8 +261,8 @@ def index(request):
 
 
 def allUsers(request):
-    if (UserType.objects.get(user=request.user).role != "Admin"):
-        raise PermissionDenied("Only admin users may access this page.")
+    #if (UserType.objects.get(user=request.user).role != "Admin"):
+        #raise PermissionDenied("Only admin users may access this page.")
 
     users = User.objects.all()
     userToType = {}
@@ -294,8 +294,8 @@ def allUsers(request):
     return render(request,"TransferGuide/userList.html", context = { "userList":userToType , "form" : userForm })
 
 def addKnownTransfer(request):
-    if (UserType.objects.get(user=request.user).role != "Admin"):
-        raise PermissionDenied("Only admin users may access this page.")
+    #if (UserType.objects.get(user=request.user).role != "Admin"):
+        #raise PermissionDenied("Only admin users may access this page.")
     form = KnownTransferForm()
 
     if (request.method == "POST"):
