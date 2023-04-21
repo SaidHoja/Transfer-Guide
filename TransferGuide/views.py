@@ -71,6 +71,7 @@ def requestCourseList(request):
     user_courses = Request.objects.filter(foreign_course__username=username)  # .order_by('-pub_date')
     pending_requests = user_courses.filter(status="P")
     denied_requests = user_courses.filter(Q(status="D_LowGrade") | Q(status="D_BadFit"))
+    print(len(denied_requests))
     approved_requests = user_courses.filter(status="A")
     return render(request, 'TransferGuide/requestCourseList.html', {'pending_requests':pending_requests,
                                                                     'approved_requests':approved_requests,
@@ -245,7 +246,6 @@ def adminApproveCourses(request):
     return render(request, 'TransferGuide/adminApproval.html', { 'courses': courses, 'coursesFilter': coursesFilter , 'requests' :requests})
 
 def requestPage(request, pk):
-
     if (UserType.objects.get(user=request.user).role != "Admin"):
         raise PermissionDenied("Only admin users may access this page.")
     form = statusForm()
@@ -260,7 +260,6 @@ def requestPage(request, pk):
             the_request.reviewer_comment=form.cleaned_data['reviewer_comment'] # uncomment when field is actually available
             the_request.reviewed_by = request.user
             the_request.save()
-
     return render(request, 'TransferGuide/requestPage.html', {'course': course, 'form':form})
 
 def searchForCourse(request):
@@ -339,19 +338,13 @@ def index(request):
         username = request.user
         user = UserType.objects.filter(user=username)
         user = user.filter(role='Admin')
-        pending_requests = Request.objects.none()
-        accepted_requests = Request.objects.none()
-        denied_requests = Request.objects.none()
         if len(user) == 1:
             own_requests = Request.objects.filter(reviewed_by=username)
-            pending_requests = Request.objects.filter(status='P')
-            accepted_requests = own_requests.filter(status='A')
-            denied_requests = own_requests.filter(Q(status='D_BadFit') | Q(status='D_LowGrade'))
         else:
             own_requests = Request.objects.filter(foreign_course__username=username)
-            pending_requests = own_requests.filter(status='P')
-            accepted_requests = own_requests.filter(status='A')
-            denied_requests = own_requests.filter(status='D')
+        pending_requests = own_requests.filter(status='P')
+        accepted_requests = own_requests.filter(status='A')
+        denied_requests = own_requests.filter(Q(status='D_BadFit') | Q(status='D_LowGrade'))
         return render(request, 'index.html', {'pending_requests': pending_requests, 'accepted_requests': accepted_requests,
                                               'denied_requests': denied_requests})
     return render(request, 'index.html')

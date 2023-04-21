@@ -1,5 +1,5 @@
-{% load static %}
 {% load bootstrap5 %}
+{% load static %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
 {% load socialaccount %}
@@ -39,9 +39,9 @@
 
                 <li class="nav-tabs">
                      {% if request.resolver_match.url_name == 'sisFormHandler' or request.resolver_match.url_name == 'apiResult' %}
-                     <a class="nav-link active" href="/sisRequest">Find a Course at UVA {{request.url_name}}</a>
+                     <a class="nav-link active" href="/sisRequest">Find UVA Course {{request.url_name}}</a>
                      {% else %}
-                     <a class="nav-link" href="/sisRequest">Find a Course at UVA</a>
+                     <a class="nav-link" href="/sisRequest">Find UVA Course</a>
                      {% endif %}
                  </li>
 
@@ -55,17 +55,17 @@
 
                 <li class="nav-tabs" >
                     {% if request.resolver_match.url_name == 'addKnownTransfer'%}
-                    <a class="nav-link active" href="/knownTransfer">Register a Known Transfer</a>
+                    <a class="nav-link active" href="/knownTransfer">Register Transfer Course</a>
                     {% else %}
-                    <a class="nav-link" href="/knownTransfer">Register a Known Transfer</a>
+                    <a class="nav-link" href="/knownTransfer">Register Transfer Course</a>
                     {% endif %}
                 </li>
 
                 <li class="nav-tabs" >
                     {% if request.resolver_match.url_name == 'userList'%}
-                    <a class="nav-link active" href="/userList">User List</a>
+                    <a class="nav-link active" href="/userList">Adjust User Permissions</a>
                     {% else %}
-                    <a class="nav-link" href="/userList">User List</a>
+                    <a class="nav-link" href="/userList">Adjust User Permissions</a>
                     {% endif %}
                 </li>
 
@@ -88,17 +88,17 @@
 
                  <li class="nav-tabs">
                      {% if request.resolver_match.url_name == 'sisFormHandler' or request.resolver_match.url_name == 'apiResult' %}
-                     <a class="nav-link active" href="/sisRequest">Find a Course at UVA {{request.url_name}}</a>
+                     <a class="nav-link active" href="/sisRequest">Find UVA Course {{request.url_name}}</a>
                      {% else %}
-                     <a class="nav-link" href="/sisRequest">Find a Course at UVA</a>
+                     <a class="nav-link" href="/sisRequest">Find UVA Course</a>
                      {% endif %}
                  </li>
 
                 <li class="nav-tabs">
                      {% if request.resolver_match.url_name == 'requestCourse' %}
-                     <a class="nav-link active" href="/requestCourse">Request a Course for Credit</a>
+                     <a class="nav-link active" href="/requestCourse">Request Transfer Credit</a>
                      {% else %}
-                     <a class="nav-link" href="/requestCourse">Request a Course for Credit</a>
+                     <a class="nav-link" href="/requestCourse">Request Transfer Credit</a>
                      {% endif %}
                 </li>
 
@@ -112,9 +112,9 @@
 
                 <li class="nav-tabs">
                      {% if request.resolver_match.url_name == 'searchForCourse' %}
-                     <a class="nav-link active" href="/searchForCourse">Search Transfer Courses</a>
+                     <a class="nav-link active" href="/searchForCourse">Search for Transfer Credit</a>
                      {% else %}
-                     <a class="nav-link" href="/searchForCourse">Search Transfer Courses</a>
+                     <a class="nav-link" href="/searchForCourse">Search for Transfer Credit</a>
                      {% endif %}
                 </li>
             </ul>
