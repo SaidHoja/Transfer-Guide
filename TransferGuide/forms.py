@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from .models import Viable_Course, Course, Request, UVA_Course, UserType, User
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.db.models import Q
 # creating a form
 
 def validate_one_word(value):
@@ -14,57 +15,82 @@ def validate_one_word(value):
         raise ValidationError("Please enter only one word.")
     if not value.isalpha():
         raise ValidationError("Please enter a valid word. Uses characters A-Z")
+
+def validate_non_uva(value):
+    if value.lower() == "university of virginia":
+        raise ValidationError("Please enter a non-UVA course.")
 class requestCourseForm(forms.Form):
-    course_institution = forms.CharField(max_length=100)
-    course_name = forms.CharField(max_length = 100)
-    course_dept = forms.CharField(max_length=5, validators=[validate_one_word])
+    course_institution = forms.CharField(max_length=100, validators=[validate_non_uva],
+                                         widget=forms.TextInput(attrs={'placeholder': 'Enter the instutition your course is from.'}))
+    course_name = forms.CharField(max_length = 100, widget=forms.TextInput(attrs={'placeholder': 'Enter the name of your course'}))
+    course_dept = forms.CharField(max_length=5, validators=[validate_one_word], widget=forms.TextInput(attrs={'placeholder': 'Example: enter MATH for transfer course MATH 1000'}))
     course_number = forms.IntegerField(min_value=0, max_value=9999)
     course_grade = forms.CharField(max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
                                                                              ('F','F')]))
     course_delivery = forms.CharField(max_length=10, widget=forms.Select(choices=[('IN-PERSON','IN-PERSON'), (
         'ONLINE','ONLINE')]))
-    syllabus_url = forms.URLField()
+    syllabus_url = forms.URLField(widget=forms.TextInput(attrs={'placeholder': 'Enter homepage of course or link to syllabus.'}))
     credit_hours = forms.IntegerField(min_value=0, max_value=10)
 
 class viableCourseForm(forms.Form):
-    course_institution = forms.CharField(max_length=100)
-    course_name = forms.CharField(max_length = 100)
-    course_dept = forms.CharField(max_length=6, validators=[validate_one_word])
+    course_institution = forms.CharField(max_length=100, validators=[validate_non_uva],
+                                         widget=forms.TextInput(attrs={'placeholder': 'Enter the institution your course came from.'}))
+    course_name = forms.CharField(max_length=100,
+                                  widget=forms.TextInput(attrs={'placeholder': 'Enter the name of your course'}))
+    course_dept = forms.CharField(max_length=6, validators=[validate_one_word],
+                                  widget=forms.TextInput(attrs={'placeholder': 'Enter "CS", "ENGL", "APMA", "CHEM".'}))
     course_number = forms.IntegerField(min_value=0, max_value=9999)
     course_grade = forms.CharField(max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
                                                                              ('F','F')]))
 
 viableCourseFormSet = formset_factory(viableCourseForm, extra=1)
 class sisForm(forms.Form):
-    subject = forms.CharField(label='Subject (e.g. CS, ASTR, etc.)', max_length=5, required = False)
+    subject = forms.CharField(label='Subject', max_length=5, required = False,
+                              widget=forms.TextInput(attrs={'placeholder': 'Enter "CS", "ENGL", "APMA", "CHEM".'}),
+                              validators=[validate_one_word])
     term = forms.CharField(max_length=6,widget=forms.Select(choices=[(8, "FALL"), (3, "SPRING")]))
-
     YEAR_CHOICES = []
     for y in range(2000, (datetime.datetime.now().year + 1)):
         YEAR_CHOICES.append((y, y))
     year= forms.CharField(max_length=4, widget=forms.Select(choices=YEAR_CHOICES))
-    instructor = forms.CharField(max_length=20, required = False)
+    instructor = forms.CharField(max_length=20, required = False,
+                                 widget=forms.TextInput(attrs={'placeholder': 'Enter last name of instructor.'}))
 
 class statusForm(forms.Form):
-    credits_approved = forms.IntegerField(label = "Approve for how many credits?", )
-    status = forms.CharField(label ='Change Status?', max_length=1,widget=forms.Select(choices=[('P','Pending'),('A','Approve'),('D','Deny')]))
+    credits_approved = forms.IntegerField(label = "Approve for how many credits?", required=False)
+    status = forms.CharField(label ='Change Status?', max_length=20,widget=forms.Select(choices=[('P','Pending'),('A','Approve'),
+                                                                                                ('D_LowGrade','Deny due to low grade'),
+                                                                                                ('D_BadFit', 'Deny due to course misalignment')]))
     equivalent = forms.ModelChoiceField(queryset = UVA_Course.objects.all(), label='Equivalent UVA Course', required = False, help_text="Only fill out if approved.")
-    reviewer_comment = forms.CharField(label="Review Comment", max_length=200, required=False, help_text="Must fill out if denied.")
-#    def equivalent_course(self):
- #       if self.cleaned_data.get('status', None) == 'A':
- #           if self.cleaned_data.get('equivalent', None) is not None:
- #               pass
+    reviewer_comment = forms.CharField(label="Reviewer Comment", max_length=200, required=False)
+    def clean(self):
+        if self.cleaned_data.get('status') == 'A': # make sure equivalent course is provided when approved
+            if self.cleaned_data.get('equivalent') is None:
+                msg = forms.ValidationError("This field is required for approved courses.")
+                self.add_error('equivalent', msg)
+            if self.cleaned_data.get('credits_approved') is None:
+                msg = forms.ValidationError("This field is required for approved courses.")
+                self.add_error('credits_approved', msg)
+
+        # if self.cleaned_data.get('status') == 'D_LowGrade': # set default comments
+        #     if not self['reviewer_comment']:
+        #         self['reviewer_comment'] = "Grade is too low"
+        # if self.cleaned_data.get('status') == 'D_BadFit':
+        #     if not self['reviewer_comment']:
+        #         self['reviewer_comment'] = "Course does not meet standards"
+            
 
 def institution_as_widget():
     # only select courses that have been approved by staff
     set_of_institutes = set()
-    for request in Request.objects.all():
+    for request in Request.objects.filter(Q(status='A') | Q(status='D_LowGrade')):
         course = request.foreign_course
         set_of_institutes.add(course.course_institution)
     result = []
     result.append(("No Preference", "No Preference"))
     for institute in set_of_institutes:
         result.append((institute, institute))
+    result = sorted(result, key=lambda x: (x[0] != 'No Preference', x))
     return result
 
 def mnemonic_as_widget():
@@ -80,24 +106,30 @@ def mnemonic_as_widget():
 
 def validate_dept_num(value):
     raw_values = value.split()
-    if len(raw_values) != 2 and len(raw_values) != 0:
-        raise ValidationError("Enter only a department (e.g. CS) and course number (3240)")
+    if len(raw_values) > 2:
+        raise ValidationError("You can enter a department (e.g. CS) and course number (3240), only a department (e.g. CS), or leave this field blank.")
     else:
-        if not raw_values[0].isalpha():
-            raise ValidationError("Enter only letters in the department (e.g. CS)")
-        if raw_values[1].isnumeric():
-           if int(raw_values[1]) < 1000:
-               raise ValidationError("Enter a valid UVA course number (> 1000)")
-        else:
-            raise ValidationError("Enter a valid number for the course number")
+        if len(raw_values) >= 1:
+            if not raw_values[0].isalpha():
+                raise ValidationError("Enter only letters in the department (e.g. CS)")
+        if len(raw_values) >= 2:
+            if raw_values[1].isnumeric():
+               if int(raw_values[1]) < 1000:
+                   raise ValidationError("Enter a valid UVA course number (> 1,000)")
+               elif int(raw_values[1]) > 9999:
+                   raise ValidationError("Enter a valid UVA course number (< 10,000)")
+            else:
+                raise ValidationError("Enter a valid number for the course number")
 
 class searchCourseForm(forms.Form):
     institution = forms.CharField(label='Select an institution to transfer courses from', max_length=100,
                                   widget=forms.Select(choices=institution_as_widget()), required=False)
-    word = forms.CharField(label='Look for all classes that share this word. (e.g. Enter "anthropology" to look for Anthropology of Water',
+    word = forms.CharField(label='Look for all classes that share this word.',
+                           widget=forms.TextInput(attrs={'placeholder': 'Enter "anthropology" to see the non-UVA class Anthropology of Water'}),
                            max_length=100, required=False)
     dept_num = forms.CharField(label='Input a UVA course department and number to see all transferable courses',
-                                max_length=13, validators=[validate_dept_num], required=False)
+                               widget=forms.TextInput(attrs={'placeholder': 'Enter "APMA 2120" to see all courses that transfer to UVA\'s Calc 2 Class. Enter "APMA" to see all courses that transfer to UVA\'s APMA department'}),
+                               max_length=13, validators=[validate_dept_num], required=False)
     # def __init__(self, *args, **kwargs):
         # super().__init__(*args, **kwargs)
         #     self.fields['course_name'] = forms.CharField(max_length=50, required=True)
@@ -132,6 +164,8 @@ class KnownTransferForm(forms.Form):
     syllabus_url = forms.URLField()
     credit_hours = forms.IntegerField(min_value=0, max_value=10)
     credits_approved = forms.IntegerField(label = "Approve for how many credits?", )
-    status = forms.CharField(label ='Denied or Approved?', max_length=1,widget=forms.Select(choices=[('A','Approve'),('D','Deny')]))
+    status = forms.CharField(label ='Denied or Approved?', max_length=20,widget=forms.Select(choices=[('A','Approve'),
+                                                                                                      ('D_LowGrade','Deny due to Low Grade'),
+                                                                                                      ('D_BadFit', 'Deny due to course misalignment')]))
     equivalent = forms.ModelChoiceField(queryset = UVA_Course.objects.all(), label='Equivalent UVA Course', required = False, help_text="Only fill out if approved.")
     reviewer_comment = forms.CharField(label="Review Comment", max_length=200, required=False, help_text="Must fill out if denied.")
