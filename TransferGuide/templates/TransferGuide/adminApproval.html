@@ -52,7 +52,15 @@
               <td>{{request.foreign_course.course_num}}</td>
               <td>{{request.foreign_course.course_name}}</td>
               <td>{{request.foreign_course.username}}</td>
-              <td>{{request.status}}</td>
+              {% if request.status == 'A' %}
+                <td>Accepted</td>
+              {% elif request.status == 'P' %}
+                <td>Pending</td>
+              {% elif request.status == 'D_LowGrade' %}
+                <td>Denied due to low grade</td>
+              {% else %}
+                <td>Denied as is a bad fit</td>
+              {% endif %}
           </tr>
         {%endfor%}
         </table>
