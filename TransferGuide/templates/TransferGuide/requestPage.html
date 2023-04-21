@@ -37,11 +37,19 @@
 
  <div class="row">
         <div class="col-sm-4">
-            <form method = "POST" >
-                {% csrf_token %}
-                {% bootstrap_form form %}
-                <button type = "submit">submit</button>
-            </form>
+            {% if approveForm%}
+                <form method = "POST">
+                    {%csrf_token %}
+                    {%bootstrap_form approveForm%}
+                    <button type = "submit" class = "button btn-primary" name = "approve-submit">Submit</button>
+                </form>
+            {%else%}
+                <form method = "POST" >
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                <button type = "submit" name = "status-submit" class = "button btn-primary">Submit</button>
+                </form>
+            {%endif%}
         </div>
     </div>
 
