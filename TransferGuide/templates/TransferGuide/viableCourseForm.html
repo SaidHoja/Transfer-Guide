@@ -44,7 +44,11 @@
                         </div>
                     </div>
                 {% endfor %}
-
+                {% if error %}
+                    {% if error != "" %}
+                        <p style="color: red;">{{ error }}</p>
+                    {% endif %}
+                {% endif %}
                 <button id="add-form" type="button" class="btn btn-primary">Add Another Course</button>
                 <button id="remove-form" type="button" class="btn btn-primary">Remove Last Course</button>
                 <button type="submit" class="btn btn-primary">See Results</button>
@@ -88,7 +92,7 @@
                 let lastForm = viableCourseForm[viableCourseForm.length-1];
                 lastForm.remove();
                 formNum = viableCourseForm.length-1;
-                totalForms.setAttribute('value', `${viableCourseForm.length}`);
+                totalForms.setAttribute('value', `${viableCourseForm.length-1}`);
             }
         </script>
     </body>
