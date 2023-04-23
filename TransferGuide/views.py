@@ -236,17 +236,18 @@ def SISFormHandler(request):
 def generateURL(term,instructor,subject):
     url = api_default_url + "&term=" + term
     if (instructor != "None"):
-        url += "&instructor=" + instructor
+        url += "&instructor_name=" + instructor
     if (subject != "None"):
         url += "&subject=" + subject
     return url
 def apiResult(request, term,instructor, subject):
     url = generateURL(term,instructor,subject)
+ #   print(url)
 
     result = requests.get(url)
     resultDict = result.json()
     #print(resultDict)
-    display = {'headers' : ['acad_group','subject_descr','descr','units'],
+    display = {'headers' : ['acad_group','acad_org','catalog_nbr','descr','units'],
               'rows': []}
     i=-1
     rows = []
@@ -258,7 +259,7 @@ def apiResult(request, term,instructor, subject):
     for elem in rows:
         if (elem not in display.get('rows')):
             display.get('rows').append(elem)
-    display['headers']= ['School','Subject', 'Course Title', 'Credits' ]
+    display['headers']= ['School','Subject','Course Number', 'Course Title', 'Credits' ]
     return render(request,'TransferGuide/searchResult.html', {'field': display})
 
 def adminApproveCourses(request):
