@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block content %}
-{% if user.is_authenticated and user.usertype.role == 'Student' %}
+{% if user.is_authenticated and user.usertype.role == 'Student' or user.usertype.role == ''%}
 <body>
     <style>
         input[type=text] {
