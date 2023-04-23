@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block content %}
-{% if user.is_authenticated and user.usertype.role == 'Student' %}
+{% if user.is_authenticated and user.usertype.role == 'Student' or user.usertype.role == ''%}
 <body>
     <style>
         input[type=text] {
@@ -28,6 +28,13 @@
             margin: 4px 0;
             box-sizing: border-box;
             font-size: 16px;
+        }
+        .has-error input, .has-error textarea {
+          border: 1px solid red;
+        }
+
+        .has-error .error {
+          color: red;
         }
     </style>
 <div class="container mt-5">
@@ -40,7 +47,15 @@
                 {% for form in viable_course_formset %}
                     <div class="viable-course-form">
                         <div class="card-body">
-                        {{form.as_p}}
+                            {% for field in form %}
+                              <div class="form-group{% if field.errors %} has-error{% endif %}">
+                                  {{ field.label_tag }}
+                                  {{ field }}
+                                  <div class="error">
+                                      {{ field.errors|striptags }}
+                                  </div>
+                              </div>
+                            {% endfor %}
                         </div>
                     </div>
                 {% endfor %}

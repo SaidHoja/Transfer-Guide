@@ -20,7 +20,7 @@
 
 
 {% block content %}
-{% if user.is_authenticated and user.usertype.role == 'Student' %}
+{% if user.is_authenticated and user.usertype.role == 'Student' or user.usertype.role == ''%}
 <div class="container mt-5">
   <div class="accordion center" id="courseAccordion" >
   <div class="accordion-item">
