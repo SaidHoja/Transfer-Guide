@@ -465,3 +465,64 @@ def addKnownTransfer(request):
 
     return render(request, "TransferGuide/knownTransferForm.html", {"form":form})
 
+def addKnownTransferType(request):
+    form = ApproveOrDeny()
+    if (request.method == "POST"):
+        form = ApproveOrDeny(request.POST)
+        if (form.is_valid):
+            if (form.cleaned_data['approved_or_denied']):
+                url = reverse(addKnownApproved)
+                return HttpResponseRedirect(url)
+            else:
+                url = reverse(addKnownDenied)
+                return HttpResponseRedirect(url)
+
+
+def addKnownDenied(request):
+    form = KnownDeniedForm()
+    if (request.method == "POST"):
+        form = KnownTransferForm(request.POST)
+        if (form.is_valid()):
+            the_request = Request()
+            new_course = Course()
+            new_course.username = request.user
+            new_course.course_institution = form.cleaned_data['course_institution']
+            new_course.course_name = form.cleaned_data['course_name']
+            new_course.course_dept = form.cleaned_data['course_dept']
+            new_course.course_number = form.cleaned_data['course_number']
+            new_course.course_grade = form.cleaned_data['course_grade']
+            new_course.course_delivery = form.cleaned_data['course_delivery']
+            new_course.syllabus_url = None
+            new_course.credit_hours = 0
+            new_course.save()
+            the_request.foreign_course = new_course
+            the_request.status = form.cleaned_data['status']
+            the_request.credits_approved=form.cleaned_data['credits_approved']
+            the_request.uva_course = form.cleaned_data['equivalent']
+            the_request.reviewer_comment = form.cleaned_data['reviewer_comment']
+            the_request.save()
+
+def addKnownApproved(request):
+    form = KnownApprovedForm()
+    if (request.method == "POST"):
+        form = KnownTransferForm(request.POST)
+        if (form.is_valid()):
+            the_request = Request()
+            new_course = Course()
+            new_course.username = request.user
+            new_course.course_institution = form.cleaned_data['course_institution']
+            new_course.course_name = form.cleaned_data['course_name']
+            new_course.course_dept = form.cleaned_data['course_dept']
+            new_course.course_number = form.cleaned_data['course_number']
+            new_course.course_grade = form.cleaned_data['course_grade']
+            new_course.course_delivery = form.cleaned_data['course_delivery']
+            new_course.syllabus_url = None
+            new_course.credit_hours = form.cleaned_data['credit_hours']
+            new_course.save()
+            the_request.foreign_course = new_course
+            the_request.status = "A"
+            the_request.credits_approved=form.cleaned_data['credits_approved']
+            the_request.uva_course = form.cleaned_data['equivalent']
+            the_request.reviewer_comment = form.cleaned_data['reviewer_comment']
+            the_request.save()
+    return render(request,context={"form":form})
