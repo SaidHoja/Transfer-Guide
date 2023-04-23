@@ -27,6 +27,7 @@
         padding: 10px;
     }
     </style>
+    {% if field.rows %}
     <table class = "table table-striped table-bordered center" >
     <thead class = "thead-dark">
         <tr>
@@ -48,9 +49,14 @@
     {% endfor %}
 
     </tbody>
+    </table>
+    {% else %}
+    <p>Sorry, no courses matching the search criteria were found. <a href = '../../../../sisRequest'>Try again?</a></p>
+
+    {% endif %}
 </div>
 
-</table>
+
 </body>
 {% endif %}
 {% endblock %}
