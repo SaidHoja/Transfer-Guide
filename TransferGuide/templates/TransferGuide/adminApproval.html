@@ -4,6 +4,8 @@
 {% load socialaccount %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
+{% load bootstrap_icons %}
+
 
 {% block banner %}
 
@@ -26,16 +28,25 @@
     <div class = "card card-body" >
         <form method = "get">
           {{coursesFilter.form}}
-          <button type = "submit">Search</button>
+          <button type = "submit" class = "button btn-primary">Search</button>
         </form>
     </div>
 </div>
-<div class="container mt-5">
-        {% if courses %}
-        <table class = "table center table-striped table-bordered">
+
+  <div class="accordion center" id="courseAccordion" >
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="pendingHeading">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#pendingData" >
+        Pending Requests
+      </button>
+    </h2>
+    <div id="pendingData" class="accordion-collapse collapse" >
+      <div class="accordion-body">
+          {%if pendingRequests%}
+        <table class = "table center table-striped table-bordered w-100">
          <thead class = "thead-dark">
             <tr>
-              <th>Request ID</th>
+              <th>View Request</th>
               <th>Institution</th>
               <th>Course Department</th>
               <th>Course Number</th>
@@ -44,19 +55,95 @@
               <th>Status</th>
             </tr>
          </thead>
-        {%for request in requests%}
+        {%for request in pendingRequests%}
+
           <tr>
-              <td><a href = "/request/{{request.pk}}">{{request.pk}}</a></td>
+              <td><a  href = "/request/{{request.pk}}">{{request.pk}}</a></td>
               <td>{{request.foreign_course.course_institution}}</td>
               <td>{{request.foreign_course.course_dept}}</td>
               <td>{{request.foreign_course.course_num}}</td>
               <td>{{request.foreign_course.course_name}}</td>
               <td>{{request.foreign_course.username}}</td>
-              {% if request.status == 'A' %}
-                <td>Accepted</td>
-              {% elif request.status == 'P' %}
-                <td>Pending</td>
-              {% elif request.status == 'D_LowGrade' %}
+              <td>Pending</td>
+          </tr>
+        {%endfor%}
+        </table>
+     {% else %}
+            <p>There are no pending course requests.</p>
+          {% endif %}
+           </div>
+    </div>
+  </div>
+      <div class="accordion-item">
+    <h2 class="accordion-header" id="approvedHeading">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#approvedData">
+        Approved Courses
+      </button>
+    </h2>
+    <div id="approvedData" class="accordion-collapse collapse" >
+      <div class="accordion-body">
+        {% if approvedRequests %}
+          <table class = "table center table-striped table-bordered w-100">
+         <thead class = "thead-dark">
+            <tr>
+              <th>View Request</th>
+              <th>Institution</th>
+              <th>Course Department</th>
+              <th>Course Number</th>
+              <th>Course Title</th>
+              <th>Submitted By</th>
+              <th>Status</th>
+            </tr>
+         </thead>
+        {%for request in approvedRequests%}
+
+          <tr>
+              <td><a  href = "/request/{{request.pk}}">{{request.pk}}</a></td>
+              <td>{{request.foreign_course.course_institution}}</td>
+              <td>{{request.foreign_course.course_dept}}</td>
+              <td>{{request.foreign_course.course_num}}</td>
+              <td>{{request.foreign_course.course_name}}</td>
+              <td>{{request.foreign_course.username}}</td>
+              <td>Accepted</td>
+          </tr>
+        {%endfor%}
+        </table>
+     {% else %}
+            <p>There are no approved course requests.</p>
+          {% endif %}
+           </div>
+    </div>
+  </div>
+       <div class="accordion-item">
+    <h2 class="accordion-header" id="deniedHeading">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#deniedData">
+        Denied Requests
+      </button>
+    </h2>
+    <div id="deniedData" class="accordion-collapse collapse" >
+      <div class="accordion-body">
+          {% if deniedRequests %}
+          <table class = "table center table-striped table-bordered w-100">
+         <thead class = "thead-dark">
+            <tr>
+              <th>View Request</th>
+              <th>Institution</th>
+              <th>Course Department</th>
+              <th>Course Number</th>
+              <th>Course Title</th>
+              <th>Submitted By</th>
+              <th>Status</th>
+            </tr>
+         </thead>
+        {%for request in deniedRequests%}
+          <tr>
+              <td><a  href = "/request/{{request.pk}}">{{request.pk}}</a></td>
+              <td>{{request.foreign_course.course_institution}}</td>
+              <td>{{request.foreign_course.course_dept}}</td>
+              <td>{{request.foreign_course.course_num}}</td>
+              <td>{{request.foreign_course.course_name}}</td>
+              <td>{{request.foreign_course.username}}</td>
+              {% if request.status == 'D_LowGrade' %}
                 <td>Denied due to low grade</td>
               {% else %}
                 <td>Denied as is a bad fit</td>
@@ -64,9 +151,12 @@
           </tr>
         {%endfor%}
         </table>
-        {% else %}
-            <p>There are no course requests.</p>
-        {% endif %}
+     {% else %}
+            <p>There are no denied course requests.</p>
+          {% endif %}
+           </div>
+    </div>
+  </div>
 </div>
 </html>
 {% endif %}
