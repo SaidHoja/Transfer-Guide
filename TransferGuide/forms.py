@@ -19,6 +19,11 @@ def validate_one_word(value):
 def validate_non_uva(value):
     if value.lower() == "university of virginia":
         raise ValidationError("Please enter a non-UVA course.")
+
+def validate_is_a_word(value):
+    if not value.isalpha():
+        raise ValidationError("Please enter a valid word. Uses characters A-Z")
+
 class requestCourseForm(forms.Form):
     course_institution = forms.CharField(max_length=100, validators=[validate_non_uva],
                                          widget=forms.TextInput(attrs={'placeholder': 'Enter the instutition your course is from.'}))
@@ -54,7 +59,8 @@ class sisForm(forms.Form):
         YEAR_CHOICES.append((y, y))
     year= forms.CharField(max_length=4, widget=forms.Select(choices=YEAR_CHOICES))
     instructor = forms.CharField(max_length=20, required = False,
-                                 widget=forms.TextInput(attrs={'placeholder': 'Enter last name of instructor.'}))
+                                 widget=forms.TextInput(attrs={'placeholder': 'Enter last name of instructor.'}),
+                                 validators=[validate_is_a_word])
 
 class approveForm(forms.Form):
     credits_approved = forms.IntegerField(label = "Approve for how many credits?", min_value = 0, required=True)
@@ -89,13 +95,14 @@ class statusForm(forms.Form):
 
 def institution_as_widget():
     # only select courses that have been approved by staff
-    set_of_institutes = set()
+    list_of_institutes = []
     for request in Request.objects.filter(Q(status='A') | Q(status='D_LowGrade')):
         course = request.foreign_course
-        set_of_institutes.add(course.course_institution)
+        if course.course_institution.lower() not in [i.lower() for i in list_of_institutes]:
+            list_of_institutes.append(course.course_institution)
     result = []
     result.append(("No Preference", "No Preference"))
-    for institute in set_of_institutes:
+    for institute in list_of_institutes:
         result.append((institute, institute))
     result = sorted(result, key=lambda x: (x[0] != 'No Preference', x))
     return result

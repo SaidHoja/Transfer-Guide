@@ -228,7 +228,7 @@ def SISFormHandler(request):
             if (form.cleaned_data['instructor']!=""):
                 instructor = str(form.cleaned_data['instructor'])
             if (form.cleaned_data['subject']!=""):
-                subject = str(form.cleaned_data['subject'])
+                subject = str(form.cleaned_data['subject']).upper()
 
             return redirect('apiResult',term=term,instructor=instructor,subject=subject )
     return render(request,'TransferGuide/sisForm.html', context = {'form':form})
@@ -320,7 +320,7 @@ def searchForCourse(request):
             # print(len(result))
             result = return_transfer_courses(dept_num, institution, approved_requests, word)
             # print(len(result))
-        return render(request, 'TransferGuide/searchCourseResult.html', {'requests':result})
+            return render(request, 'TransferGuide/searchCourseResult.html', {'requests':result})
     return render(request, 'TransferGuide/searchCourse.html', {'form':form})
 
 
