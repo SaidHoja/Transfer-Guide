@@ -208,7 +208,11 @@ class Viable_Course_Form(TestCase):
                      'course_dept': 'MATH', 'course_number': 1000.1, 'course_grade': 'B'}
         form = viableCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
-
+    def test_course_num_is_0(self):
+        form_data = {'course_institution': 'University of Central Arkansas', 'course_name': 'Calculus II',
+                     'course_dept': 'MATH', 'course_number': -0, 'course_grade': 'B'}
+        form = viableCourseForm(data=form_data)
+        self.assertFalse(form.is_valid())
 class LoginViewTests(TestCase):
     def test_login_load(self):
         response = self.client.get("/")
