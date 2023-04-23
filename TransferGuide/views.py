@@ -269,10 +269,18 @@ def adminApproveCourses(request):
     coursesFilter = OrderCourses(request.GET, queryset=courses)
     courses = coursesFilter.qs
     requests = []
+    pendingRequests = []
+    approvedRequests = []
+    deniedRequests = []
     for course in courses:
-        for r in Request.objects.filter(foreign_course=course):
-            requests.append(r)
-    return render(request, 'TransferGuide/adminApproval.html', { 'courses': courses, 'coursesFilter': coursesFilter , 'requests' :requests})
+            a_request = Request.objects.get(foreign_course=course)
+            if (a_request.status == "A"):
+                approvedRequests.append(a_request)
+            elif (a_request.status == "D_LowGrade" or a_request.status == "D_BadFit"):
+                deniedRequests.append(a_request)
+            else:
+                pendingRequests.append(a_request)
+    return render(request, 'TransferGuide/adminApproval.html', { 'courses': courses, 'coursesFilter': coursesFilter , 'approvedRequests' :approvedRequests, 'deniedRequests' :deniedRequests,'pendingRequests' :pendingRequests})
 
 def requestPage(request, pk):
     if (UserType.objects.get(user=request.user).role != "Admin"):
