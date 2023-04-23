@@ -8,7 +8,7 @@ import json, requests
 from django.core.exceptions import PermissionDenied, ValidationError
 from oauth_app.models import UserType
 from .forms import requestCourseForm, sisForm, viableCourseFormSet
-from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm, editRoleForm, KnownTransferForm, approveForm
+from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm, editRoleForm, KnownTransferForm, approveForm,KnownApprovalForm, KnownDenialForm
 from .models import Course, Viable_Course, Request, UserType, User
 from .filters import OrderCourses
 import re
@@ -496,14 +496,14 @@ def addKnownDenied(request):
             new_course.credit_hours = 0
             new_course.save()
             the_request.foreign_course = new_course
-            the_request.status = form.cleaned_data['status']
+            the_request.status = "D_BadFit"
             the_request.credits_approved=form.cleaned_data['credits_approved']
             the_request.uva_course = form.cleaned_data['equivalent']
             the_request.reviewer_comment = form.cleaned_data['reviewer_comment']
             the_request.save()
 
 def addKnownApproved(request):
-    form = KnownApprovedForm()
+    form = KnownApprovalForm()
     if (request.method == "POST"):
         form = KnownTransferForm(request.POST)
         if (form.is_valid()):
