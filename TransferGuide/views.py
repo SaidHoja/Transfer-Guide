@@ -320,7 +320,7 @@ def searchForCourse(request):
             # print(len(result))
             result = return_transfer_courses(dept_num, institution, approved_requests, word)
             # print(len(result))
-        return render(request, 'TransferGuide/searchCourseResult.html', {'requests':result})
+            return render(request, 'TransferGuide/searchCourseResult.html', {'requests':result})
     return render(request, 'TransferGuide/searchCourse.html', {'form':form})
 
 

@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from .models import Course, User, UVA_Course, Request
-from .forms import requestCourseForm, searchCourseForm, viableCourseForm
+from .forms import requestCourseForm, searchCourseForm, viableCourseForm, sisForm
 from .views import return_transfer_courses, doesCourseExist
 import unittest
 
@@ -58,6 +58,16 @@ class Request_Course_Form(TestCase):
                      'course_delivery': 'IN-PERSON',
                      'syllabus_url': 'https://docs.djangoproject.com/en/4.1/topics/db/models/', 'credit_hours': '4'}
         form = requestCourseForm(data=form_data)
+        self.assertFalse(form.is_valid())
+
+class SIS_Form(TestCase):
+    def test_bad_instructor(self):
+        form_data = {'subject':'' , 'terms':'' , 'year':'' , 'instructor':'%'}
+        form = sisForm(data=form_data)
+        self.assertFalse(form.is_valid())
+    def test_beta_ankit(self):
+        form_data = {'subject':'APMA' , 'terms':'FALL' , 'year':'2023' , 'instructor':'%%%'}
+        form = sisForm(data=form_data)
         self.assertFalse(form.is_valid())
 # class Request_New_Course(unittest.TestCase):
 #     instances = []
