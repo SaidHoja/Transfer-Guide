@@ -168,6 +168,7 @@ def submitViableCourse(request):
                     error = "At least two of the courses you inputted are duplicates. Please try again"
                     return render(request, 'TransferGuide/viableCourseForm.html', {'viable_course_formset': formset,
                                                                                    'error':error})
+            print(len(formset))
             for form in formset:
                 course_institution = form.cleaned_data['course_institution']
                 course_name = form.cleaned_data['course_name']
