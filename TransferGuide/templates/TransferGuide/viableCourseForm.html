@@ -64,8 +64,9 @@
                         <p style="color: red;">{{ error }}</p>
                     {% endif %}
                 {% endif %}
-                <button id="add-form" type="button" class="btn btn-primary">Add Another Course</button>
-                <button id="remove-form" type="button" class="btn btn-primary">Remove Last Course</button>
+                <button id="add-form" type="button" class="btn btn-primary" style="background-color:#306844; border-color:#306844">Add Another Course</button>
+                <button id="restart-form" type="button" class="btn btn-primary" style="background-color:#8B0000; border-color:#8B0000"><a href="/submitViableCourse" style="text-decoration:none;color:white">Restart</a></button>
+<!--                <button id="remove-form" type="button" class="btn btn-primary">Remove Last Course</button>-->
                 <button type="submit" class="btn btn-primary">See Results</button>
         </form>
             </div>
@@ -96,19 +97,19 @@
                 totalForms.setAttribute('value', `${formNum+1}`)
             }
 
-            removeButton.addEventListener('click', removeForm)
+<!--            removeButton.addEventListener('click', removeForm)-->
 
-            function removeForm(e){
-                e.preventDefault();
-                let viableCourseForm = document.querySelectorAll(".viable-course-form");
-                if (viableCourseForm.length === 1) {
-                    return;
-                }
-                let lastForm = viableCourseForm[viableCourseForm.length-1];
-                lastForm.remove();
-                formNum = viableCourseForm.length-1;
-                totalForms.setAttribute('value', `${viableCourseForm.length-1}`);
-            }
+<!--            function removeForm(e){-->
+<!--                e.preventDefault();-->
+<!--                let viableCourseForm = document.querySelectorAll(".viable-course-form");-->
+<!--                if (viableCourseForm.length === 1) {-->
+<!--                    return;-->
+<!--                }-->
+<!--                let lastForm = viableCourseForm[viableCourseForm.length-1];-->
+<!--                lastForm.remove();-->
+<!--                formNum = viableCourseForm.length-1;-->
+<!--                totalForms.setAttribute('value', `${viableCourseForm.length-1}`);-->
+<!--            }-->
         </script>
     </body>
 {% endif %}
