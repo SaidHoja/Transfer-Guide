@@ -168,6 +168,7 @@ def submitViableCourse(request):
                     error = "At least two of the courses you inputted are duplicates. Please try again"
                     return render(request, 'TransferGuide/viableCourseForm.html', {'viable_course_formset': formset,
                                                                                    'error':error})
+            print(len(formset))
             for form in formset:
                 course_institution = form.cleaned_data['course_institution']
                 course_name = form.cleaned_data['course_name']
@@ -236,17 +237,18 @@ def SISFormHandler(request):
 def generateURL(term,instructor,subject):
     url = api_default_url + "&term=" + term
     if (instructor != "None"):
-        url += "&instructor=" + instructor
+        url += "&instructor_name=" + instructor
     if (subject != "None"):
         url += "&subject=" + subject
     return url
 def apiResult(request, term,instructor, subject):
     url = generateURL(term,instructor,subject)
+ #   print(url)
 
     result = requests.get(url)
     resultDict = result.json()
     #print(resultDict)
-    display = {'headers' : ['acad_group','subject_descr','descr','units'],
+    display = {'headers' : ['acad_group','acad_org','catalog_nbr','descr','units'],
               'rows': []}
     i=-1
     rows = []
@@ -258,7 +260,7 @@ def apiResult(request, term,instructor, subject):
     for elem in rows:
         if (elem not in display.get('rows')):
             display.get('rows').append(elem)
-    display['headers']= ['School','Subject', 'Course Title', 'Credits' ]
+    display['headers']= ['School','Subject','Course Number', 'Course Title', 'Credits' ]
     return render(request,'TransferGuide/searchResult.html', {'field': display})
 
 def adminApproveCourses(request):
@@ -376,7 +378,7 @@ def return_transfer_courses(dept_num, institution, approved_requests, word):
     # create a set of tuples with the unique combination of institution, dept, and num
     unique_tuples = set((r.foreign_course.course_institution, r.foreign_course.course_dept, r.foreign_course.course_num) for r in result)
     # create a list of the first matching request for each unique combination of institution, dept, and num
-    result_list = [result.filter(foreign_course__course_institution=t[0], foreign_course__course_dept=t[1], foreign_course__course_num=t[2]).first() for t in unique_tuples]
+    result_list = [result.filter(foreign_course__course_institution__iexact=t[0], foreign_course__course_dept__iexact=t[1], foreign_course__course_num=t[2]).first() for t in unique_tuples]
     # filter out None values from the result_list
     result_list = list(filter(None, result_list))
     # create a QuerySet from the result_list

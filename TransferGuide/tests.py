@@ -61,12 +61,40 @@ class Request_Course_Form(TestCase):
         self.assertFalse(form.is_valid())
 
 class SIS_Form(TestCase):
-    def test_bad_instructor(self):
-        form_data = {'subject':'' , 'terms':'' , 'year':'' , 'instructor':'%'}
+    def test_instructor_as_nonChar(self):
+        form_data = {'subject':'' , 'terms':'FALL' , 'year':'2000' , 'instructor':'%'}
+        form = sisForm(data=form_data)
+        self.assertFalse(form.is_valid())
+    def test_instructor_as_num(self):
+        form_data = {'subject': '', 'terms': 'FALL', 'year': '2000', 'instructor': 'm1'}
+        form = sisForm(data=form_data)
+        self.assertFalse(form.is_valid())
+    def test_instructor_two_words(self):
+        form_data = {'subject': '', 'terms': 'FALL', 'year': '2000', 'instructor': 'hui ma'}
+        form = sisForm(data=form_data)
+        self.assertFalse(form.is_valid())
+    def test_instructor_one_word(self):
+        form_data = {'subject': '', 'terms': 'FALL', 'year': '2000', 'instructor': 'ma'}
         form = sisForm(data=form_data)
         self.assertFalse(form.is_valid())
     def test_beta_ankit(self):
-        form_data = {'subject':'APMA' , 'terms':'FALL' , 'year':'2023' , 'instructor':'%%%'}
+        form_data = {'subject':'APMA' , 'terms':'FALL' , 'year':'2023', 'instructor':'%%%'}
+        form = sisForm(data=form_data)
+        self.assertFalse(form.is_valid())
+    # def test_no_subject_no_instructor(self):
+    #     form_data = {'subject':'', 'terms': 'FALL', 'year':'2000', 'instructor':''}
+    #     form = sisForm(data=form_data)
+    #     self.assertTrue(form.is_valid())
+    def test_subject_as_num(self):
+        form_data = {'subject': '1', 'terms': 'FALL', 'year':'2000', 'instructor':''}
+        form = sisForm(data=form_data)
+        self.assertFalse(form.is_valid())
+    def test_subject_as_nonAlpha(self):
+        form_data = {'subject': '%', 'terms': 'FALL', 'year': '2000', 'instructor': ''}
+        form = sisForm(data=form_data)
+        self.assertFalse(form.is_valid())
+    def test_subject_as_two_words(self):
+        form_data = {'subject': 'M I', 'terms': 'FALL', 'year': '2000', 'instructor': ''}
         form = sisForm(data=form_data)
         self.assertFalse(form.is_valid())
 # class Request_New_Course(unittest.TestCase):
@@ -180,7 +208,11 @@ class Viable_Course_Form(TestCase):
                      'course_dept': 'MATH', 'course_number': 1000.1, 'course_grade': 'B'}
         form = viableCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
-
+    def test_course_num_is_0(self):
+        form_data = {'course_institution': 'University of Central Arkansas', 'course_name': 'Calculus II',
+                     'course_dept': 'MATH', 'course_number': -0, 'course_grade': 'B'}
+        form = viableCourseForm(data=form_data)
+        self.assertFalse(form.is_valid())
 class LoginViewTests(TestCase):
     def test_login_load(self):
         response = self.client.get("/")

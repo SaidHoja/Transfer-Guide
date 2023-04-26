@@ -44,7 +44,7 @@ class viableCourseForm(forms.Form):
                                   widget=forms.TextInput(attrs={'placeholder': 'Enter the name of your course'}))
     course_dept = forms.CharField(max_length=6, validators=[validate_one_word],
                                   widget=forms.TextInput(attrs={'placeholder': 'Enter "CS", "ENGL", "APMA", "CHEM".'}))
-    course_number = forms.IntegerField(min_value=0, max_value=9999)
+    course_number = forms.IntegerField(min_value=1, max_value=9999)
     course_grade = forms.CharField(max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
                                                                              ('F','F')]))
 
