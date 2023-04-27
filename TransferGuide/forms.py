@@ -171,16 +171,33 @@ class KnownTransferForm(forms.Form):
     course_name = forms.CharField(max_length = 100, required = True)
     course_dept = forms.CharField(max_length=5, validators=[validate_one_word], required = True)
     course_number = forms.IntegerField(min_value=0, max_value=9999, required = True)
-    status = forms.CharField(label ='Denied or Approved?',required = True, max_length=20,widget=forms.Select(choices=[('A','Approve'),
-                                                                                                      ('D_LowGrade','Deny due to Low Grade'),
+    status = forms.CharField(label ='Add as a known denied course or approved??',required = True, max_length=20,widget=forms.Select(choices=[('A','Approve'),
                                                                                                       ('D_BadFit', 'Deny due to course misalignment')]))
     course_grade = forms.CharField(label = "Minimum grade", max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
                                                                              ('F','F')]))
     course_delivery = forms.CharField(max_length=10, widget=forms.Select(choices=[('IN-PERSON','IN-PERSON'), (
         'ONLINE','ONLINE')]))
-    syllabus_url = forms.URLField()
-    credit_hours = forms.IntegerField(min_value=0, max_value=10)
     credits_approved = forms.IntegerField(label = "Approve for how many credits?", )
 
     equivalent = forms.ModelChoiceField(queryset = UVA_Course.objects.all(), label='Equivalent UVA Course', required = False, help_text="Only fill out if approved.")
     reviewer_comment = forms.CharField(label="Review Comment", max_length=200, required=False, help_text="Must fill out if denied.")
+
+class KnownApprovalForm:
+
+    course_grade = forms.CharField(label="Minimum grade", max_length=1, required = True,
+                                   widget=forms.Select(choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D'),
+                                                                ('F', 'F')]))
+    course_delivery = forms.CharField(max_length=10, required=  True, widget=forms.Select(choices=[('IN-PERSON', 'IN-PERSON'), (
+        'ONLINE', 'ONLINE')]))
+    credits_approved = forms.IntegerField(label="Approve for how many credits?", required = True, min_value = 0 )
+
+    equivalent = forms.ModelChoiceField(queryset=UVA_Course.objects.all(), label='Equivalent UVA Course',
+                                        required=True, help_text="Only fill out if approved.")
+    reviewer_comment = forms.CharField(label="Review Comment", max_length=200, required=True,
+                                       help_text="Must fill out if denied.")
+
+class KnownDenialForm:
+    course_institution = forms.CharField(max_length=100, required=True)
+    course_name = forms.CharField(max_length=100, required=True)
+    course_dept = forms.CharField(max_length=5, validators=[validate_one_word], required=True)
+    course_number = forms.IntegerField(min_value=0, max_value=9999, required=True)
