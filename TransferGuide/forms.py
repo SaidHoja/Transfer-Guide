@@ -172,7 +172,6 @@ class KnownTransferForm(forms.Form):
     course_dept = forms.CharField(max_length=5, validators=[validate_one_word], required = True)
     course_number = forms.IntegerField(min_value=0, max_value=9999, required = True)
     status = forms.CharField(label ='Add as a known denied course or approved??',required = True, max_length=20,widget=forms.Select(choices=[('A','Approve'),
-                                                                                                      ('D_LowGrade','Deny due to Low Grade'),
                                                                                                       ('D_BadFit', 'Deny due to course misalignment')]))
     course_grade = forms.CharField(label = "Minimum grade", max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
                                                                              ('F','F')]))
@@ -184,10 +183,7 @@ class KnownTransferForm(forms.Form):
     reviewer_comment = forms.CharField(label="Review Comment", max_length=200, required=False, help_text="Must fill out if denied.")
 
 class KnownApprovalForm:
-    course_institution = forms.CharField( label = "Institution" ,max_length=100, required=True)
-    course_name = forms.CharField(label = "Course Name",max_length=100, required=True)
-    course_dept = forms.CharField(label = "Course Department",max_length=5, validators=[validate_one_word], required=True)
-    course_number = forms.IntegerField(label = "Course Number",min_value=0, max_value=9999, required=True)
+
     course_grade = forms.CharField(label="Minimum grade", max_length=1, required = True,
                                    widget=forms.Select(choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D'),
                                                                 ('F', 'F')]))

@@ -293,28 +293,29 @@ def requestPage(request, pk):
     course = the_request.foreign_course
     if request.method == 'POST':
         if ('status-submit' in request.POST):
-            print("status submit part")
             form = statusForm(request.POST)
             if (form.is_valid()):
                 the_request.status = form.cleaned_data['status']
                 the_request.reviewed_by = request.user
                 the_request.save()
                 if (form.cleaned_data['status'] == "D_LowGrade" or form.cleaned_data['status'] == "D_BadFit"):
-                    print("denied part")
                     url = reverse(adminApproveCourses)
-                 #   messages.success(request, "Status succesfully changed to denied")
+                    messages.success(request, "Status successfully changed to denied.")
                     return HttpResponseRedirect(url)
                 if (form.cleaned_data['status'] == "A"):
-                    print("approved part")
                     approved_form = approveForm()
         if ('approve-submit' in request.POST):
-            approved_form = approveForm()
+            approved_form = approveForm(request.POST)
             if (approved_form.is_valid()):
-                the_request.credits_approved = form.cleaned_data['credits_approved']
-                the_request.uva_course = form.cleaned_data['equivalent']  # this line has gotta go but I don't know how
-                the_request.reviewer_comment = form.cleaned_data['reviewer_comment']  # uncomment when field is actually available
+                the_request.credits_approved = approved_form.cleaned_data['credits_approved']
+                the_request.uva_course = approved_form.cleaned_data['equivalent']  # this line has gotta go but I don't know how
+                the_request.reviewer_comment = approved_form.cleaned_data['reviewer_comment']  # uncomment when field is actually available
                 the_request.reviewed_by = request.user
                 the_request.save()
+                messages.success(request, 'Request status successfully changed to approved.')
+                url = reverse(adminApproveCourses)
+                print("got here")
+                return HttpResponseRedirect(url)
     return render(request, 'TransferGuide/requestPage.html', {'course': course, 'form':form, 'approveForm':approved_form})
 
 def searchForCourse(request):
@@ -472,7 +473,7 @@ def addKnownTransferType(request):
     if (request.method == "POST"):
         form = ApproveOrDeny(request.POST)
         if (form.is_valid):
-            if (form.cleaned_data['approved_or_denied']):
+            if (form.cleaned_data['approved_or_denied'] == "A"):
                 url = reverse(addKnownApproved)
                 return HttpResponseRedirect(url)
             else:
