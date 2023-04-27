@@ -75,6 +75,7 @@ def requestCourse(request):
                 else:
                     r = Request(foreign_course=c, credit_hours=credit_hours)
                     r.save()
+            messages.success(request, "Course successfully submitted!")
             return HttpResponseRedirect('/')
     form = requestCourseForm()
     return render(request, 'TransferGuide/requestCourseForm.html', {'form': form})
@@ -264,9 +265,6 @@ def apiResult(request, term,instructor, subject):
     return render(request,'TransferGuide/searchResult.html', {'field': display})
 
 def adminApproveCourses(request):
-    if (UserType.objects.get(user=request.user).role != "Admin"):
-        raise PermissionDenied("Only admin users may access this page.")
-
     courses = Course.objects.filter()
     coursesFilter = OrderCourses(request.GET, queryset=courses)
     courses = coursesFilter.qs
@@ -285,8 +283,6 @@ def adminApproveCourses(request):
     return render(request, 'TransferGuide/adminApproval.html', { 'courses': courses, 'coursesFilter': coursesFilter , 'approvedRequests' :approvedRequests, 'deniedRequests' :deniedRequests,'pendingRequests' :pendingRequests})
 
 def requestPage(request, pk):
-    if (UserType.objects.get(user=request.user).role != "Admin"):
-        raise PermissionDenied("Only admin users may access this page.")
     form = statusForm()
     approved_form = None
     the_request = Request.objects.get(pk=pk)
@@ -304,6 +300,12 @@ def requestPage(request, pk):
                     return HttpResponseRedirect(url)
                 if (form.cleaned_data['status'] == "A"):
                     approved_form = approveForm()
+                if (form.cleaned_data['status'] == "P"):
+                    the_request.status = "P"
+                    url = reverse(adminApproveCourses)
+                    messages.success(request, "Status successfully changed to pending.")
+                    return HttpResponseRedirect(url)
+
         if ('approve-submit' in request.POST):
             approved_form = approveForm(request.POST)
             if (approved_form.is_valid()):
