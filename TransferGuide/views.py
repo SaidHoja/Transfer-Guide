@@ -183,16 +183,15 @@ def submitViableCourse(request):
                 approved_course_lowest_grade = 70
                 if len(specific_requests) > 0:
                     uva_course = specific_requests.first().uva_course
-                    print(uva_course)
-                    print(uva_course.course_name)
-                    print(uva_course.course_dept)
-                    print(uva_course.course_num)
                     if translate_grade(course_grade) >= approved_course_lowest_grade:
                         num_of_transfer_courses += 1
                         new_course = {num_of_transfer_courses: {'transfer_course_institution': course_institution,
                                                                 'transfer_course_name': course_name,
                                                                 'transfer_course_dept': course_dept,
-                                                                'transfer_course_number': course_number}}
+                                                                'transfer_course_num': course_number,
+                                                                'uva_course_name':uva_course.course_name,
+                                                                'uva_course_dept':uva_course.course_dept,
+                                                                'uva_course_num':uva_course.course_num}}
                         accepted_courses.update(new_course)
             return render(request, 'TransferGuide/viableCourseList.html', {'accepted_courses': accepted_courses,
                                                                            'num_of_transfer_courses': num_of_transfer_courses,
@@ -218,6 +217,13 @@ def find_lowest_grade(approved_courses):
         if approved_course_grade < lowest_grade:
             lowest_grade = approved_course_grade
     return lowest_grade
+
+# def course_name_has_error(course_institution, course_name, course_dept, course_num):
+#     set_of_courses = Course.objects.filter(Q(course_institution__iexact=course_institution) &
+#                                            Q(course_dept__iexact=course_dept) & Q(course_name__iexact=course_name) &
+#                                            Q(course_num=course_num))
+#     if len(set_of_courses) > 0:
+#         course = set_of_courses.first():
 
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')
