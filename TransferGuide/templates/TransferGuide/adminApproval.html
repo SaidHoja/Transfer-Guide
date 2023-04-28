@@ -8,8 +8,17 @@
 
 
 {% block banner %}
-
-  <h1>Review Transfer Credit Requests</h1>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+    {% endfor %}
+{% endif %}
+<h1>Review Transfer Credit Requests</h1>
 
     {% if not user.is_authenticated %}
         <p>Welcome, please log in to continue!</p>
@@ -161,3 +170,5 @@
 </html>
 {% endif %}
 {% endblock %}
+
+
