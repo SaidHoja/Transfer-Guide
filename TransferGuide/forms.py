@@ -53,7 +53,7 @@ class sisForm(forms.Form):
     subject = forms.CharField(label='Subject', max_length=5, required = False,
                               widget=forms.TextInput(attrs={'placeholder': 'Enter "CS", "ENGL", "APMA", "CHEM".'}),
                               validators=[validate_one_word])
-    term = forms.CharField(max_length=6,widget=forms.Select(choices=[(8, "FALL"), (3, "SPRING")]))
+    term = forms.CharField(max_length=6,widget=forms.Select(choices=[(8, "FALL"), (2, "SPRING")]))
     YEAR_CHOICES = []
     for y in range(2000, (datetime.datetime.now().year + 1)):
         YEAR_CHOICES.append((y, y))
