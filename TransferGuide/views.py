@@ -259,7 +259,7 @@ def apiResult(request, term,instructor, subject):
         for item in display.get('headers'):
             rows[i].append(c[item])
     for elem in rows:
-        if (elem not in display.get('rows')):
+        if (elem not in display.get('rows') and elem[4]!=0):
             display.get('rows').append(elem)
     display['headers']= ['School','Subject','Course Number', 'Course Title', 'Credits' ]
     return render(request,'TransferGuide/searchResult.html', {'field': display})
