@@ -8,7 +8,7 @@ import json, requests
 from django.core.exceptions import PermissionDenied, ValidationError
 from oauth_app.models import UserType
 from .forms import requestCourseForm, sisForm, viableCourseFormSet
-from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm, editRoleForm, KnownTransferForm, approveForm
+from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm, editRoleForm, KnownTransferForm, approveForm,KnownApprovalForm, KnownDenialForm
 from .models import Course, Viable_Course, Request, UserType, User
 from .filters import OrderCourses
 import re
@@ -75,6 +75,7 @@ def requestCourse(request):
                 else:
                     r = Request(foreign_course=c, credit_hours=credit_hours)
                     r.save()
+            messages.success(request, "Course successfully submitted!")
             return HttpResponseRedirect('/')
     form = requestCourseForm()
     return render(request, 'TransferGuide/requestCourseForm.html', {'form': form})
@@ -258,15 +259,12 @@ def apiResult(request, term,instructor, subject):
         for item in display.get('headers'):
             rows[i].append(c[item])
     for elem in rows:
-        if (elem not in display.get('rows')):
+        if (elem not in display.get('rows') and elem[4]!=0):
             display.get('rows').append(elem)
     display['headers']= ['School','Subject','Course Number', 'Course Title', 'Credits' ]
     return render(request,'TransferGuide/searchResult.html', {'field': display})
 
 def adminApproveCourses(request):
-    if (UserType.objects.get(user=request.user).role != "Admin"):
-        raise PermissionDenied("Only admin users may access this page.")
-
     courses = Course.objects.filter()
     coursesFilter = OrderCourses(request.GET, queryset=courses)
     courses = coursesFilter.qs
@@ -285,36 +283,41 @@ def adminApproveCourses(request):
     return render(request, 'TransferGuide/adminApproval.html', { 'courses': courses, 'coursesFilter': coursesFilter , 'approvedRequests' :approvedRequests, 'deniedRequests' :deniedRequests,'pendingRequests' :pendingRequests})
 
 def requestPage(request, pk):
-    if (UserType.objects.get(user=request.user).role != "Admin"):
-        raise PermissionDenied("Only admin users may access this page.")
     form = statusForm()
     approved_form = None
     the_request = Request.objects.get(pk=pk)
     course = the_request.foreign_course
     if request.method == 'POST':
         if ('status-submit' in request.POST):
-            print("status submit part")
             form = statusForm(request.POST)
             if (form.is_valid()):
                 the_request.status = form.cleaned_data['status']
                 the_request.reviewed_by = request.user
                 the_request.save()
                 if (form.cleaned_data['status'] == "D_LowGrade" or form.cleaned_data['status'] == "D_BadFit"):
-                    print("denied part")
                     url = reverse(adminApproveCourses)
-                 #   messages.success(request, "Status succesfully changed to denied")
+                    messages.success(request, "Status successfully changed to denied.")
                     return HttpResponseRedirect(url)
                 if (form.cleaned_data['status'] == "A"):
-                    print("approved part")
                     approved_form = approveForm()
+                if (form.cleaned_data['status'] == "P"):
+                    the_request.status = "P"
+                    url = reverse(adminApproveCourses)
+                    messages.success(request, "Status successfully changed to pending.")
+                    return HttpResponseRedirect(url)
+
         if ('approve-submit' in request.POST):
-            approved_form = approveForm()
+            approved_form = approveForm(request.POST)
             if (approved_form.is_valid()):
-                the_request.credits_approved = form.cleaned_data['credits_approved']
-                the_request.uva_course = form.cleaned_data['equivalent']  # this line has gotta go but I don't know how
-                the_request.reviewer_comment = form.cleaned_data['reviewer_comment']  # uncomment when field is actually available
+                the_request.credits_approved = approved_form.cleaned_data['credits_approved']
+                the_request.uva_course = approved_form.cleaned_data['equivalent']  # this line has gotta go but I don't know how
+                the_request.reviewer_comment = approved_form.cleaned_data['reviewer_comment']  # uncomment when field is actually available
                 the_request.reviewed_by = request.user
                 the_request.save()
+                messages.success(request, 'Request status successfully changed to approved.')
+                url = reverse(adminApproveCourses)
+                print("got here")
+                return HttpResponseRedirect(url)
     return render(request, 'TransferGuide/requestPage.html', {'course': course, 'form':form, 'approveForm':approved_form})
 
 def searchForCourse(request):
@@ -467,3 +470,64 @@ def addKnownTransfer(request):
 
     return render(request, "TransferGuide/knownTransferForm.html", {"form":form})
 
+def addKnownTransferType(request):
+    form = ApproveOrDeny()
+    if (request.method == "POST"):
+        form = ApproveOrDeny(request.POST)
+        if (form.is_valid):
+            if (form.cleaned_data['approved_or_denied'] == "A"):
+                url = reverse(addKnownApproved)
+                return HttpResponseRedirect(url)
+            else:
+                url = reverse(addKnownDenied)
+                return HttpResponseRedirect(url)
+
+
+def addKnownDenied(request):
+    form = KnownDeniedForm()
+    if (request.method == "POST"):
+        form = KnownTransferForm(request.POST)
+        if (form.is_valid()):
+            the_request = Request()
+            new_course = Course()
+            new_course.username = request.user
+            new_course.course_institution = form.cleaned_data['course_institution']
+            new_course.course_name = form.cleaned_data['course_name']
+            new_course.course_dept = form.cleaned_data['course_dept']
+            new_course.course_number = form.cleaned_data['course_number']
+            new_course.course_grade = form.cleaned_data['course_grade']
+            new_course.course_delivery = form.cleaned_data['course_delivery']
+            new_course.syllabus_url = None
+            new_course.credit_hours = 0
+            new_course.save()
+            the_request.foreign_course = new_course
+            the_request.status = "D_BadFit"
+            the_request.credits_approved=form.cleaned_data['credits_approved']
+            the_request.uva_course = form.cleaned_data['equivalent']
+            the_request.reviewer_comment = form.cleaned_data['reviewer_comment']
+            the_request.save()
+
+def addKnownApproved(request):
+    form = KnownApprovalForm()
+    if (request.method == "POST"):
+        form = KnownTransferForm(request.POST)
+        if (form.is_valid()):
+            the_request = Request()
+            new_course = Course()
+            new_course.username = request.user
+            new_course.course_institution = form.cleaned_data['course_institution']
+            new_course.course_name = form.cleaned_data['course_name']
+            new_course.course_dept = form.cleaned_data['course_dept']
+            new_course.course_number = form.cleaned_data['course_number']
+            new_course.course_grade = form.cleaned_data['course_grade']
+            new_course.course_delivery = form.cleaned_data['course_delivery']
+            new_course.syllabus_url = None
+            new_course.credit_hours = form.cleaned_data['credit_hours']
+            new_course.save()
+            the_request.foreign_course = new_course
+            the_request.status = "A"
+            the_request.credits_approved=form.cleaned_data['credits_approved']
+            the_request.uva_course = form.cleaned_data['equivalent']
+            the_request.reviewer_comment = form.cleaned_data['reviewer_comment']
+            the_request.save()
+    return render(request,context={"form":form})
