@@ -160,6 +160,7 @@ def submitViableCourse(request):
             list_of_courses = []
             for form in formset:
                 course_institution = form.cleaned_data['course_institution']
+                course_name = form.cleaned_data['course_name']
                 course_dept = form.cleaned_data['course_dept']
                 course_number = form.cleaned_data['course_number']
                 query = course_institution + " " + course_dept + " " + str(course_number)
@@ -169,7 +170,10 @@ def submitViableCourse(request):
                     error = "At least two of the courses you inputted are duplicates. Please try again"
                     return render(request, 'TransferGuide/viableCourseForm.html', {'viable_course_formset': formset,
                                                                                    'error':error})
-            print(len(formset))
+                error = course_name_has_error(course_institution, course_name, course_dept, course_number)
+                if error != "":
+                    return render(request, 'TransferGuide/viableCourseForm.html', {'viable_course_formset': formset,
+                                                                                   'error': error})
             for form in formset:
                 course_institution = form.cleaned_data['course_institution']
                 course_name = form.cleaned_data['course_name']
@@ -218,12 +222,17 @@ def find_lowest_grade(approved_courses):
             lowest_grade = approved_course_grade
     return lowest_grade
 
-# def course_name_has_error(course_institution, course_name, course_dept, course_num):
-#     set_of_courses = Course.objects.filter(Q(course_institution__iexact=course_institution) &
-#                                            Q(course_dept__iexact=course_dept) & Q(course_name__iexact=course_name) &
-#                                            Q(course_num=course_num))
-#     if len(set_of_courses) > 0:
-#         course = set_of_courses.first():
+def course_name_has_error(course_institution, course_name, course_dept, course_num):
+    set_of_courses = Course.objects.filter(Q(course_institution__iexact=course_institution) &
+                                           Q(course_dept__iexact=course_dept) & Q(course_num=course_num))
+    error = ""
+    if len(set_of_courses) > 0:
+        course = set_of_courses.first()
+        if course.course_name.lower() != course_name.lower():
+            error = "It seems the course " + course_dept + " " + str(course_num) + " at " + course_institution +\
+                    " exists but the course name you entered is wrong. Did you mean to enter: " + course.course_name + \
+                    ", as the course_name?"
+    return error
 
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')
