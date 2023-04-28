@@ -182,11 +182,17 @@ def submitViableCourse(request):
                 specific_requests = specific_requests.filter(foreign_course__course_num=course_number)
                 approved_course_lowest_grade = 70
                 if len(specific_requests) > 0:
+                    uva_course = specific_requests.first().uva_course
+                    print(uva_course)
+                    print(uva_course.course_name)
+                    print(uva_course.course_dept)
+                    print(uva_course.course_num)
                     if translate_grade(course_grade) >= approved_course_lowest_grade:
                         num_of_transfer_courses += 1
-                        new_course = {num_of_transfer_courses: {'course_institution': course_institution,
-                                                                'course_name': course_name,
-                                                                'course_dept': course_dept, 'course_number': course_number}}
+                        new_course = {num_of_transfer_courses: {'transfer_course_institution': course_institution,
+                                                                'transfer_course_name': course_name,
+                                                                'transfer_course_dept': course_dept,
+                                                                'transfer_course_number': course_number}}
                         accepted_courses.update(new_course)
             return render(request, 'TransferGuide/viableCourseList.html', {'accepted_courses': accepted_courses,
                                                                            'num_of_transfer_courses': num_of_transfer_courses,
