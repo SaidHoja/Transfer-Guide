@@ -35,8 +35,9 @@
                     <tbody>
                         {% for course in accepted_courses.values %}
                             <tr>
-                                <td>{{ course.transfer_course_dept}}&nbsp{{course.transfer_course_number}} : {{course.transfer_course_name}}</td>
+                                <td>{{ course.transfer_course_dept}}&nbsp{{course.transfer_course_num}}: {{course.transfer_course_name}}</td>
                                 <td>{{ course.transfer_course_institution }}</td>
+                                <td> {{ course.uva_course_dept }}&nbsp{{ course.uva_course_num }}: {{ course.uva_course_name }} </td>
                             </tr>
                          {% endfor %}
                     </tbody>
