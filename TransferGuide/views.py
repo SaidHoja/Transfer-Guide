@@ -8,7 +8,7 @@ import json, requests
 from django.core.exceptions import PermissionDenied, ValidationError
 from oauth_app.models import UserType
 from .forms import requestCourseForm, sisForm, viableCourseFormSet
-from .forms import requestCourseForm, sisForm, statusForm, viableCourseForm, searchCourseForm, editRoleForm, KnownTransferForm, approveForm,KnownApprovalForm, KnownDenialForm
+from .forms import *
 from .models import Course, Viable_Course, Request, UserType, User
 from .filters import OrderCourses
 import re
@@ -285,6 +285,7 @@ def adminApproveCourses(request):
 def requestPage(request, pk):
     form = statusForm()
     approved_form = None
+    denied_form = None
     the_request = Request.objects.get(pk=pk)
     course = the_request.foreign_course
     if request.method == 'POST':
@@ -294,18 +295,24 @@ def requestPage(request, pk):
                 the_request.status = form.cleaned_data['status']
                 the_request.reviewed_by = request.user
                 the_request.save()
-                if (form.cleaned_data['status'] == "D_LowGrade" or form.cleaned_data['status'] == "D_BadFit"):
-                    url = reverse(adminApproveCourses)
-                    messages.success(request, "Status successfully changed to denied.")
-                    return HttpResponseRedirect(url)
+                if (form.cleaned_data['status'] == "D"):
+                    denied_form = denyForm()
                 if (form.cleaned_data['status'] == "A"):
                     approved_form = approveForm()
                 if (form.cleaned_data['status'] == "P"):
                     the_request.status = "P"
                     url = reverse(adminApproveCourses)
-                    messages.success(request, "Status successfully changed to pending.")
+                    messages.success(request, "Status successfully set to pending.")
                     return HttpResponseRedirect(url)
-
+        if ("deny-submit" in request.POST):
+            denied_form = denyForm(request.POST)
+            if denied_form.is_valid():
+                the_request.status = denied_form.cleaned_data['status']
+                the_request.reviewer_comment = denied_form.cleaned_data['reviewer_comment']
+                the_request.save()
+                url = reverse(adminApproveCourses)
+                messages.success(request, "Status successfully set to denied.")
+                return HttpResponseRedirect(url)
         if ('approve-submit' in request.POST):
             approved_form = approveForm(request.POST)
             if (approved_form.is_valid()):
@@ -314,11 +321,10 @@ def requestPage(request, pk):
                 the_request.reviewer_comment = approved_form.cleaned_data['reviewer_comment']  # uncomment when field is actually available
                 the_request.reviewed_by = request.user
                 the_request.save()
-                messages.success(request, 'Request status successfully changed to approved.')
+                messages.success(request, 'Request status successfully set to approved.')
                 url = reverse(adminApproveCourses)
-                print("got here")
                 return HttpResponseRedirect(url)
-    return render(request, 'TransferGuide/requestPage.html', {'course': course, 'form':form, 'approveForm':approved_form})
+    return render(request, 'TransferGuide/requestPage.html', {'course': course, 'form':form, 'approveForm':approved_form, "denyForm" : denied_form})
 
 def searchForCourse(request):
     form = searchCourseForm()
