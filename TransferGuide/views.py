@@ -464,15 +464,13 @@ def addKnownTransfer(request):
             new_course.course_number = form.cleaned_data['course_number']
             new_course.course_grade = form.cleaned_data['course_grade']
             new_course.course_delivery = form.cleaned_data['course_delivery']
-            new_course.syllabus_url = form.cleaned_data['syllabus_url']
-            new_course.credit_hours = form.cleaned_data['credit_hours']
             new_course.save()
             the_request.foreign_course = new_course
-            the_request.status = form.cleaned_data['status']
-            the_request.credits_approved=form.cleaned_data['credits_approved']
-            the_request.uva_course = form.cleaned_data['equivalent']
-            the_request.reviewer_comment = form.cleaned_data['reviewer_comment']
             the_request.save()
+            url = reverse(requestPage,args=[the_request.pk])
+            print("gothere")
+            print(url)
+            return HttpResponseRedirect(url)
 
     return render(request, "TransferGuide/knownTransferForm.html", {"form":form})
 
