@@ -21,27 +21,69 @@
 {% block content %}
 {% if user.is_authenticated and user.usertype.role != 'Student' %}
 <div class="container mt-5">
-
-    <p>    Username: {{course.username}} </p>
-    <p>   Student Name: {{course.username.first_name}} {{course.username.last_name}} </p>
-    <p>    Institution: {{course.course_institution}}</p>
-    <p>    Course Name: {{course.course_name}}</p>
-    <p>    Course Dept: {{course.course_dept}}</p>
-    <p>  Course Number: {{course.course_num}}</p>
-    <p>          Grade: {{course.course_grade}}</p>
-    <p>       Delivery: {{course.course_delivery}}</p>
-    <p>   Credit Hours: {{course.credit_hours}}</p>
+    <div class="row bi-align-center">
+        <div class="col-sm-5">
+    <table class = "table center table-striped table-bordered w-50">
+        <thead class = "thead-dark">
+            <tr>
+                <td> Request Information </td>
+            </tr>
+        </thead>
+        <tr>
+            <td>Submitter Username </td>
+            <td>{{course.username}}</td>
+        </tr>
+        <tr>
+            <td>Submitter Name </td>
+            <td>{{course.username.first_name}} {{course.username.last_name}}</td>
+        </tr>
+        <tr>
+            <td>Institution </td>
+            <td>{{course.course_institution}}</td>
+        </tr>
+        <tr>
+            <td>Course Name </td>
+            <td>{{course.course_name}}</td>
+        </tr>
+        <tr>
+            <td>Course Department </td>
+            <td>{{course.course_dept}}</td>
+        </tr>
+        <tr>
+            <td>Course Number </td>
+            <td>{{course.course_num}}</td>
+        </tr>
+        <tr>
+            <td>Grade Achieved </td>
+            <td>{{course.course_grade}}</td>
+        </tr>
+        <tr>
+            <td>Delivery Method </td>
+            <td>{{course.course_delivery}}</td>
+        </tr>
+        <tr>
+            <td>Credit Hours </td>
+            <td>{{course.credit_hours}}</td>
+        </tr>
+    </table>
+            </div>
 <!--    <p>Approval Status: {{course.status}}</p>-->
 <!--    <p>Equivalent UVA Course: {{course.equivalent}}</p>-->
 <!--    <p>Reason for Denying: {{course.why_denied}}</p>-->
 
- <div class="row">
-        <div class="col-sm-4">
+
+        <div class="col-sm-3">
             {% if approveForm%}
                 <form method = "POST">
                     {%csrf_token %}
                     {%bootstrap_form approveForm%}
                     <button type = "submit" class = "button btn-primary" name = "approve-submit">Submit</button>
+                </form>
+            {% elif denyForm %}
+                <form method = "POST">
+                    {%csrf_token %}
+                    {%bootstrap_form denyForm%}
+                    <button type = "submit" class = "button btn-primary" name = "deny-submit">Submit</button>
                 </form>
             {%else%}
                 <form method = "POST" >
@@ -52,7 +94,6 @@
             {%endif%}
         </div>
     </div>
-
 </div>
 
 {% endif %}
