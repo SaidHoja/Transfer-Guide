@@ -30,7 +30,12 @@ def requestCourse(request):
             course_delivery = form.cleaned_data['course_delivery']
             syllabus_url = form.cleaned_data['syllabus_url']
             credit_hours = form.cleaned_data['credit_hours']
-
+            error = course_name_has_error(course_institution, course_name, course_dept, course_number)
+            if error != "":
+                return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, "error":error})
+            error = credit_hour_has_erorr(course_institution, course_dept, course_number, credit_hours)
+            if error != "":
+                return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, "error": error})
             if userSubmittedCourse(username, course_dept, course_number, course_institution):
                 user_request = getUserRequest(username, course_dept, course_number, course_institution)
                 if user_request.status == 'A':
@@ -231,7 +236,19 @@ def course_name_has_error(course_institution, course_name, course_dept, course_n
         if course.course_name.lower() != course_name.lower():
             error = "It seems the course " + course_dept + " " + str(course_num) + " at " + course_institution +\
                     " exists but the course name you entered is wrong. Did you mean to enter: " + course.course_name + \
-                    ", as the course_name?"
+                    ", as the course name?"
+    return error
+
+def credit_hour_has_erorr(course_institution, course_dept, course_num, credit_hours):
+    set_of_courses = Course.objects.filter(Q(course_institution__iexact=course_institution) &
+                                           Q(course_dept__iexact=course_dept) & Q(course_num=course_num))
+    error = ""
+    if len(set_of_courses) > 0:
+        course = set_of_courses.first()
+        if course.credit_hours != credit_hours:
+            error = "It seems the course " + str(course_dept) + " " + str(course_num) + " at " + course_institution + \
+                    " exists but the number of credit hours you entered is wrong. Did you mean to enter: " + \
+                    str(course.credit_hours) + ", as the number of credit hours"
     return error
 
 def tryAgain(request):
