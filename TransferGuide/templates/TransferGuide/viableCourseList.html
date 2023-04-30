@@ -24,14 +24,24 @@
         <div id="acceptedData" >
         <strong>ACCEPTED COURSES HERE</strong>
             {% if accepted_courses %}
-            <ul>
-                {% for course in accepted_courses.values %}
-                    <div class="card-body">
-                        <h6 class="card-title">{{course.course_name}}</h6>
-                        <p class="card-text"> {{ course.course_institution }} <br> {{ course.course_dept}}&nbsp{{course.course_num}}</p>
-                    </div>
-                {% endfor %}
-            </ul>
+                <table class = "table table-striped table-bordered center" >
+                    <thead class = "thead-dark">
+                        <tr>
+                            <th>Transfer Course Name</th>
+                            <th>Transfer Institution</th>
+                            <th>Equivalent UVA Course</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in accepted_courses.values %}
+                            <tr>
+                                <td>{{ course.transfer_course_dept}}&nbsp{{course.transfer_course_num}}: {{course.transfer_course_name}}</td>
+                                <td>{{ course.transfer_course_institution }}</td>
+                                <td> {{ course.uva_course_dept }}&nbsp{{ course.uva_course_num }}: {{ course.uva_course_name }} </td>
+                            </tr>
+                         {% endfor %}
+                    </tbody>
+                </table>
              <p>Total number of courses that can transfer: {{num_of_transfer_courses}} / {{num_of_courses}} </p>
             {% else %}
                 <p>None of the courses you entered are accepted at this institution.</p>
