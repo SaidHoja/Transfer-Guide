@@ -30,7 +30,12 @@ def requestCourse(request):
             course_delivery = form.cleaned_data['course_delivery']
             syllabus_url = form.cleaned_data['syllabus_url']
             credit_hours = form.cleaned_data['credit_hours']
-
+            error = course_name_has_error(course_institution, course_name, course_dept, course_number)
+            if error != "":
+                return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, "error":error})
+            error = credit_hour_has_erorr(course_institution, course_dept, course_number, credit_hours)
+            if error != "":
+                return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, "error": error})
             if userSubmittedCourse(username, course_dept, course_number, course_institution):
                 user_request = getUserRequest(username, course_dept, course_number, course_institution)
                 if user_request.status == 'A':
@@ -160,6 +165,7 @@ def submitViableCourse(request):
             list_of_courses = []
             for form in formset:
                 course_institution = form.cleaned_data['course_institution']
+                course_name = form.cleaned_data['course_name']
                 course_dept = form.cleaned_data['course_dept']
                 course_number = form.cleaned_data['course_number']
                 query = course_institution + " " + course_dept + " " + str(course_number)
@@ -169,7 +175,10 @@ def submitViableCourse(request):
                     error = "At least two of the courses you inputted are duplicates. Please try again"
                     return render(request, 'TransferGuide/viableCourseForm.html', {'viable_course_formset': formset,
                                                                                    'error':error})
-            print(len(formset))
+                error = course_name_has_error(course_institution, course_name, course_dept, course_number)
+                if error != "":
+                    return render(request, 'TransferGuide/viableCourseForm.html', {'viable_course_formset': formset,
+                                                                                   'error': error})
             for form in formset:
                 course_institution = form.cleaned_data['course_institution']
                 course_name = form.cleaned_data['course_name']
@@ -182,11 +191,16 @@ def submitViableCourse(request):
                 specific_requests = specific_requests.filter(foreign_course__course_num=course_number)
                 approved_course_lowest_grade = 70
                 if len(specific_requests) > 0:
+                    uva_course = specific_requests.first().uva_course
                     if translate_grade(course_grade) >= approved_course_lowest_grade:
                         num_of_transfer_courses += 1
-                        new_course = {num_of_transfer_courses: {'course_institution': course_institution,
-                                                                'course_name': course_name,
-                                                                'course_dept': course_dept, 'course_number': course_number}}
+                        new_course = {num_of_transfer_courses: {'transfer_course_institution': course_institution,
+                                                                'transfer_course_name': course_name,
+                                                                'transfer_course_dept': course_dept,
+                                                                'transfer_course_num': course_number,
+                                                                'uva_course_name':uva_course.course_name,
+                                                                'uva_course_dept':uva_course.course_dept,
+                                                                'uva_course_num':uva_course.course_num}}
                         accepted_courses.update(new_course)
             return render(request, 'TransferGuide/viableCourseList.html', {'accepted_courses': accepted_courses,
                                                                            'num_of_transfer_courses': num_of_transfer_courses,
@@ -212,6 +226,30 @@ def find_lowest_grade(approved_courses):
         if approved_course_grade < lowest_grade:
             lowest_grade = approved_course_grade
     return lowest_grade
+
+def course_name_has_error(course_institution, course_name, course_dept, course_num):
+    set_of_courses = Course.objects.filter(Q(course_institution__iexact=course_institution) &
+                                           Q(course_dept__iexact=course_dept) & Q(course_num=course_num))
+    error = ""
+    if len(set_of_courses) > 0:
+        course = set_of_courses.first()
+        if course.course_name.lower() != course_name.lower():
+            error = "It seems the course " + course_dept + " " + str(course_num) + " at " + course_institution +\
+                    " exists but the course name you entered is wrong. Did you mean to enter: " + course.course_name + \
+                    ", as the course name?"
+    return error
+
+def credit_hour_has_erorr(course_institution, course_dept, course_num, credit_hours):
+    set_of_courses = Course.objects.filter(Q(course_institution__iexact=course_institution) &
+                                           Q(course_dept__iexact=course_dept) & Q(course_num=course_num))
+    error = ""
+    if len(set_of_courses) > 0:
+        course = set_of_courses.first()
+        if course.credit_hours != credit_hours:
+            error = "It seems the course " + str(course_dept) + " " + str(course_num) + " at " + course_institution + \
+                    " exists but the number of credit hours you entered is wrong. Did you mean to enter: " + \
+                    str(course.credit_hours) + ", as the number of credit hours"
+    return error
 
 def tryAgain(request):
     return render(request, 'TransferGuide/tryAgain.html')
