@@ -33,6 +33,14 @@
 {% block content %}
 {% if user.is_authenticated and user.usertype.role == 'Admin' %}
 <html>
+<style>
+    table {
+        table-layout: fixed;
+      }
+    table td {
+        word-wrap: break-word;
+      }
+</style>
 <div class="container mt-5">
     <div class = "card card-body" >
         <form method = "get">
