@@ -265,24 +265,27 @@ def SISFormHandler(request):
             term = "1" + str(form.cleaned_data['year'][-2:]) + str(form.cleaned_data['term'])
             instructor = "None"
             subject = "None"
+            page = 1
             if (form.cleaned_data['instructor']!=""):
                 instructor = str(form.cleaned_data['instructor'])
             if (form.cleaned_data['subject']!=""):
                 subject = str(form.cleaned_data['subject']).upper()
 
-            return redirect('apiResult',term=term,instructor=instructor,subject=subject )
+            return redirect('apiResult',term=term,instructor=instructor,subject=subject,page=page )
     return render(request,'TransferGuide/sisForm.html', context = {'form':form})
 
-def generateURL(term,instructor,subject):
+def generateURL(term,instructor,subject,page):
     url = api_default_url + "&term=" + term
     if (instructor != "None"):
         url += "&instructor_name=" + instructor
     if (subject != "None"):
         url += "&subject=" + subject
+    if (page != None):
+        url += "&page=" + str(page)
     return url
-def apiResult(request, term,instructor, subject):
-    url = generateURL(term,instructor,subject)
- #   print(url)
+def apiResult(request, term,instructor, subject,page):
+    url = generateURL(term,instructor,subject,page)
+    print(url)
 
     result = requests.get(url)
     resultDict = result.json()
@@ -297,10 +300,11 @@ def apiResult(request, term,instructor, subject):
         for item in display.get('headers'):
             rows[i].append(c[item])
     for elem in rows:
-        if (elem not in display.get('rows') and elem[4]!=0):
+        if (elem not in display.get('rows') and elem[4] != "0"):
             display.get('rows').append(elem)
+        print(elem)
     display['headers']= ['School','Subject','Course Number', 'Course Title', 'Credits' ]
-    return render(request,'TransferGuide/searchResult.html', {'field': display})
+    return render(request,'TransferGuide/searchResult.html', {'field': display, 'page': page})
 
 def adminApproveCourses(request):
     courses = Course.objects.filter()
@@ -573,3 +577,9 @@ def addKnownApproved(request):
             the_request.reviewer_comment = form.cleaned_data['reviewer_comment']
             the_request.save()
     return render(request,context={"form":form})
+
+def UVAEquivalents(request,dept,num):
+    dept_num = dept + " " + str(num)
+    request_qs = return_transfer_courses(dept_num=dept_num,institution="No Preference",word="",approved_requests = Request.objects.filter(Q(status='A') | Q(status='D_LowGrade')))
+    print(dept_num)
+    return render(request,'TransferGuide/uvaEquivalentCourses.html',context =  {"courseDept": dept, "courseNum": num, "requests": request_qs })
