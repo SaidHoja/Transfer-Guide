@@ -30,7 +30,7 @@ urlpatterns = [
     # path('tryAgain/', views.tryAgain, name="tryAgain"),
     # path('requestCourseList', views.requestCourseList, name='requestCourseList'),
     path('sisRequest', views.SISFormHandler, name = 'sisFormHandler'),
-    path('sisRequest/<str:term>/<str:instructor>/<str:subject>/', views.apiResult, name='apiResult'),
+    path('sisRequest/<str:term>/<str:instructor>/<str:subject>/<int:page>', views.apiResult, name='apiResult'),
     path('adminApproval/',views.adminApproveCourses, name = 'adminApproveCourses'),
     path('request/<int:pk>/', views.requestPage, name = 'requestPage'),
     path('submitViableCourse/', views.submitViableCourse, name = 'submitViableCourse'),
@@ -38,6 +38,7 @@ urlpatterns = [
     path('searchForCourse/', views.searchForCourse, name = 'searchForCourse'),
     path('userList/', views.allUsers, name = "userList"),
     path('userList/<int:pk>', views.allUsers, name="userList"),
-    path('knownTransfer/', views.addKnownTransfer, name = "addKnownTransfer")
+    path('knownTransfer/', views.addKnownTransfer, name = "addKnownTransfer"),
+    path('uvaEquivalents/<str:dept>/<int:num>',views.UVAEquivalents , name = "uvaEquivalents"),
 
 ]
