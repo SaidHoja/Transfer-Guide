@@ -39,6 +39,6 @@ urlpatterns = [
     path('userList/', views.allUsers, name = "userList"),
     path('userList/<int:pk>', views.allUsers, name="userList"),
     path('knownTransfer/', views.addKnownTransfer, name = "addKnownTransfer"),
-    path('uvaEquivalents/<str:dept>/<int:num>',views.UVAEquivalents , name = "uvaEquivalents"),
+    path('uvaEquivalents/<str:dept>/<str:num>',views.UVAEquivalents , name = "uvaEquivalents"),
 
 ]
