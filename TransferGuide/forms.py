@@ -61,7 +61,7 @@ class sisForm(forms.Form):
         YEAR_CHOICES.append((y, y))
     year= forms.CharField(max_length=4, widget=forms.Select(choices=YEAR_CHOICES))
     instructor = forms.CharField(max_length=20, required = False,
-                                 widget=forms.TextInput(attrs={'placeholder': 'Enter last name of instructor.'}),
+                                 widget=forms.TextInput(attrs={'placeholder': 'Enter last name of instructor. For example, to see classes taught by Mark Floryan, enter Floryan.'}),
                                  validators=[validate_one_word])
 
 class approveForm(forms.Form):
