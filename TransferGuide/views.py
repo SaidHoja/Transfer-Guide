@@ -161,7 +161,7 @@ def submitViableCourse(request):
     formset = viableCourseFormSet()
     num_of_courses = 0
     num_of_transfer_courses = 0
-    approved_requests = Request.objects.filter(Q(status='A') | Q(status='D_LowGrade'))
+    approved_requests = Request.objects.filter(Q(status='A'))
     accepted_courses = {}
     error = ""
     if request.method == 'POST':
@@ -196,6 +196,7 @@ def submitViableCourse(request):
                 specific_requests = specific_requests.filter(foreign_course__course_num=course_number)
                 approved_course_lowest_grade = 70
                 if len(specific_requests) > 0:
+                    print(specific_requests.first())
                     uva_course = specific_requests.first().uva_course
                     if translate_grade(course_grade) >= approved_course_lowest_grade:
                         num_of_transfer_courses += 1
