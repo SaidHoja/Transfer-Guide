@@ -42,6 +42,7 @@ def requestCourse(request):
                 return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, "error": error})
             if userSubmittedCourse(username, course_dept, course_number, course_institution):
                 user_request = getUserRequest(username, course_dept, course_number, course_institution)
+                print(user_request)
                 if user_request.status == 'A':
                     if translate_grade(course_grade) < 70:
                         user_request.status = 'D_LowGrade'
@@ -111,9 +112,9 @@ def userSubmittedCourse(username, course_dept, course_num, course_institution):
     return len(user_courses) > 0
 
 def getUserRequest(username, course_dept, course_num, course_institution):
-    user_request = Request.objects.filter(Q(foreign_course__username=username) & Q(foreign_course__course_dept=course_dept),
+    user_request = Request.objects.filter(Q(foreign_course__username=username) & Q(foreign_course__course_dept__iexact=course_dept),
                                           Q(foreign_course__course_num=course_num) &
-                                          Q(foreign_course__course_institution=course_institution))
+                                          Q(foreign_course__course_institution__iexact=course_institution))
     return user_request.first()
 
 def doesCourseExist(user_courses, course_dept, course_num, course_institution):
