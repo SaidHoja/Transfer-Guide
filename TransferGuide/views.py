@@ -30,6 +30,10 @@ def requestCourse(request):
             course_delivery = form.cleaned_data['course_delivery']
             syllabus_url = form.cleaned_data['syllabus_url']
             credit_hours = form.cleaned_data['credit_hours']
+
+            if course_institution.upper() == "UNIVERSITY OF VIRGINIA":
+                error = "You cannot submit a UVA-taught course as a transfer course"
+                return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, "error": error})
             error = course_name_has_error(course_institution, course_name, course_dept, course_number)
             if error != "":
                 return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, "error":error})
@@ -38,6 +42,7 @@ def requestCourse(request):
                 return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, "error": error})
             if userSubmittedCourse(username, course_dept, course_number, course_institution):
                 user_request = getUserRequest(username, course_dept, course_number, course_institution)
+                print(user_request)
                 if user_request.status == 'A':
                     if translate_grade(course_grade) < 70:
                         user_request.status = 'D_LowGrade'
@@ -62,19 +67,17 @@ def requestCourse(request):
                                     reviewer_comment="Autodeclined - grade is too low")
                         r.save()
                 elif wasCourseDenied(course_dept, course_number, course_institution):
-                    # print("course denied")
-                    uva_course = getUVACourse(course_dept, course_number, course_institution)
                     if deniedDueToLowGrade(course_dept, course_number, course_institution):
                         if translate_grade(course_grade) >= 70:
-                            r = Request(uva_course=uva_course, foreign_course=c, status='A', credit_hours=credit_hours,
-                                        reviewer_comment="Autoapproved - grade is sufficient")
+                            r = Request(foreign_course=c, status='P', credit_hours=credit_hours,
+                                        reviewer_comment="Credit should be approved but waiting for reviewer to assign equivalent UVA course")
                             r.save()
                         else:
-                            r = Request(uva_course=uva_course, foreign_course=c, status='D_LowGrade', credit_hours=credit_hours,
+                            r = Request(foreign_course=c, status='D_LowGrade', credit_hours=credit_hours,
                                         reviewer_comment="Autodeclined - grade is too low")
                             r.save()
                     else:
-                        r = Request(uva_course=uva_course, foreign_course=c, status='D_BadFit', credit_hours=credit_hours,
+                        r = Request(foreign_course=c, status='D_BadFit', credit_hours=credit_hours,
                                     reviewer_comment="Autodeclined - course does not align with UVA's educational values")
                         r.save()
                 else:
@@ -107,9 +110,9 @@ def userSubmittedCourse(username, course_dept, course_num, course_institution):
     return len(user_courses) > 0
 
 def getUserRequest(username, course_dept, course_num, course_institution):
-    user_request = Request.objects.filter(Q(foreign_course__username=username) & Q(foreign_course__course_dept=course_dept),
+    user_request = Request.objects.filter(Q(foreign_course__username=username) & Q(foreign_course__course_dept__iexact=course_dept),
                                           Q(foreign_course__course_num=course_num) &
-                                          Q(foreign_course__course_institution=course_institution))
+                                          Q(foreign_course__course_institution__iexact=course_institution))
     return user_request.first()
 
 def doesCourseExist(user_courses, course_dept, course_num, course_institution):
@@ -156,7 +159,7 @@ def submitViableCourse(request):
     formset = viableCourseFormSet()
     num_of_courses = 0
     num_of_transfer_courses = 0
-    approved_requests = Request.objects.filter(Q(status='A') | Q(status='D_LowGrade'))
+    approved_requests = Request.objects.filter(Q(status='A'))
     accepted_courses = {}
     error = ""
     if request.method == 'POST':
@@ -191,6 +194,7 @@ def submitViableCourse(request):
                 specific_requests = specific_requests.filter(foreign_course__course_num=course_number)
                 approved_course_lowest_grade = 70
                 if len(specific_requests) > 0:
+                    print(specific_requests.first())
                     uva_course = specific_requests.first().uva_course
                     if translate_grade(course_grade) >= approved_course_lowest_grade:
                         num_of_transfer_courses += 1
@@ -444,11 +448,12 @@ def index(request):
         username = request.user
         user = UserType.objects.filter(user=username)
         user = user.filter(role='Admin')
-        if len(user) == 1:
+        if len(user) == 1: # user is an admin
             own_requests = Request.objects.filter(reviewed_by=username)
+            pending_requests = Request.objects.filter(status="P")
         else:
             own_requests = Request.objects.filter(foreign_course__username=username)
-        pending_requests = own_requests.filter(status='P')
+            pending_requests = own_requests.filter(status='P')
         accepted_requests = own_requests.filter(status='A')
         denied_requests = own_requests.filter(Q(status='D_BadFit') | Q(status='D_LowGrade'))
         return render(request, 'index.html', {'pending_requests': pending_requests, 'accepted_requests': accepted_requests,
