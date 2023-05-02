@@ -30,6 +30,10 @@ def requestCourse(request):
             course_delivery = form.cleaned_data['course_delivery']
             syllabus_url = form.cleaned_data['syllabus_url']
             credit_hours = form.cleaned_data['credit_hours']
+
+            if course_institution.upper() == "UNIVERSITY OF VIRGINIA":
+                error = "You cannot submit a UVA-taught course as a transfer course"
+                return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, "error": error})
             error = course_name_has_error(course_institution, course_name, course_dept, course_number)
             if error != "":
                 return render(request, 'TransferGuide/requestCourseForm.html', {'form': form, "error":error})
