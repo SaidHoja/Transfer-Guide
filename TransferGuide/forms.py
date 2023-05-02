@@ -173,17 +173,13 @@ class KnownTransferForm(forms.Form):
     course_name = forms.CharField(max_length = 100, required = True)
     course_dept = forms.CharField(max_length=5, validators=[validate_one_word], required = True)
     course_number = forms.IntegerField(min_value=0, max_value=9999, required = True)
-    course_grade = forms.CharField(label = "Minimum grade", max_length=1,widget=forms.Select(choices=[('A','A'),('B','B'),('C','C'),('D','D'),
-                                                                             ('F','F')]))
     course_delivery = forms.CharField(max_length=10, widget=forms.Select(choices=[('IN-PERSON','IN-PERSON'), (
         'ONLINE','ONLINE')]))
 
 
 class KnownApprovalForm:
 
-    course_grade = forms.CharField(label="Minimum grade", max_length=1, required = True,
-                                   widget=forms.Select(choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D'),
-                                                                ('F', 'F')]))
+
     course_delivery = forms.CharField(max_length=10, required=  True, widget=forms.Select(choices=[('IN-PERSON', 'IN-PERSON'), (
         'ONLINE', 'ONLINE')]))
     credits_approved = forms.IntegerField(label="Approve for how many credits?", required = True, min_value = 0 )
