@@ -36,7 +36,7 @@ class requestCourseForm(forms.Form):
                                                                              ('F','F')]))
     course_delivery = forms.CharField(max_length=10, widget=forms.Select(choices=[('IN-PERSON','IN-PERSON'), (
         'ONLINE','ONLINE')]))
-    syllabus_url = forms.URLField(widget=forms.TextInput(attrs={'placeholder': 'Enter homepage of course or link to syllabus.'}))
+    syllabus_url = forms.URLField(label='URL course\'s home page or course syllabus', widget=forms.TextInput(attrs={'placeholder': 'Enter homepage of course or link to syllabus.'}))
     credit_hours = forms.IntegerField(min_value=0, max_value=10)
 
 class viableCourseForm(forms.Form):
