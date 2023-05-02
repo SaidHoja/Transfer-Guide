@@ -13,7 +13,7 @@
     {% elif user.usertype.role == 'Admin' %}
         <p>Welcome {{ user.username }}, Admins do not have access to this page. Did you mean to go to the Review Course Requests page </p>
     {% else %}
-         <p>{{ user.username }}, you can request a non-UVA course for UVA credit through this page</p>
+         <p>{{ user.username }}, you can see which courses in your schedule/transcript transfer.</p>
     {% endif %}
 
 {% endblock %}
@@ -47,6 +47,7 @@
                 {% for form in viable_course_formset %}
                     <div class="viable-course-form">
                         <div class="card-body">
+                            <p><strong>Course {{ forloop.counter }}</strong></p>
                             {% for field in form %}
                               <div class="form-group{% if field.errors %} has-error{% endif %}">
                                   {{ field.label_tag }}
@@ -92,6 +93,8 @@
 
                 formNum++
                 newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`)
+                newForm.querySelector('p').textContent = `Course ${formNum+1}`; // update course number title
+                newForm.querySelector('p').style.fontWeight = 'bold';
                 container.insertBefore(newForm, addButton)
 
                 totalForms.setAttribute('value', `${formNum+1}`)
