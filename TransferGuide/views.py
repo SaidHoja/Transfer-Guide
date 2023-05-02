@@ -67,19 +67,17 @@ def requestCourse(request):
                                     reviewer_comment="Autodeclined - grade is too low")
                         r.save()
                 elif wasCourseDenied(course_dept, course_number, course_institution):
-                    # print("course denied")
-                    uva_course = getUVACourse(course_dept, course_number, course_institution)
                     if deniedDueToLowGrade(course_dept, course_number, course_institution):
                         if translate_grade(course_grade) >= 70:
-                            r = Request(uva_course=uva_course, foreign_course=c, status='A', credit_hours=credit_hours,
-                                        reviewer_comment="Autoapproved - grade is sufficient")
+                            r = Request(foreign_course=c, status='P', credit_hours=credit_hours,
+                                        reviewer_comment="Credit should be approved but waiting for reviewer to assign equivalent UVA course")
                             r.save()
                         else:
-                            r = Request(uva_course=uva_course, foreign_course=c, status='D_LowGrade', credit_hours=credit_hours,
+                            r = Request(foreign_course=c, status='D_LowGrade', credit_hours=credit_hours,
                                         reviewer_comment="Autodeclined - grade is too low")
                             r.save()
                     else:
-                        r = Request(uva_course=uva_course, foreign_course=c, status='D_BadFit', credit_hours=credit_hours,
+                        r = Request(foreign_course=c, status='D_BadFit', credit_hours=credit_hours,
                                     reviewer_comment="Autodeclined - course does not align with UVA's educational values")
                         r.save()
                 else:
