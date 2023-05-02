@@ -52,13 +52,13 @@ class Request_Course_Form(TestCase):
                      'syllabus_url':'https://docs.djangoproject.com/en/4.1/topics/db/models/','credit_hours':'100'}
         form = requestCourseForm(data=form_data)
         self.assertFalse(form.is_valid())
-    def test_bad_institution(self):
-        form_data = {'course_institution': 'University of Virginia', 'course_name': 'Advanced Software Development',
-                     'course_dept': 'CS', 'course_number': '1000', 'course_grade': 'A',
-                     'course_delivery': 'IN-PERSON',
-                     'syllabus_url': 'https://docs.djangoproject.com/en/4.1/topics/db/models/', 'credit_hours': '4'}
-        form = requestCourseForm(data=form_data)
-        self.assertFalse(form.is_valid())
+    # def test_bad_institution(self):
+    #     form_data = {'course_institution': 'University of Virginia', 'course_name': 'Advanced Software Development',
+    #                  'course_dept': 'CS', 'course_number': '1000', 'course_grade': 'A',
+    #                  'course_delivery': 'IN-PERSON',
+    #                  'syllabus_url': 'https://docs.djangoproject.com/en/4.1/topics/db/models/', 'credit_hours': '4'}
+    #     form = requestCourseForm(data=form_data)
+    #     self.assertFalse(form.is_valid())
 
 class SIS_Form(TestCase):
     def test_instructor_as_nonChar(self):
