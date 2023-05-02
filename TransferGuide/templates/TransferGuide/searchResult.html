@@ -55,8 +55,16 @@
         </div>
     </div>
     {% else %}
-    <p>Sorry, no courses matching the search criteria were found. <a href = '../../../../sisRequest'>Try again?</a></p>
+    {% if page == 1 %}
+        <p>Sorry, no courses matching the search criteria were found. <a href = '../../../../sisRequest'>Try another search?</a></p>
+    {%else%}
+        <p>Sorry, no further courses where found. <a href = '../../../../sisRequest'>Try another search?</a></p>
 
+    <div class="d-flex justify-content-between">
+       <div class = "p-2 bd-highlight">
+            <a class = "btn btn-primary" href = '{{page|add:"-1"}}'>Previous Page</a>
+    </div>
+    {% endif %}
     {% endif %}
 
 </div>
