@@ -21,8 +21,10 @@ def validate_non_uva(value):
         raise ValidationError("Please enter a non-UVA course.")
 
 def validate_is_a_word(value):
-    if not value.isalpha():
-        raise ValidationError("Please enter a valid word. Uses characters A-Z")
+    words = value.split()
+    for word in words:
+        if not word.isalpha():
+            raise ValidationError("Please enter a valid word. Uses characters A-Z")
 
 class requestCourseForm(forms.Form):
     course_institution = forms.CharField(max_length=100, validators=[validate_non_uva],
@@ -60,7 +62,7 @@ class sisForm(forms.Form):
     year= forms.CharField(max_length=4, widget=forms.Select(choices=YEAR_CHOICES))
     instructor = forms.CharField(max_length=20, required = False,
                                  widget=forms.TextInput(attrs={'placeholder': 'Enter last name of instructor.'}),
-                                 validators=[validate_is_a_word])
+                                 validators=[validate_one_word])
 
 class approveForm(forms.Form):
     credits_approved = forms.IntegerField(label = "Approve for how many credits?", min_value = 0, required=True)
