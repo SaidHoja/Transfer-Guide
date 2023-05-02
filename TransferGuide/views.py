@@ -504,7 +504,7 @@ def addKnownTransfer(request):
             new_course.course_institution = form.cleaned_data['course_institution']
             new_course.course_name = form.cleaned_data['course_name']
             new_course.course_dept = form.cleaned_data['course_dept']
-            new_course.course_number = form.cleaned_data['course_number']
+            new_course.course_num = form.cleaned_data['course_number']
             new_course.course_grade = "C"
             new_course.course_delivery = form.cleaned_data['course_delivery']
             new_course.save()
