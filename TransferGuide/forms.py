@@ -21,12 +21,13 @@ def validate_non_uva(value):
         raise ValidationError("Please enter a non-UVA course.")
 
 def validate_is_a_word(value):
-    if not value.isalpha():
-        raise ValidationError("Please enter a valid word. Uses characters A-Z")
+    words = value.split()
+    for word in words:
+        if not word.isalpha():
+            raise ValidationError("Please enter a valid word. Uses characters A-Z")
 
 class requestCourseForm(forms.Form):
-    course_institution = forms.CharField(max_length=100, validators=[validate_non_uva],
-                                         widget=forms.TextInput(attrs={'placeholder': 'Enter the instutition your course is from.'}))
+    course_institution = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Enter the instutition your course is from.'}))
     course_name = forms.CharField(max_length = 100, widget=forms.TextInput(attrs={'placeholder': 'Enter the name of your course'}))
     course_dept = forms.CharField(label="Course department",max_length=5, validators=[validate_one_word], widget=forms.TextInput(attrs={'placeholder': 'Example: enter MATH for transfer course MATH 1000'}))
     course_number = forms.IntegerField(min_value=0, max_value=9999)
@@ -34,7 +35,7 @@ class requestCourseForm(forms.Form):
                                                                              ('F','F')]))
     course_delivery = forms.CharField(max_length=10, widget=forms.Select(choices=[('IN-PERSON','IN-PERSON'), (
         'ONLINE','ONLINE')]))
-    syllabus_url = forms.URLField(widget=forms.TextInput(attrs={'placeholder': 'Enter homepage of course or link to syllabus.'}))
+    syllabus_url = forms.URLField(label='URL course\'s home page or course syllabus', widget=forms.TextInput(attrs={'placeholder': 'Enter homepage of course or link to syllabus.'}))
     credit_hours = forms.IntegerField(min_value=0, max_value=10)
 
 class viableCourseForm(forms.Form):
@@ -59,8 +60,8 @@ class sisForm(forms.Form):
         YEAR_CHOICES.append((y, y))
     year= forms.CharField(max_length=4, widget=forms.Select(choices=YEAR_CHOICES))
     instructor = forms.CharField(max_length=20, required = False,
-                                 widget=forms.TextInput(attrs={'placeholder': 'Enter last name of instructor.'}),
-                                 validators=[validate_is_a_word])
+                                 widget=forms.TextInput(attrs={'placeholder': 'Enter last name of instructor. For example, to see classes taught by Mark Floryan, enter Floryan.'}),
+                                 validators=[validate_one_word])
 
 class approveForm(forms.Form):
     credits_approved = forms.IntegerField(label = "Approve for how many credits?", min_value = 0, required=True)

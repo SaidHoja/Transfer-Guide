@@ -49,8 +49,8 @@
                     <ul>
                         {% for request in pending_requests %}
                         <div class="card-body" style="word-wrap: break-word;">
-                        <h6 class="card-title">{{request.foreign_course.course_name}}</h6>
-                        <p class="card-text">{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
+                            <h6 class="card-title">{{request.foreign_course.course_name}}</h6>
+                            <p class="card-text">{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
                         </div>
                         {% endfor %}
                     </ul>
@@ -73,8 +73,11 @@
                     <ul>
                         {% for request in accepted_requests %}
                         <div class="card-body" style="word-wrap: break-word;">
-                        <h6 class="card-title">{{request.foreign_course.course_name}}</h6>
-                        <p class="card-text">{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
+                            <h6 class="card-title">{{request.foreign_course.course_name}}</h6>
+                            <p class="card-text">{{request.foreign_course.course_institution }}<br>
+                                {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}<br>
+                                {{request.reviewer_comment}}
+                            </p>
                         </div>
                         {% endfor %}
                     </ul>
@@ -97,8 +100,11 @@
                     <ul>
                         {% for request in denied_requests %}
                         <div class="card-body" style="word-wrap: break-word;">
-                        <h6 class="card-title">{{request.foreign_course.course_name}}</h6>
-                        <p class="card-text">{{request.foreign_course.course_institution }} <br> {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}</p>
+                            <h6 class="card-title">{{request.foreign_course.course_name}}</h6>
+                            <p class="card-text">{{request.foreign_course.course_institution }}<br>
+                                {{request.foreign_course.course_dept}}&nbsp;{{request.foreign_course.course_num}}<br>
+                                {{request.reviewer_comment}}
+                            </p>
                         </div>
                         {% endfor %}
                     </ul>
