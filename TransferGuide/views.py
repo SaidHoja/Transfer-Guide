@@ -465,7 +465,7 @@ def allUsers(request):
     #if (UserType.objects.get(user=request.user).role != "Admin"):
         #raise PermissionDenied("Only admin users may access this page.")
 
-    users = User.objects.all()
+    users = [request.user]
     userToType = {}
     userForm = editRoleForm()
     if (request.method == "POST"):
